@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bumble France | Rencontres, amitiés et réseautage</title>
+<meta name="description" content="Sur Bumble, faites le premier pas. Rencontres amoureuses, nouvelles amitiés et réseautage professionnel — en toute bienveillance.">
+<!-- Reproduction non officielle de la page d'accueil bumble.com/fr, réalisée à des fins de démonstration technique. Aucune affiliation avec Bumble Inc. -->
+<style>
+  :root{
+    --yellow:#FFC629;
+    --yellow-soft:#FFDD75;
+    --yellow-pale:#FFF3D0;
+    --ink:#20160F;
+    --ink-soft:#4A3B31;
+    --white:#FFFFFF;
+    --cream:#FDF8EF;
+    --grey:#8A7F76;
+    --line:rgba(32,22,15,.12);
+    --radius:22px;
+    --shadow:0 18px 45px rgba(32,22,15,.14);
+    --font:'Avenir Next','Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--font);color:var(--ink);background:var(--white);line-height:1.55;-webkit-font-smoothing:antialiased}
+  img,svg{max-width:100%;display:block}
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  .wrap{width:min(1180px,92%);margin-inline:auto}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:700;font-size:1rem;
+       padding:.85rem 1.9rem;border-radius:999px;border:2px solid transparent;cursor:pointer;
+       transition:transform .15s ease, box-shadow .15s ease, background .15s ease;white-space:nowrap}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(32,22,15,.18)}
+  .btn-primary{background:var(--ink);color:var(--yellow)}
+  .btn-outline{border-color:var(--ink);color:var(--ink);background:transparent}
+  .btn-yellow{background:var(--yellow);color:var(--ink)}
+  .eyebrow{display:inline-block;font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--ink-soft);background:var(--yellow-pale);padding:.35rem .9rem;border-radius:999px;margin-bottom:1rem}
+  h1,h2,h3{line-height:1.12;letter-spacing:-.015em}
+  h2{font-size:clamp(1.9rem,3.6vw,2.8rem);font-weight:800}
+  .section{padding:5.5rem 0}
+  .section-head{max-width:640px;margin-bottom:3rem}
+  .section-head p{color:var(--ink-soft);font-size:1.08rem;margin-top:.9rem}
+
+  /* ---------- Header ---------- */
+  header{position:sticky;top:0;z-index:50;background:var(--yellow);border-bottom:1px solid rgba(32,22,15,.08)}
+  .nav{display:flex;align-items:center;gap:2rem;height:76px}
+  .logo{display:flex;align-items:center;gap:.55rem;font-weight:900;font-size:1.5rem;letter-spacing:-.02em}
+  .logo svg{width:34px;height:34px}
+  nav.menu{display:flex;gap:1.6rem;margin-inline:auto}
+  nav.menu a{font-weight:700;font-size:.98rem;padding:.4rem 0;position:relative}
+  nav.menu a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:3px;background:var(--ink);border-radius:2px;transition:right .2s ease}
+  nav.menu a:hover::after{right:0}
+  .nav-actions{display:flex;gap:.8rem;align-items:center}
+  .burger{display:none;background:none;border:none;cursor:pointer;padding:.4rem}
+  .burger span{display:block;width:26px;height:3px;background:var(--ink);border-radius:2px;margin:5px 0;transition:.25s}
+  .mobile-menu{display:none;background:var(--yellow);padding:1rem 0 2rem;border-bottom:1px solid rgba(32,22,15,.1)}
+  .mobile-menu.open{display:block}
+  .mobile-menu a{display:block;padding:.8rem 0;font-weight:700;font-size:1.1rem;border-bottom:1px solid rgba(32,22,15,.08)}
+
+  /* ---------- Hero ---------- */
+  .hero{background:var(--yellow);overflow:hidden;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center;padding:4.5rem 0 6rem}
+  .hero h1{font-size:clamp(2.6rem,5.6vw,4.4rem);font-weight:900}
+  .hero p.lead{font-size:1.22rem;color:var(--ink-soft);margin:1.4rem 0 2.2rem;max-width:32rem}
+  .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+  .store-badges{display:flex;gap:.9rem;margin-top:1.6rem;flex-wrap:wrap}
+  .badge{display:inline-flex;align-items:center;gap:.6rem;background:var(--ink);color:#fff;border-radius:12px;
+         padding:.55rem 1.1rem;transition:transform .15s ease}
+  .badge:hover{transform:translateY(-2px)}
+  .badge small{display:block;font-size:.62rem;opacity:.75;line-height:1.1;text-align:left}
+  .badge strong{display:block;font-size:.95rem;line-height:1.15}
+  .hero-visual{position:relative;display:flex;justify-content:center}
+  .hex-bg{position:absolute;inset:-40px 0 0;z-index:0;opacity:.5}
+  .phone{position:relative;z-index:1;width:min(300px,72vw);background:var(--ink);border-radius:44px;padding:14px;box-shadow:var(--shadow)}
+  .phone-screen{background:var(--cream);border-radius:32px;overflow:hidden}
+  .phone-top{background:var(--yellow);padding:1rem 1.1rem .8rem;display:flex;align-items:center;justify-content:space-between}
+  .phone-top .mini-logo{font-weight:900;font-size:1rem;display:flex;align-items:center;gap:.35rem}
+  .card-photo{position:relative;height:290px;background:
+      radial-gradient(circle at 30% 25%,#F8B26A 0 22%,transparent 23%),
+      radial-gradient(circle at 68% 60%,#E9805E 0 30%,transparent 31%),
+      linear-gradient(160deg,#FFDD75,#F5A65B 60%,#E9805E)}
+  .card-info{position:absolute;left:0;right:0;bottom:0;padding:2.2rem 1.1rem .9rem;
+             background:linear-gradient(transparent,rgba(32,22,15,.72));color:#fff}
+  .card-info strong{font-size:1.15rem}
+  .card-info span{font-size:.8rem;opacity:.9;display:block}
+  .verify{display:inline-flex;align-items:center;gap:.25rem;font-size:.68rem;background:rgba(255,255,255,.22);
+          border-radius:999px;padding:.12rem .5rem;margin-top:.3rem}
+  .phone-actions{display:flex;justify-content:center;gap:1.1rem;padding:1rem 0 1.2rem;background:var(--cream)}
+  .action-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+              background:#fff;box-shadow:0 6px 16px rgba(32,22,15,.15);font-size:1.3rem}
+  .float-chip{position:absolute;z-index:2;background:#fff;border-radius:16px;box-shadow:var(--shadow);
+              padding:.7rem 1rem;display:flex;align-items:center;gap:.6rem;font-size:.85rem;font-weight:700}
+  .float-chip.chip-match{top:12%;left:-4%;animation:float 5s ease-in-out infinite}
+  .float-chip.chip-msg{bottom:16%;right:-6%;animation:float 6s ease-in-out 1s infinite}
+  .chip-ico{width:34px;height:34px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hero-marquee{background:var(--ink);color:var(--yellow);padding:.85rem 0;overflow:hidden;white-space:nowrap}
+  .marquee-inner{display:inline-block;animation:scroll 28s linear infinite;font-weight:800;letter-spacing:.06em}
+  .marquee-inner span{margin-right:3.2rem}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ---------- Modes ---------- */
+  .modes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+  .mode-card{background:var(--cream);border-radius:var(--radius);padding:2.4rem 2rem;position:relative;overflow:hidden;
+             transition:transform .2s ease, box-shadow .2s ease;border:1px solid var(--line)}
+  .mode-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .mode-ico{width:64px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem;font-size:1.6rem}
+  .mode-date .mode-ico{background:var(--yellow)}
+  .mode-bff .mode-ico{background:#B8E4D8}
+  .mode-bizz .mode-ico{background:#CFCDE8}
+  .mode-card h3{font-size:1.4rem;font-weight:800;margin-bottom:.6rem}
+  .mode-card p{color:var(--ink-soft);font-size:.98rem;margin-bottom:1.4rem}
+  .mode-card a{font-weight:800;display:inline-flex;align-items:center;gap:.4rem}
+  .mode-card a:hover{gap:.7rem}
+  .mode-card a{transition:gap .15s ease}
+
+  /* ---------- First move ---------- */
+  .firstmove{background:var(--ink);color:var(--cream)}
+  .firstmove .eyebrow{background:rgba(255,198,41,.15);color:var(--yellow)}
+  .fm-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+  .fm-grid h2{color:#fff}
+  .fm-grid p{color:rgba(253,248,239,.75);font-size:1.08rem;margin:1.1rem 0 2rem}
+  .steps{display:grid;gap:1.1rem}
+  .step{display:flex;gap:1.1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+        border-radius:18px;padding:1.2rem 1.4rem;transition:background .2s}
+  .step:hover{background:rgba(255,198,41,.1)}
+  .step-num{flex:0 0 44px;height:44px;border-radius:50%;background:var(--yellow);color:var(--ink);
+            display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem}
+  .step strong{display:block;font-size:1.05rem;color:#fff;margin-bottom:.2rem}
+  .step span{color:rgba(253,248,239,.7);font-size:.92rem}
+  .timer-pill{display:inline-flex;align-items:center;gap:.5rem;background:var(--yellow);color:var(--ink);
+              font-weight:800;border-radius:999px;padding:.5rem 1.2rem;font-size:.9rem}
+
+  /* ---------- Safety ---------- */
+  .safety{background:var(--yellow-pale)}
+  .safety-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4rem}
+  .safe-card{background:#fff;border-radius:var(--radius);padding:1.8rem 1.5rem;border:1px solid var(--line)}
+  .safe-card .s-ico{width:48px;height:48px;border-radius:14px;background:var(--yellow);display:flex;
+                    align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:1rem}
+  .safe-card h3{font-size:1.08rem;font-weight:800;margin-bottom:.4rem}
+  .safe-card p{font-size:.9rem;color:var(--ink-soft)}
+
+  /* ---------- Stories ---------- */
+  .stories{overflow:hidden}
+  .story-viewport{position:relative;overflow:hidden}
+  .story-track{display:flex;transition:transform .45s ease}
+  .story{flex:0 0 100%;padding:0 .2rem}
+  .story-inner{background:var(--cream);border-radius:var(--radius);padding:3rem;display:grid;
+               grid-template-columns:120px 1fr;gap:2rem;align-items:center;border:1px solid var(--line)}
+  .avatar-duo{position:relative;width:120px;height:120px}
+  .avatar{width:84px;height:84px;border-radius:50%;border:4px solid #fff;position:absolute;box-shadow:0 6px 16px rgba(32,22,15,.18)}
+  .avatar.a1{background:linear-gradient(140deg,#F5A65B,#E9805E);top:0;left:0}
+  .avatar.a2{background:linear-gradient(140deg,#B8E4D8,#6BB8A4);bottom:0;right:0}
+  blockquote{font-size:1.25rem;font-weight:600;line-height:1.5}
+  .story cite{display:block;margin-top:1rem;font-style:normal;font-weight:800;color:var(--ink-soft);font-size:.95rem}
+  .story-nav{display:flex;gap:.7rem;margin-top:1.8rem;align-items:center}
+  .story-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);background:#fff;cursor:pointer;
+             font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .story-btn:hover{background:var(--yellow)}
+  .dots{display:flex;gap:.45rem;margin-left:.6rem}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--line);transition:.2s;cursor:pointer}
+  .dot.active{background:var(--ink);transform:scale(1.2)}
+
+  /* ---------- Download band ---------- */
+  .download{background:var(--yellow);position:relative;overflow:hidden}
+  .download .wrap{position:relative;z-index:1;text-align:center;padding:1rem 0}
+  .download h2{max-width:640px;margin-inline:auto}
+  .download p{max-width:520px;margin:1rem auto 2rem;color:var(--ink-soft);font-size:1.1rem}
+  .download .store-badges{justify-content:center;margin-top:0}
+  .hex-deco{position:absolute;opacity:.35}
+  .hex-deco.h1{top:-30px;left:-40px;width:180px}
+  .hex-deco.h2{bottom:-40px;right:-30px;width:220px}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--ink);color:rgba(253,248,239,.8);padding:4.5rem 0 2rem}
+  .foot-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:2.5rem;margin-bottom:3rem}
+  .foot-brand .logo{color:var(--yellow);margin-bottom:1rem}
+  .foot-brand p{font-size:.92rem;max-width:280px}
+  footer h4{color:#fff;font-size:.85rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:1.1rem}
+  footer li{margin-bottom:.65rem}
+  footer li a{font-size:.95rem;opacity:.85;transition:.15s}
+  footer li a:hover{color:var(--yellow);opacity:1}
+  .socials{display:flex;gap:.8rem;margin-top:1.4rem}
+  .soc{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;
+       justify-content:center;transition:.15s;font-size:1rem}
+  .soc:hover{background:var(--yellow);color:var(--ink)}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:1.6rem;display:flex;flex-wrap:wrap;
+               gap:1rem;align-items:center;justify-content:space-between;font-size:.85rem}
+  .foot-legal{display:flex;gap:1.4rem;flex-wrap:wrap}
+  .foot-legal a:hover{color:var(--yellow)}
+  .lang{background:rgba(255,255,255,.08);color:inherit;border:1px solid rgba(255,255,255,.2);
+        border-radius:8px;padding:.45rem .8rem;font-family:inherit;font-size:.85rem}
+  .disclaim{width:100%;text-align:center;font-size:.72rem;opacity:.45;margin-top:1.2rem}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:960px){
+    nav.menu{display:none}
+    .nav-actions .btn{display:none}
+    .burger{display:block}
+    .hero-grid{grid-template-columns:1fr;padding:3rem 0 4.5rem;text-align:center}
+    .hero p.lead{margin-inline:auto}
+    .hero-ctas,.store-badges{justify-content:center}
+    .float-chip.chip-match{left:2%}
+    .float-chip.chip-msg{right:2%}
+    .modes-grid{grid-template-columns:1fr;max-width:480px;margin-inline:auto}
+    .fm-grid{grid-template-columns:1fr;gap:2.5rem}
+    .safety-grid{grid-template-columns:1fr 1fr}
+    .story-inner{grid-template-columns:1fr;text-align:center;padding:2.2rem 1.6rem}
+    .avatar-duo{margin-inline:auto}
+    .story-nav{justify-content:center}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:560px){
+    .safety-grid{grid-template-columns:1fr}
+    .foot-grid{grid-template-columns:1fr}
+    .foot-bottom{flex-direction:column;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= HEADER ======================= -->
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#" aria-label="Bumble — accueil">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M24 3 42 13.5v21L24 45 6 34.5v-21L24 3Z" fill="#20160F"/>
+        <path d="M24 10.5 35.5 17v13L24 36.5 12.5 30V17L24 10.5Z" fill="#FFC629"/>
+        <rect x="17" y="19" width="14" height="3.2" rx="1.6" fill="#20160F"/>
+        <rect x="19" y="25" width="10" height="3.2" rx="1.6" fill="#20160F"/>
+      </svg>
+      bumble
+    </a>
+    <nav class="menu" aria-label="Navigation principale">
+      <a href="#modes">L'appli</a>
+      <a href="#premier-pas">Le premier pas</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#temoignages">Belles rencontres</a>
+      <a href="#telecharger">Télécharger</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-outline" href="#">Se connecter</a>
+      <a class="btn btn-primary" href="#telecharger">Rejoindre Bumble</a>
+      <button class="burger" aria-label="Ouvrir le menu" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu">
+    <div class="wrap">
+      <a href="#modes">L'appli</a>
+      <a href="#premier-pas">Le premier pas</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#temoignages">Belles rencontres</a>
+      <a href="#telecharger">Télécharger</a>
+      <a href="#">Se connecter</a>
+    </div>
+  </div>
+</header>
+
+<!-- ======================= HERO ======================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Rencontres · Amitiés · Réseautage</span>
+      <h1>Osez faire<br>le premier pas.</h1>
+      <p class="lead">Sur Bumble, ce sont les femmes qui donnent le ton. Des rencontres sincères et respectueuses, à votre rythme — pour trouver l'amour, des amis ou de nouvelles opportunités.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#telecharger">Rejoindre Bumble</a>
+        <a class="btn btn-outline" href="#modes">Découvrir l'appli</a>
+      </div>
+      <div class="store-badges">
+        <a class="badge" href="#" aria-label="Télécharger sur l'App Store">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.05 12.54c-.03-2.89 2.36-4.27 2.47-4.34-1.35-1.97-3.44-2.24-4.18-2.27-1.78-.18-3.47 1.05-4.37 1.05-.9 0-2.29-1.02-3.77-1-1.94.03-3.72 1.13-4.72 2.86-2.01 3.49-.51 8.65 1.45 11.48.96 1.39 2.1 2.94 3.6 2.88 1.44-.06 1.99-.93 3.73-.93s2.23.93 3.76.9c1.56-.03 2.54-1.41 3.49-2.8 1.1-1.61 1.55-3.17 1.58-3.25-.04-.02-3.02-1.16-3.04-4.58ZM14.16 4.06c.8-.96 1.33-2.3 1.18-3.64-1.14.05-2.53.76-3.35 1.72-.73.85-1.38 2.21-1.2 3.52 1.27.1 2.58-.65 3.37-1.6Z"/></svg>
+          <span><small>Télécharger sur</small><strong>l'App Store</strong></span>
+        </a>
+        <a class="badge" href="#" aria-label="Disponible sur Google Play">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5Z" fill="#34A853"/><path d="M4 2.5 14 12l3.2-3L6 2 4 2.5Z" fill="#FBBC04"/><path d="M4 21.5 14 12l3.2 3L6 22l-2-.5Z" fill="#EA4335"/><path d="M17.2 9 20 12l-2.8 3L14 12l3.2-3Z" fill="#4285F4"/></svg>
+          <span><small>Disponible sur</small><strong>Google Play</strong></span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <svg class="hex-bg" viewBox="0 0 400 400" aria-hidden="true">
+        <g fill="none" stroke="#20160F" stroke-opacity=".18" stroke-width="2">
+          <path d="M200 20 320 90v140l-120 70L80 230V90l120-70Z"/>
+          <path d="M200 60 285 110v100l-85 50-85-50V110l85-50Z"/>
+        </g>
+        <circle cx="60" cy="70" r="8" fill="#20160F" opacity=".2"/>
+        <circle cx="350" cy="300" r="12" fill="#fff" opacity=".5"/>
+        <circle cx="330" cy="60" r="6" fill="#20160F" opacity=".25"/>
+      </svg>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-top">
+            <span class="mini-logo">bumble</span>
+            <span aria-hidden="true">⚙️</span>
+          </div>
+          <div class="card-photo">
+            <div class="card-info">
+              <strong>Camille, 28</strong>
+              <span>Paris · à 3 km</span>
+              <span class="verify">✓ Profil vérifié</span>
+            </div>
+          </div>
+          <div class="phone-actions">
+            <span class="action-dot" aria-hidden="true">✕</span>
+            <span class="action-dot" aria-hidden="true">⭐</span>
+            <span class="action-dot" aria-hidden="true">💛</span>
+          </div>
+        </div>
+      </div>
+      <div class="float-chip chip-match"><span class="chip-ico">💛</span> C'est un match&nbsp;!</div>
+      <div class="float-chip chip-msg"><span class="chip-ico">💬</span> « Salut, ton chien est adorable&nbsp;! »</div>
+    </div>
+  </div>
+  <div class="hero-marquee" aria-hidden="true">
+    <div class="marquee-inner">
+      <span>💛 Faites le premier pas</span><span>🐝 Des millions de rencontres</span><span>💬 Des conversations sincères</span><span>🤝 Amour · Amitié · Réseautage</span>
+      <span>💛 Faites le premier pas</span><span>🐝 Des millions de rencontres</span><span>💬 Des conversations sincères</span><span>🤝 Amour · Amitié · Réseautage</span>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= MODES ======================= -->
+<section class="section" id="modes">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Une appli, trois univers</span>
+      <h2>Bien plus qu'une appli de rencontres</h2>
+      <p>Amour, amitié ou carrière : choisissez votre mode et faites des rencontres qui vous ressemblent.</p>
+    </div>
+    <div class="modes-grid">
+      <article class="mode-card mode-date">
+        <div class="mode-ico" aria-hidden="true">💛</div>
+        <h3>Bumble Date</h3>
+        <p>Trouvez une relation sincère. Ici, les femmes envoient le premier message : des échanges plus respectueux, dès le départ.</p>
+        <a href="#">En savoir plus →</a>
+      </article>
+      <article class="mode-card mode-bff">
+        <div class="mode-ico" aria-hidden="true">🤝</div>
+        <h3>Bumble BFF</h3>
+        <p>Nouvelle ville, nouvelles envies ? Rencontrez des personnes qui partagent vos passions et créez des amitiés durables.</p>
+        <a href="#">En savoir plus →</a>
+      </article>
+      <article class="mode-card mode-bizz">
+        <div class="mode-ico" aria-hidden="true">💼</div>
+        <h3>Bumble Bizz</h3>
+        <p>Développez votre réseau professionnel, trouvez un mentor ou votre prochaine opportunité — en toute simplicité.</p>
+        <a href="#">En savoir plus →</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PREMIER PAS ======================= -->
+<section class="section firstmove" id="premier-pas">
+  <div class="wrap fm-grid">
+    <div>
+      <span class="eyebrow">Comment ça marche</span>
+      <h2>Le premier pas change tout</h2>
+      <p>Nous avons repensé les codes de la rencontre pour des échanges plus équilibrés et bienveillants. Un match ? Vous avez 24 heures pour lancer la conversation.</p>
+      <span class="timer-pill">⏳ 24 h pour dire bonjour</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div><strong>Créez votre profil</strong><span>Photos, passions, valeurs : montrez qui vous êtes vraiment.</span></div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div><strong>Matchez</strong><span>Un intérêt mutuel ? C'est un match. Simple et sans pression.</span></div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <div><strong>Faites le premier pas</strong><span>Sur Bumble Date, les femmes engagent la conversation dans les 24 h.</span></div>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <div><strong>Rencontrez-vous</strong><span>Passez du virtuel au réel, en toute confiance.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= SÉCURITÉ ======================= -->
+<section class="section safety" id="securite">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Votre sécurité d'abord</span>
+      <h2>Un espace bienveillant, par conception</h2>
+      <p>Des outils pensés pour que chaque rencontre se fasse en confiance et dans le respect.</p>
+    </div>
+    <div class="safety-grid">
+      <div class="safe-card">
+        <div class="s-ico" aria-hidden="true">✓</div>
+        <h3>Vérification photo</h3>
+        <p>Assurez-vous que la personne derrière le profil est bien réelle grâce à la vérification par selfie.</p>
+      </div>
+      <div class="safe-card">
+        <div class="s-ico" aria-hidden="true">🛡️</div>
+        <h3>Blocage & signalement</h3>
+        <p>Signalez ou bloquez en quelques secondes tout comportement inapproprié. Nos équipes veillent.</p>
+      </div>
+      <div class="safe-card">
+        <div class="s-ico" aria-hidden="true">🙈</div>
+        <h3>Filtres intelligents</h3>
+        <p>Nos outils détectent et masquent automatiquement les contenus indésirables avant que vous ne les voyiez.</p>
+      </div>
+      <div class="safe-card">
+        <div class="s-ico" aria-hidden="true">📍</div>
+        <h3>Conseils de rendez-vous</h3>
+        <p>Des recommandations concrètes pour organiser des premières rencontres sereines, dans des lieux publics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TÉMOIGNAGES ======================= -->
+<section class="section stories" id="temoignages">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Belles rencontres</span>
+      <h2>Ils ont fait le premier pas</h2>
+    </div>
+    <div class="story-viewport">
+      <div class="story-track" id="storyTrack">
+        <div class="story">
+          <div class="story-inner">
+            <div class="avatar-duo"><span class="avatar a1"></span><span class="avatar a2"></span></div>
+            <div>
+              <blockquote>« J'ai envoyé le premier message un dimanche soir, un peu au hasard. Deux ans plus tard, on emménage ensemble. Merci Bumble ! »</blockquote>
+              <cite>Léa & Thomas — Lyon</cite>
+            </div>
+          </div>
+        </div>
+        <div class="story">
+          <div class="story-inner">
+            <div class="avatar-duo"><span class="avatar a1" style="background:linear-gradient(140deg,#CFCDE8,#8B87C6)"></span><span class="avatar a2" style="background:linear-gradient(140deg,#FFDD75,#F5A65B)"></span></div>
+            <div>
+              <blockquote>« Fraîchement arrivée à Bordeaux, je ne connaissais personne. Grâce à BFF, j'ai trouvé ma bande de copines — et ma coloc ! »</blockquote>
+              <cite>Inès — Bordeaux</cite>
+            </div>
+          </div>
+        </div>
+        <div class="story">
+          <div class="story-inner">
+            <div class="avatar-duo"><span class="avatar a1" style="background:linear-gradient(140deg,#B8E4D8,#6BB8A4)"></span><span class="avatar a2" style="background:linear-gradient(140deg,#E9805E,#C85A3E)"></span></div>
+            <div>
+              <blockquote>« Sur Bizz, j'ai rencontré ma future associée. Six mois après, on lançait notre studio de design. Tout a commencé par un match. »</blockquote>
+              <cite>Sarah & Manon — Paris</cite>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="story-nav">
+      <button class="story-btn" onclick="moveStory(-1)" aria-label="Témoignage précédent">←</button>
+      <button class="story-btn" onclick="moveStory(1)" aria-label="Témoignage suivant">→</button>
+      <div class="dots" id="storyDots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= TÉLÉCHARGER ======================= -->
+<section class="section download" id="telecharger">
+  <svg class="hex-deco h1" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 92 28v48L50 100 8 76V28L50 4Z" fill="none" stroke="#20160F" stroke-width="3"/></svg>
+  <svg class="hex-deco h2" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 92 28v48L50 100 8 76V28L50 4Z" fill="none" stroke="#fff" stroke-width="3"/></svg>
+  <div class="wrap">
+    <h2>Votre prochaine belle rencontre commence ici</h2>
+    <p>Téléchargez Bumble gratuitement et faites le premier pas dès aujourd'hui.</p>
+    <div class="store-badges">
+      <a class="badge" href="#" aria-label="Télécharger sur l'App Store">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M17.05 12.54c-.03-2.89 2.36-4.27 2.47-4.34-1.35-1.97-3.44-2.24-4.18-2.27-1.78-.18-3.47 1.05-4.37 1.05-.9 0-2.29-1.02-3.77-1-1.94.03-3.72 1.13-4.72 2.86-2.01 3.49-.51 8.65 1.45 11.48.96 1.39 2.1 2.94 3.6 2.88 1.44-.06 1.99-.93 3.73-.93s2.23.93 3.76.9c1.56-.03 2.54-1.41 3.49-2.8 1.1-1.61 1.55-3.17 1.58-3.25-.04-.02-3.02-1.16-3.04-4.58ZM14.16 4.06c.8-.96 1.33-2.3 1.18-3.64-1.14.05-2.53.76-3.35 1.72-.73.85-1.38 2.21-1.2 3.52 1.27.1 2.58-.65 3.37-1.6Z"/></svg>
+        <span><small>Télécharger sur</small><strong>l'App Store</strong></span>
+      </a>
+      <a class="badge" href="#" aria-label="Disponible sur Google Play">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5Z" fill="#34A853"/><path d="M4 2.5 14 12l3.2-3L6 2 4 2.5Z" fill="#FBBC04"/><path d="M4 21.5 14 12l3.2 3L6 22l-2-.5Z" fill="#EA4335"/><path d="M17.2 9 20 12l-2.8 3L14 12l3.2-3Z" fill="#4285F4"/></svg>
+        <span><small>Disponible sur</small><strong>Google Play</strong></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FOOTER ======================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#" aria-label="Bumble">
+          <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+            <path d="M24 3 42 13.5v21L24 45 6 34.5v-21L24 3Z" fill="#FFC629"/>
+            <rect x="15" y="19" width="18" height="3.4" rx="1.7" fill="#20160F"/>
+            <rect x="18" y="26" width="12" height="3.4" rx="1.7" fill="#20160F"/>
+          </svg>
+          bumble
+        </a>
+        <p>L'appli où les femmes font le premier pas. Rencontres amoureuses, amitiés et réseautage professionnel.</p>
+        <div class="socials">
+          <a class="soc" href="#" aria-label="Instagram">◎</a>
+          <a class="soc" href="#" aria-label="X (Twitter)">𝕏</a>
+          <a class="soc" href="#" aria-label="Facebook">f</a>
+          <a class="soc" href="#" aria-label="TikTok">♪</a>
+          <a class="soc" href="#" aria-label="YouTube">▶</a>
+        </div>
+      </div>
+      <div>
+        <h4>L'appli</h4>
+        <ul>
+          <li><a href="#modes">Bumble Date</a></li>
+          <li><a href="#modes">Bumble BFF</a></li>
+          <li><a href="#modes">Bumble Bizz</a></li>
+          <li><a href="#premier-pas">Comment ça marche</a></li>
+          <li><a href="#telecharger">Télécharger</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>L'entreprise</h4>
+        <ul>
+          <li><a href="#">À propos</a></li>
+          <li><a href="#">Carrières</a></li>
+          <li><a href="#">Presse</a></li>
+          <li><a href="#">Événements</a></li>
+          <li><a href="#">Le Buzz — notre blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Ressources</h4>
+        <ul>
+          <li><a href="#">Assistance</a></li>
+          <li><a href="#securite">Sécurité & bien-être</a></li>
+          <li><a href="#">Directives de la communauté</a></li>
+          <li><a href="#">Conseils de rencontre</a></li>
+          <li><a href="#">Espace presse</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="foot-legal">
+        <a href="#">Politique de confidentialité</a>
+        <a href="#">Conditions d'utilisation</a>
+        <a href="#">Gestion des cookies</a>
+        <a href="#">Accessibilité</a>
+      </div>
+      <label>
+        <span class="sr-only" hidden>Langue</span>
+        <select class="lang" aria-label="Choisir la langue">
+          <option selected>🇫🇷 Français</option>
+          <option>🇬🇧 English</option>
+          <option>🇪🇸 Español</option>
+          <option>🇩🇪 Deutsch</option>
+          <option>🇮🇹 Italiano</option>
+        </select>
+      </label>
+      <span>© 2026 Bumble — Tous droits réservés.</span>
+      <span class="disclaim">Reproduction non officielle réalisée à des fins de démonstration technique. Sans affiliation avec Bumble Inc.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Carrousel de témoignages
+  const track = document.getElementById('storyTrack');
+  const dotsBox = document.getElementById('storyDots');
+  const count = track.children.length;
+  let idx = 0;
+
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => { idx = i; render(); });
+    dotsBox.appendChild(d);
+  }
+
+  function render() {
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    [...dotsBox.children].forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  function moveStory(dir) {
+    idx = (idx + dir + count) % count;
+    render();
+  }
+
+  setInterval(() => moveStory(1), 7000);
+
+  // Fermer le menu mobile après clic sur un lien
+  document.querySelectorAll('.mobile-menu a').forEach(a =>
+    a.addEventListener('click', () => document.querySelector('.mobile-menu').classList.remove('open'))
+  );
+</script>
+</body>
+</html>

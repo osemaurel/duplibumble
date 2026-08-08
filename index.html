@@ -3,417 +3,386 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bumble France | L'appli pour rencontrer de nouvelles personnes</title>
-<meta name="description" content="Des millions de personnes se sont rencontrées sur Bumble. Rencontres amoureuses, nouvelles amitiés, réseautage : faites le premier pas.">
-<!-- Reproduction non officielle de bumble.com/fr à des fins de démonstration technique. Aucune affiliation avec Bumble Inc. Photos générées par IA. -->
+<title>Bumble France | L'appli de rencontres pour trouver l'amour et des amis</title>
+<meta name="description" content="Notre mission : te faire (re)découvrir l'amour. Rencontres sincères, nouvelles amitiés — fais le premier pas sur Bumble.">
+<!-- Reproduction non officielle de bumble.com/fr (design 2026) à des fins de démonstration technique. Aucune affiliation avec Bumble Inc. Photos générées par IA — personnes fictives. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --yellow:#FFC629;
-    --yellow-dark:#F5B800;
-    --cream:#FFF8E7;
-    --ink:#282017;
-    --grey:#6F6A63;
-    --line:#EAE6DD;
-    --white:#fff;
-    --font:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
-    --shadow:0 14px 40px rgba(40,32,23,.13);
+    --yellow:#F8CE46;
+    --yellow-card:#F7D45E;
+    --yellow-pill:#F5C93D;
+    --ink:#2E2D29;
+    --ink-soft:#4C4B45;
+    --paper:#FFFFFF;
+    --line:#E9E7E1;
+    --r-lg:28px;
+    --r-xl:40px;
+    --font:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
+    --shadow:0 20px 50px rgba(46,45,41,.16);
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{font-family:var(--font);color:var(--ink);background:var(--white);line-height:1.6;-webkit-font-smoothing:antialiased}
+  body{font-family:var(--font);color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
   img,svg{display:block;max-width:100%}
   a{text-decoration:none;color:inherit}
-  ul{list-style:none}
-  .wrap{width:min(1200px,92%);margin-inline:auto}
-  h1,h2,h3{font-weight:800;line-height:1.08;letter-spacing:-.02em}
-  h2{font-size:clamp(2rem,4vw,3.1rem)}
-  .center{text-align:center}
-  .btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:1.02rem;
-       padding:.9rem 2.2rem;border-radius:999px;border:none;cursor:pointer;white-space:nowrap;
-       transition:transform .15s,box-shadow .15s,background .15s}
-  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(40,32,23,.2)}
-  .btn-yellow{background:var(--yellow);color:var(--ink)}
-  .btn-yellow:hover{background:var(--yellow-dark)}
-  .btn-dark{background:var(--ink);color:#fff}
-  .btn-ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
-  .section{padding:5.5rem 0}
-  .kicker{font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:.78rem;color:var(--grey);display:block;margin-bottom:.9rem}
+  .wrap{width:min(1680px,94%);margin-inline:auto}
+  h1,h2,h3{font-weight:700;line-height:1.06;letter-spacing:-.025em}
+  .btn-dark{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:#fff;
+            font-weight:600;font-size:1.05rem;padding:1.05rem 2.1rem;border-radius:16px;border:none;cursor:pointer;
+            transition:transform .15s,box-shadow .15s}
+  .btn-dark:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(46,45,41,.25)}
 
-  /* -------- Scallop divider (signature Bumble) -------- */
-  .scallop{display:block;width:100%;height:34px}
-
-  /* ---------------- Header ---------------- */
-  .topbar{position:sticky;top:0;z-index:60;background:#fff;box-shadow:0 1px 0 var(--line)}
-  .nav{display:flex;align-items:center;height:72px;gap:2.2rem}
-  .logo{display:flex;align-items:center;gap:.5rem;font-size:1.65rem;font-weight:800;letter-spacing:-.03em}
-  .logo .bee{width:36px;height:36px}
-  nav.main{display:flex;gap:1.8rem;margin-left:auto}
-  nav.main a{font-weight:600;font-size:.95rem;color:var(--ink);opacity:.85;transition:.15s}
-  nav.main a:hover{opacity:1;color:#B58900}
-  .nav-cta{display:flex;align-items:center;gap:1rem;margin-left:.5rem}
-  .nav-cta .signin{font-weight:700;font-size:.95rem}
-  .nav-cta .signin:hover{color:#B58900}
-  .burger{display:none;background:none;border:none;cursor:pointer;padding:.4rem;margin-left:auto}
-  .burger span{display:block;width:26px;height:3px;background:var(--ink);border-radius:2px;margin:5px 0}
-  .mobile-menu{display:none;background:#fff;border-bottom:1px solid var(--line);padding:.6rem 0 1.4rem}
+  /* ================= Header ================= */
+  header{position:sticky;top:0;z-index:80;pointer-events:none}
+  .nav{display:flex;align-items:center;gap:1rem;padding:1.6rem 0;position:relative}
+  .nav>*{pointer-events:auto}
+  .wordmark{font-size:2.1rem;font-weight:700;letter-spacing:-.04em;color:var(--ink)}
+  .nav-pill{position:absolute;left:50%;transform:translateX(-50%);display:flex;background:#fff;border-radius:999px;
+            padding:.35rem;box-shadow:0 8px 30px rgba(46,45,41,.10)}
+  .nav-pill a{font-weight:600;font-size:1.02rem;padding:.75rem 1.5rem;border-radius:999px;transition:background .15s}
+  .nav-pill a:hover{background:#F4F2EC}
+  .nav-right{margin-left:auto;display:flex;gap:.9rem;align-items:center}
+  .globe-pill{display:flex;align-items:center;gap:.55rem;background:#fff;border-radius:999px;padding:.85rem 1.4rem;
+              box-shadow:0 8px 30px rgba(46,45,41,.10);cursor:pointer;font-weight:600;transition:.15s}
+  .globe-pill:hover{background:#F4F2EC}
+  .login{display:inline-flex;align-items:center;background:var(--ink);color:#fff;font-weight:600;font-size:1.02rem;
+         padding:.95rem 1.9rem;border-radius:18px;transition:.15s}
+  .login:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(46,45,41,.28)}
+  .burger{display:none;background:#fff;border:none;border-radius:999px;box-shadow:0 8px 30px rgba(46,45,41,.10);
+          padding:.9rem;cursor:pointer;margin-left:auto}
+  .burger span{display:block;width:22px;height:2.5px;background:var(--ink);border-radius:2px;margin:4px 0}
+  .mobile-menu{display:none;background:#fff;border-radius:20px;box-shadow:var(--shadow);margin:0 4% .8rem;
+               padding:.6rem 1.4rem;pointer-events:auto}
   .mobile-menu.open{display:block}
   .mobile-menu a{display:block;padding:.85rem 0;font-weight:600;border-bottom:1px solid var(--line)}
+  .mobile-menu a:last-child{border:none}
 
-  /* ---------------- Hero ---------------- */
-  .hero{position:relative;min-height:min(88vh,760px);display:flex;align-items:flex-end;overflow:hidden;background:#D8A24A}
-  .hero-media{position:absolute;inset:0}
-  .hero-media img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
-  .hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,32,23,.05) 40%,rgba(40,32,23,.55));}
-  .hero-content{position:relative;z-index:2;padding:0 0 5.5rem;color:#fff;width:100%}
-  .hero h1{font-size:clamp(2.8rem,7vw,5.4rem);max-width:14ch;text-shadow:0 4px 30px rgba(40,32,23,.4)}
-  .hero p{font-size:clamp(1.05rem,1.6vw,1.35rem);font-weight:500;margin:1.2rem 0 2rem;max-width:34ch;text-shadow:0 2px 16px rgba(40,32,23,.5)}
-  .hero .btn{font-size:1.1rem;padding:1.05rem 2.6rem}
+  /* ================= Hero ================= */
+  .hero{background:var(--yellow);margin-top:-104px;padding-top:104px;position:relative;overflow:hidden}
+  .hero-stage{position:relative;height:min(88vh,860px);min-height:560px}
+  .hero-word{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;user-select:none}
+  .hero-word span{font-size:clamp(9rem,23.5vw,26rem);font-weight:700;letter-spacing:-.045em;color:#3A3934;line-height:1;white-space:nowrap}
+  .hero-cards{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
+  .hcard{position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(46,45,41,.25)}
+  .hcard img{width:100%;height:100%;object-fit:cover}
+  .hcard .hname{position:absolute;left:1.2rem;bottom:1.2rem;color:#fff;font-weight:600;font-size:1.5rem;
+                transform:rotate(-6deg);text-shadow:0 2px 14px rgba(0,0,0,.35);font-style:italic}
+  .hc1{width:clamp(240px,29vw,420px);aspect-ratio:10/17;border-radius:26px;border-top-left-radius:50% 22%;border-top-right-radius:50% 22%;z-index:3}
+  .hc2{width:clamp(120px,13.5vw,190px);aspect-ratio:10/26;border-radius:100px;margin-left:-1.5rem;z-index:2;align-self:center}
+  .hc3{width:clamp(110px,12vw,175px);aspect-ratio:10/24;border-radius:22px;margin-left:-1rem;transform:rotate(6deg);z-index:1}
+  .hc3 .hname,.hc2 .hname{font-size:1rem;left:.9rem;bottom:.9rem}
+  .hcard .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F5A65B,#E9805E)}
 
-  /* ---------------- Stats band ---------------- */
-  .stats{background:var(--yellow)}
-  .stats-in{display:flex;justify-content:space-around;gap:1rem;padding:2.6rem 0;flex-wrap:wrap;text-align:center}
-  .stat b{display:block;font-size:clamp(1.7rem,3vw,2.4rem);font-weight:800;letter-spacing:-.02em}
-  .stat span{font-weight:600;font-size:.95rem;opacity:.8}
+  /* ================= Mission ================= */
+  .mission{padding:8rem 0 7rem}
+  .mission-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center}
+  .mission h2{font-size:clamp(2.6rem,4.8vw,4.6rem)}
+  .mission p{font-size:clamp(1.05rem,1.4vw,1.35rem);color:var(--ink-soft);margin:1.8rem 0 3rem;max-width:34rem}
+  .collage{display:flex;justify-content:center;align-items:center}
+  .ccard{position:relative;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+  .ccard img{width:100%;height:100%;object-fit:cover}
+  .cc1{width:clamp(240px,24vw,380px);aspect-ratio:10/13;z-index:3}
+  .cc2{width:clamp(90px,9vw,140px);aspect-ratio:10/22;margin-left:-1.2rem;z-index:2}
+  .cc3{width:clamp(80px,8vw,120px);aspect-ratio:10/20;margin-left:-.8rem;z-index:1}
+  .vpill{position:absolute;top:1rem;right:1rem;background:var(--yellow-pill);color:var(--ink);font-weight:600;
+         font-size:1.05rem;padding:1.1rem .6rem;border-radius:999px;writing-mode:vertical-rl;letter-spacing:.01em;
+         box-shadow:0 8px 22px rgba(46,45,41,.18)}
+  .cc2 .vpill,.cc3 .vpill{font-size:.85rem;padding:.9rem .45rem;top:.7rem;right:.55rem}
 
-  /* ---------------- Apps trio ---------------- */
-  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;margin-top:3rem}
-  .tile{position:relative;border-radius:26px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:3/4;
-        display:flex;align-items:flex-end;transition:transform .25s ease}
-  .tile:hover{transform:translateY(-8px)}
-  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
-  .tile:hover img{transform:scale(1.05)}
-  .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(40,32,23,.72))}
-  .tile-txt{position:relative;z-index:2;color:#fff;padding:1.8rem}
-  .tile-tag{display:inline-block;background:var(--yellow);color:var(--ink);font-weight:800;font-size:.78rem;
-            letter-spacing:.08em;text-transform:uppercase;padding:.3rem .85rem;border-radius:999px;margin-bottom:.7rem}
-  .tile h3{font-size:1.5rem;margin-bottom:.35rem}
-  .tile p{font-size:.93rem;opacity:.92;font-weight:500}
+  /* ================= Member circle ================= */
+  .circle-sec{padding:2rem 0 6rem}
+  .circle-card{border:1px solid var(--line);border-radius:var(--r-xl);overflow:hidden;display:grid;
+               grid-template-columns:1fr 1.15fr;background:#fff;box-shadow:0 10px 40px rgba(46,45,41,.06)}
+  .circle-photo{position:relative;min-height:480px}
+  .circle-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .stamp{position:absolute;left:8%;bottom:6%;width:180px;height:180px;animation:spin 18s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .circle-body{padding:clamp(2.2rem,4vw,4.5rem);display:flex;flex-direction:column;justify-content:center}
+  .circle-body h2{font-size:clamp(2.2rem,3.6vw,3.6rem);margin-bottom:1.6rem}
+  .circle-body p{font-size:1.13rem;color:var(--ink-soft);margin-bottom:1.4rem;max-width:36rem}
+  .circle-body .btn-dark{align-self:flex-start;margin-top:1rem}
 
-  /* ---------------- First move ---------------- */
-  .fm{background:var(--cream)}
-  .fm-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:4.5rem;align-items:center}
-  .fm-grid p.big{font-size:1.15rem;color:var(--grey);margin:1.2rem 0 2rem}
-  .checks{display:grid;gap:1rem}
-  .check{display:flex;gap:1rem;align-items:flex-start}
-  .check .c{flex:0 0 30px;height:30px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;
-            justify-content:center;font-weight:800;font-size:.9rem;margin-top:.15rem}
-  .check strong{display:block}
-  .check span{color:var(--grey);font-size:.93rem}
-  .fm-photo{border-radius:26px;overflow:hidden;box-shadow:var(--shadow);position:relative}
-  .fm-photo img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/5}
-  .fm-badge{position:absolute;left:50%;bottom:1.4rem;transform:translateX(-50%);background:#fff;color:var(--ink);
-            font-weight:700;font-size:.9rem;border-radius:999px;padding:.6rem 1.4rem;box-shadow:var(--shadow);white-space:nowrap}
+  /* ================= Date / BFF ================= */
+  .duo{padding:0 0 6rem}
+  .duo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+  .ycard{background:var(--yellow-card);border-radius:var(--r-xl);padding:clamp(1.6rem,2.5vw,2.6rem);
+         display:flex;flex-direction:column;gap:1.6rem}
+  .ycard-visual{background:#FFFDF4;border-radius:26px;padding:1.6rem;display:flex;align-items:center;
+                justify-content:center;gap:1rem;min-height:400px;position:relative;overflow:hidden}
+  .shots{display:flex;align-items:center;gap:.8rem}
+  .shot{border-radius:16px;overflow:hidden;position:relative;box-shadow:0 12px 30px rgba(46,45,41,.15);flex:0 0 auto}
+  .shot img{width:100%;height:100%;object-fit:cover}
+  .shot.s-side{width:clamp(70px,7vw,120px);aspect-ratio:10/14}
+  .shot.s-main{width:clamp(150px,14vw,220px);aspect-ratio:10/19;border-radius:26px;border:6px solid var(--ink);z-index:2}
+  .idv{position:absolute;left:.5rem;bottom:.5rem;background:#3B7BF6;color:#fff;font-size:.62rem;font-weight:600;
+       padding:.18rem .5rem;border-radius:999px;display:flex;align-items:center;gap:.25rem;white-space:nowrap}
+  .shot-name{position:absolute;left:.6rem;bottom:1.6rem;color:#fff;font-weight:600;font-size:.95rem;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+  .chip{position:absolute;background:#FCC6E2;color:var(--ink);font-weight:600;font-size:.95rem;padding:.5rem 1.1rem;
+        border-radius:999px;box-shadow:0 8px 20px rgba(46,45,41,.15);display:flex;gap:.45rem;align-items:center;z-index:3}
+  .chip .cdot{width:10px;height:10px;border-radius:50%;background:#E64FA0}
+  .flower{position:absolute;z-index:3;width:110px;height:110px;background:var(--yellow-pill);border-radius:28px;
+          display:flex;align-items:center;justify-content:center;box-shadow:0 14px 34px rgba(46,45,41,.2)}
+  .ycard h3{font-size:clamp(1.9rem,2.6vw,2.7rem)}
+  .ycard p{font-size:1.1rem;color:var(--ink-soft);max-width:38rem}
+  .ycard .go{font-weight:600;font-size:1.1rem;text-decoration:underline;text-underline-offset:5px;margin-top:auto}
+  .ycard .go:hover{opacity:.7}
 
-  /* ---------------- Stories ---------------- */
-  .stories-bg{background:var(--yellow);overflow:hidden}
-  .story-viewport{overflow:hidden;margin-top:3rem}
-  .story-track{display:flex;transition:transform .5s ease}
-  .story{flex:0 0 100%;padding:0 .25rem}
-  .story-card{background:#fff;border-radius:26px;box-shadow:var(--shadow);display:grid;
-              grid-template-columns:280px 1fr;overflow:hidden;max-width:880px;margin-inline:auto}
-  .story-card img{width:100%;height:100%;object-fit:cover;min-height:280px}
-  .story-body{padding:2.6rem;display:flex;flex-direction:column;justify-content:center}
-  .story-body blockquote{font-size:1.18rem;font-weight:600;line-height:1.55}
-  .story-body cite{margin-top:1.2rem;font-style:normal;font-weight:700;color:var(--grey);font-size:.95rem}
-  .snav{display:flex;justify-content:center;align-items:center;gap:.8rem;margin-top:2.2rem}
-  .sbtn{width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--yellow);border:none;font-size:1.15rem;
-        cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
-  .sbtn:hover{transform:scale(1.08)}
-  .dots{display:flex;gap:.5rem}
-  .dot{width:10px;height:10px;border-radius:50%;background:rgba(40,32,23,.25);cursor:pointer;transition:.2s}
-  .dot.active{background:var(--ink);transform:scale(1.25)}
+  /* ================= Testimonial ================= */
+  .testi{padding:3rem 0 8rem}
+  .testi-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:4.5rem;align-items:center}
+  .qmark{font-size:5rem;font-weight:800;line-height:.4;display:block;margin-bottom:2.2rem}
+  .testi blockquote{font-size:clamp(1.9rem,3.4vw,3.4rem);font-weight:700;line-height:1.15;letter-spacing:-.02em}
+  .testi cite{display:block;font-style:normal;font-size:1.2rem;color:var(--ink-soft);margin:2rem 0 2.6rem}
+  .testi-photo{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);position:relative;aspect-ratio:10/11}
+  .testi-photo .ph{position:absolute;inset:0}
+  .testi-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05)}
 
-  /* ---------------- Buzz ---------------- */
-  .buzz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8rem;margin-top:3rem}
-  .buzz-card{border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:.2s;background:#fff}
-  .buzz-card:hover{box-shadow:var(--shadow);transform:translateY(-5px)}
-  .buzz-thumb{height:170px;display:flex;align-items:center;justify-content:center;font-size:3rem}
-  .bt1{background:linear-gradient(135deg,#FFE9A8,#FFC629)}
-  .bt2{background:linear-gradient(135deg,#FFD9C4,#F5A65B)}
-  .bt3{background:linear-gradient(135deg,#D9EFE7,#8FD3BC)}
-  .buzz-body{padding:1.5rem}
-  .buzz-body small{font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:.72rem;color:#B58900}
-  .buzz-body h3{font-size:1.12rem;margin:.5rem 0 .6rem;line-height:1.35}
-  .buzz-body p{font-size:.9rem;color:var(--grey)}
-  .buzz-body a{display:inline-block;margin-top:1rem;font-weight:700;font-size:.92rem;color:var(--ink)}
-  .buzz-body a:hover{color:#B58900}
+  /* ================= Download band ================= */
+  .dl{background:var(--yellow);padding:6rem 0;text-align:center}
+  .dl h2{font-size:clamp(2.2rem,4vw,3.6rem);max-width:22ch;margin-inline:auto}
+  .dl p{font-size:1.15rem;color:var(--ink-soft);margin:1.4rem auto 2.6rem;max-width:44ch}
+  .stores{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+  .store{display:inline-flex;align-items:center;gap:.65rem;background:var(--ink);color:#fff;border-radius:14px;
+         padding:.7rem 1.4rem;transition:.15s}
+  .store:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(46,45,41,.3)}
+  .store small{display:block;font-size:.62rem;opacity:.75;line-height:1.1;text-align:left}
+  .store b{display:block;font-size:1rem;line-height:1.15;text-align:left}
 
-  /* ---------------- Download CTA ---------------- */
-  .dl{background:var(--ink);color:#fff;position:relative;overflow:hidden}
-  .dl h2{color:#fff}
-  .dl p{color:rgba(255,255,255,.75);max-width:46ch;margin:1.1rem auto 2.2rem;font-size:1.08rem}
-  .badges{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
-  .store{display:inline-flex;align-items:center;gap:.65rem;border:1.5px solid rgba(255,255,255,.5);border-radius:12px;
-         padding:.6rem 1.2rem;color:#fff;transition:.15s;background:rgba(255,255,255,.04)}
-  .store:hover{background:#fff;color:var(--ink)}
-  .store small{display:block;font-size:.62rem;opacity:.75;line-height:1.1}
-  .store b{display:block;font-size:1rem;line-height:1.15}
-  .dl .bee-deco{position:absolute;opacity:.08;width:340px}
-  .bee-deco.d1{top:-70px;left:-60px;transform:rotate(-15deg)}
-  .bee-deco.d2{bottom:-90px;right:-50px;transform:rotate(20deg)}
-
-  /* ---------------- Footer ---------------- */
-  footer{background:#fff;border-top:1px solid var(--line);padding:4.5rem 0 2rem;color:var(--ink)}
-  .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3.2rem}
-  .fbrand p{color:var(--grey);font-size:.93rem;max-width:280px;margin-top:1rem}
-  footer h4{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:1.1rem}
-  footer li{margin-bottom:.6rem}
-  footer li a{font-size:.95rem;color:var(--grey);transition:.15s}
+  /* ================= Footer ================= */
+  footer{padding:5rem 0 2.5rem}
+  .fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3.5rem}
+  .fgrid .wordmark{font-size:1.9rem}
+  .fbrand p{color:var(--ink-soft);font-size:.98rem;max-width:280px;margin-top:1rem}
+  footer h4{font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:1.2rem;font-weight:700}
+  footer ul{list-style:none}
+  footer li{margin-bottom:.7rem}
+  footer li a{color:var(--ink-soft);font-size:1rem;transition:.15s}
   footer li a:hover{color:var(--ink)}
-  .socials{display:flex;gap:.7rem;margin-top:1.3rem}
-  .soc{width:40px;height:40px;border-radius:50%;background:var(--cream);display:flex;align-items:center;
-       justify-content:center;transition:.15s}
-  .soc:hover{background:var(--yellow)}
-  .fbottom{border-top:1px solid var(--line);padding-top:1.6rem;display:flex;flex-wrap:wrap;gap:1rem;
-           align-items:center;justify-content:space-between;font-size:.85rem;color:var(--grey)}
-  .flegal{display:flex;gap:1.4rem;flex-wrap:wrap}
+  .fbottom{border-top:1px solid var(--line);padding-top:1.8rem;display:flex;flex-wrap:wrap;gap:1rem;
+           align-items:center;justify-content:space-between;font-size:.9rem;color:var(--ink-soft)}
+  .flegal{display:flex;gap:1.5rem;flex-wrap:wrap}
   .flegal a:hover{color:var(--ink)}
-  .lang{border:1px solid var(--line);border-radius:8px;padding:.45rem .8rem;font-family:inherit;font-size:.85rem;color:var(--ink);background:#fff}
-  .disclaim{width:100%;text-align:center;font-size:.72rem;color:#B9B2A7;margin-top:1rem}
+  .disclaim{width:100%;text-align:center;font-size:.74rem;color:#B5B1A6;margin-top:1rem}
 
-  /* ---------------- Responsive ---------------- */
-  @media (max-width:1000px){
-    nav.main,.nav-cta{display:none}
+  /* ================= Responsive ================= */
+  @media (max-width:1180px){
+    .nav-pill{display:none}
     .burger{display:block}
-    .trio{grid-template-columns:1fr;max-width:440px;margin-inline:auto;margin-top:3rem}
-    .fm-grid{grid-template-columns:1fr;gap:2.8rem}
-    .story-card{grid-template-columns:1fr;max-width:520px}
-    .story-card img{max-height:300px}
-    .buzz-grid{grid-template-columns:1fr;max-width:440px;margin-inline:auto;margin-top:3rem}
+    .nav-right .globe-pill{display:none}
+  }
+  @media (max-width:980px){
+    .mission-grid,.testi-grid{grid-template-columns:1fr;gap:3rem}
+    .circle-card{grid-template-columns:1fr}
+    .circle-photo{min-height:340px}
+    .duo-grid{grid-template-columns:1fr}
+    .hero-stage{height:70vh;min-height:480px}
+  }
+  @media (max-width:640px){
+    .nav-right .login{padding:.75rem 1.3rem;font-size:.95rem}
+    .wordmark{font-size:1.7rem}
     .fgrid{grid-template-columns:1fr 1fr}
-  }
-  @media (max-width:600px){
-    .fgrid{grid-template-columns:1fr}
     .fbottom{flex-direction:column;text-align:center}
-    .stats-in{gap:1.6rem}
+    .hc2,.cc3{display:none}
   }
+  @media (max-width:480px){.fgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <!-- ================= HEADER ================= -->
-<div class="topbar">
+<header>
   <div class="wrap nav">
-    <a class="logo" href="#" aria-label="Bumble — accueil">
-      <svg class="bee" viewBox="0 0 40 40" aria-hidden="true">
-        <circle cx="20" cy="20" r="20" fill="#FFC629"/>
-        <rect x="10" y="13" width="20" height="4.2" rx="2.1" fill="#282017"/>
-        <rect x="13" y="20.5" width="14" height="4.2" rx="2.1" fill="#282017"/>
-        <rect x="16" y="28" width="8" height="4.2" rx="2.1" fill="#282017"/>
-      </svg>
-      bumble
-    </a>
-    <nav class="main" aria-label="Navigation principale">
-      <a href="#lappli">L'appli</a>
-      <a href="#premier-pas">Comment ça marche</a>
-      <a href="#rencontres">Belles rencontres</a>
-      <a href="#buzz">Le Buzz</a>
-      <a href="#">Assistance</a>
+    <a class="wordmark" href="#" aria-label="Bumble — accueil">Bumble</a>
+    <nav class="nav-pill" aria-label="Navigation principale">
+      <a href="#duo">Date</a>
+      <a href="#duo">BFF</a>
+      <a href="#histoires">Histoires</a>
+      <a href="#">Sécurité</a>
+      <a href="#">Aide</a>
     </nav>
-    <div class="nav-cta">
-      <a class="signin" href="#">Se connecter</a>
-      <a class="btn btn-yellow" href="#telecharger">Rejoignez Bumble</a>
+    <div class="nav-right">
+      <button class="globe-pill" aria-label="Choisir la langue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3Z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <a class="login" href="#">Se connecter</a>
+      <button class="burger" aria-label="Ouvrir le menu" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-    <button class="burger" aria-label="Ouvrir le menu" onclick="document.querySelector('.mobile-menu').classList.toggle('open')">
-      <span></span><span></span><span></span>
-    </button>
   </div>
   <div class="mobile-menu">
-    <div class="wrap">
-      <a href="#lappli">L'appli</a>
-      <a href="#premier-pas">Comment ça marche</a>
-      <a href="#rencontres">Belles rencontres</a>
-      <a href="#buzz">Le Buzz</a>
-      <a href="#">Assistance</a>
-      <a href="#">Se connecter</a>
-      <a href="#telecharger"><b>Rejoignez Bumble</b></a>
-    </div>
+    <a href="#duo">Date</a>
+    <a href="#duo">BFF</a>
+    <a href="#histoires">Histoires</a>
+    <a href="#">Sécurité</a>
+    <a href="#">Aide</a>
   </div>
-</div>
+</header>
 
 <!-- ================= HERO ================= -->
 <section class="hero">
-  <div class="hero-media">
-    <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_230325_f005137d-0651-4cef-a0e9-2d986399aca6.png" alt="Un couple heureux qui rit ensemble à une terrasse parisienne"
-         onerror="this.parentElement.style.background='linear-gradient(150deg,#FFC629,#F5A65B 60%,#E9805E)';this.remove()">
-  </div>
-  <div class="wrap hero-content">
-    <h1>Faites le premier&nbsp;pas</h1>
-    <p>Des millions de personnes se sont rencontrées sur Bumble. À vous de jouer.</p>
-    <a class="btn btn-yellow" href="#telecharger">Rejoignez Bumble</a>
-  </div>
-</section>
-<svg class="scallop" viewBox="0 0 1440 34" preserveAspectRatio="none" aria-hidden="true" style="background:transparent;margin-top:-33px;position:relative;z-index:3">
-  <path d="M0 34h1440V20c-30 18-60 18-90 0s-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0-60 18-90 0-60-18-90 0v14Z" fill="#FFC629"/>
-</svg>
-
-<!-- ================= STATS ================= -->
-<section class="stats">
-  <div class="wrap stats-in">
-    <div class="stat"><b>+50 M</b><span>de membres dans le monde</span></div>
-    <div class="stat"><b>N°1</b><span>des applis où les femmes font le premier pas</span></div>
-    <div class="stat"><b>+1 Md</b><span>de premiers pas déjà faits</span></div>
-    <div class="stat"><b>150</b><span>pays, dont la France 🇫🇷</span></div>
-  </div>
-</section>
-
-<!-- ================= TRIO ================= -->
-<section class="section" id="lappli">
-  <div class="wrap">
-    <div class="center">
-      <span class="kicker">Une appli, trois façons de se rencontrer</span>
-      <h2>Vous cherchez quoi, au juste&nbsp;?</h2>
-    </div>
-    <div class="trio">
-      <a class="tile" href="#">
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231024_72aaceea-3b67-4304-910c-af7b4b215805_min.webp" alt="Un couple en rendez-vous autour d'un baby-foot"
-             onerror="this.parentElement.style.background='linear-gradient(160deg,#FFC629,#E9805E)';this.remove()">
-        <div class="tile-txt">
-          <span class="tile-tag">Date</span>
-          <h3>Trouvez l'amour</h3>
-          <p>Des relations sincères, où les femmes envoient le premier message.</p>
-        </div>
-      </a>
-      <a class="tile" href="#">
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231124_3fed6e62-5ade-4dd4-a9e5-f4b3776a38c7_min.webp" alt="Deux amies qui rient lors d'un pique-nique"
-             onerror="this.parentElement.style.background='linear-gradient(160deg,#8FD3BC,#4FA98A)';this.remove()">
-        <div class="tile-txt">
-          <span class="tile-tag">BFF</span>
-          <h3>Faites-vous des amis</h3>
-          <p>Rencontrez des personnes qui partagent vos passions, près de chez vous.</p>
-        </div>
-      </a>
-      <a class="tile" href="#">
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231159_59fb5a1b-60cd-445e-a5f3-3e692b9c94af_min.webp" alt="Deux professionnels en discussion dans un espace de coworking"
-             onerror="this.parentElement.style.background='linear-gradient(160deg,#A5A1E0,#6C67B8)';this.remove()">
-        <div class="tile-txt">
-          <span class="tile-tag">Bizz</span>
-          <h3>Boostez votre réseau</h3>
-          <p>Mentorat, opportunités, nouveaux projets : développez votre carrière.</p>
-        </div>
-      </a>
+  <div class="hero-stage">
+    <div class="hero-word" aria-hidden="true"><span>Bumble</span></div>
+    <div class="hero-cards">
+      <div class="hcard hc1">
+        <div class="ph"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Danna, 28 ans" onerror="this.remove()">
+        <span class="hname">Danna, 28</span>
+      </div>
+      <div class="hcard hc2">
+        <div class="ph" style="background:linear-gradient(160deg,#7FB069,#3E7C4F)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234704_e94fc7fb-5fe7-4ee7-9e61-283c8491ea11_min.webp" alt="Josh, 34 ans" onerror="this.remove()">
+        <span class="hname">Josh, 34</span>
+      </div>
+      <div class="hcard hc3">
+        <div class="ph" style="background:linear-gradient(160deg,#E88BB5,#C85A8E)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Tiana, 30 ans" onerror="this.remove()">
+        <span class="hname">Tiana, 30</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= PREMIER PAS ================= -->
-<section class="section fm" id="premier-pas">
-  <div class="wrap fm-grid">
+<!-- ================= MISSION ================= -->
+<section class="mission">
+  <div class="wrap mission-grid">
     <div>
-      <span class="kicker">Comment ça marche</span>
-      <h2>Ici, les femmes donnent le ton</h2>
-      <p class="big">Nous avons changé les règles du jeu pour que chaque rencontre commence dans le respect. Résultat&nbsp;: des conversations plus sincères, et moins de pression pour tout le monde.</p>
-      <div class="checks">
-        <div class="check"><span class="c">1</span><div><strong>Créez votre profil</strong><span>Photos, passions, valeurs — montrez qui vous êtes vraiment.</span></div></div>
-        <div class="check"><span class="c">2</span><div><strong>Matchez</strong><span>Un intérêt mutuel&nbsp;? C'est un match.</span></div></div>
-        <div class="check"><span class="c">3</span><div><strong>Le premier pas</strong><span>Dans les rencontres hétéros, la femme a 24&nbsp;h pour engager la conversation.</span></div></div>
-        <div class="check"><span class="c">4</span><div><strong>Rencontrez-vous</strong><span>Passez du match au rendez-vous, en toute confiance.</span></div></div>
-      </div>
+      <h2>Notre mission&nbsp;: te faire (re)découvrir l'amour.</h2>
+      <p>Nous avons à cœur que nos membres tissent en toute confiance des relations sincères, authentiques et joyeuses.</p>
+      <a class="btn-dark" href="#telecharger">Télécharger Bumble</a>
     </div>
-    <div class="fm-photo">
-      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231238_9a848674-ecba-4336-9294-8ad6fcbc1b8e_min.webp" alt="Un couple heureux qui se prend dans les bras au coucher du soleil"
-           onerror="this.parentElement.style.background='linear-gradient(160deg,#FFC629,#F5A65B)';this.parentElement.style.aspectRatio='4/5';this.remove()">
-      <span class="fm-badge">⏳ 24 h pour dire bonjour</span>
+    <div class="collage">
+      <div class="ccard cc1">
+        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F8CE46,#D9A73A)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Une jeune femme souriante avec son skateboard dans un parc" onerror="this.remove()">
+        <span class="vpill">Sports de plein air</span>
+      </div>
+      <div class="ccard cc2">
+        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#A8C6E8,#5E8AC0)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Une coureuse en ville" onerror="this.remove()">
+        <span class="vpill">Course à pied</span>
+      </div>
+      <div class="ccard cc3">
+        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#EAD9C6,#C9A87F)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Une personne avec son petit chien" onerror="this.remove()">
+        <span class="vpill">J'ai un chien</span>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= STORIES ================= -->
-<section class="section stories-bg" id="rencontres">
+<!-- ================= MEMBER CIRCLE ================= -->
+<section class="circle-sec">
   <div class="wrap">
-    <div class="center">
-      <span class="kicker">Belles rencontres</span>
-      <h2>Tout commence par un premier pas</h2>
-    </div>
-    <div class="story-viewport">
-      <div class="story-track" id="storyTrack">
-        <div class="story">
-          <div class="story-card">
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231332_636281e2-794b-45f5-8b37-a926636db1a2_min.webp" alt="Léa et Thomas" onerror="this.style.background='linear-gradient(140deg,#F5A65B,#E9805E)';this.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';this.onerror=null">
-            <div class="story-body">
-              <blockquote>«&nbsp;J'ai envoyé le premier message un dimanche soir, un peu au hasard. Deux ans plus tard, on emménage ensemble.&nbsp;»</blockquote>
-              <cite>Léa &amp; Thomas — Lyon</cite>
-            </div>
-          </div>
-        </div>
-        <div class="story">
-          <div class="story-card">
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231305_91d1e43d-359a-450d-909f-f41680099cc3_min.webp" alt="Inès et Chloé" onerror="this.style.background='linear-gradient(140deg,#8FD3BC,#4FA98A)';this.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';this.onerror=null">
-            <div class="story-body">
-              <blockquote>«&nbsp;Fraîchement arrivée à Bordeaux, je ne connaissais personne. Grâce à BFF, j'ai trouvé ma bande de copines — et ma coloc&nbsp;!&nbsp;»</blockquote>
-              <cite>Inès — Bordeaux, via Bumble BFF</cite>
-            </div>
-          </div>
-        </div>
-        <div class="story">
-          <div class="story-card">
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231422_c22ff11d-1e78-4606-933d-161e65ca3099_min.webp" alt="Sarah et Manon" onerror="this.style.background='linear-gradient(140deg,#A5A1E0,#6C67B8)';this.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';this.onerror=null">
-            <div class="story-body">
-              <blockquote>«&nbsp;Sur Bizz, j'ai rencontré ma future associée. Six mois plus tard, on lançait notre studio de design.&nbsp;»</blockquote>
-              <cite>Sarah &amp; Manon — Paris, via Bumble Bizz</cite>
-            </div>
-          </div>
-        </div>
+    <div class="circle-card">
+      <div class="circle-photo">
+        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#B98A5E,#7C5638)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235128_5cf5654a-1a81-4364-bc96-35b3f65940bf_min.webp" alt="Deux personnes qui rient en partageant des frites au restaurant" onerror="this.remove()">
+        <svg class="stamp" viewBox="0 0 200 200" aria-hidden="true">
+          <defs><path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+          <circle cx="100" cy="100" r="98" fill="rgba(46,45,41,.35)"/>
+          <circle cx="100" cy="100" r="56" fill="#F8CE46"/>
+          <g fill="#2E2D29">
+            <rect x="72" y="82" width="56" height="9" rx="4.5"/>
+            <rect x="80" y="97" width="40" height="9" rx="4.5"/>
+            <rect x="88" y="112" width="24" height="9" rx="4.5"/>
+          </g>
+          <text font-size="17" font-weight="700" letter-spacing="3.5" fill="#F8CE46" font-family="Outfit,sans-serif">
+            <textPath href="#circ">MEMBER CIRCLE • MEMBER CIRCLE •</textPath>
+          </text>
+        </svg>
       </div>
-    </div>
-    <div class="snav">
-      <button class="sbtn" onclick="moveStory(-1)" aria-label="Précédent">←</button>
-      <div class="dots" id="storyDots"></div>
-      <button class="sbtn" onclick="moveStory(1)" aria-label="Suivant">→</button>
+      <div class="circle-body">
+        <h2>Fais-nous part de tes idées</h2>
+        <p>Rejoins notre Cercle de membres et construis avec nous l'avenir de Bumble. Entre en contact direct avec nos équipes et fais-nous part de tes idées et de ton avis lors de discussions et de tests de produits.</p>
+        <p>En rejoignant notre Cercle des membres, tu accèdes en exclusivité à de nouvelles fonctionnalités, tu découvres en avant-première les campagnes à venir et tu participes à améliorer l'expérience des membres de Bumble.</p>
+        <a class="btn-dark" href="#">S'inscrire</a>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= BUZZ ================= -->
-<section class="section" id="buzz">
-  <div class="wrap">
-    <div class="center">
-      <span class="kicker">Le Buzz — le blog de Bumble</span>
-      <h2>Conseils &amp; inspiration</h2>
+<!-- ================= DATE / BFF ================= -->
+<section class="duo" id="duo">
+  <div class="wrap duo-grid">
+    <div class="ycard">
+      <div class="ycard-visual">
+        <div class="shots">
+          <div class="shot s-side">
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F5A65B,#C97B3F)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231238_9a848674-ecba-4336-9294-8ad6fcbc1b8e_min.webp" alt="" onerror="this.remove()">
+            <span class="idv">✓ ID verified</span>
+          </div>
+          <div class="shot s-main">
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#E9805E,#B85538)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Profil de Tiana, 30 ans" onerror="this.remove()">
+            <span class="shot-name">Tiana, 30</span>
+            <span class="idv">✓ ID verified</span>
+          </div>
+          <div class="shot s-side">
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#8FB57C,#5C8049)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231332_636281e2-794b-45f5-8b37-a926636db1a2_min.webp" alt="" onerror="this.remove()">
+            <span class="idv">✓ ID verified</span>
+          </div>
+        </div>
+      </div>
+      <h3>Bumble Date</h3>
+      <p>Que tu fasses tes premiers pas dans le dating ou que tu aies envie de t'y remettre, le mode Date de Bumble est conçu pour te permettre de (re)découvrir l'amour dans la sincérité et la sécurité.</p>
+      <a class="go" href="#">Trouver mon match</a>
     </div>
-    <div class="buzz-grid">
-      <article class="buzz-card">
-        <div class="buzz-thumb bt1" aria-hidden="true">💬</div>
-        <div class="buzz-body">
-          <small>Conversations</small>
-          <h3>10 premières phrases qui donnent vraiment envie de répondre</h3>
-          <p>Oubliez le «&nbsp;salut, ça va&nbsp;?&nbsp;». Voici comment lancer une conversation mémorable.</p>
-          <a href="#">Lire l'article →</a>
+    <div class="ycard">
+      <div class="ycard-visual">
+        <span class="chip" style="top:14%;left:8%"><span class="cdot"></span> Book club</span>
+        <span class="chip" style="top:34%;left:5%"><span class="cdot" style="background:#8B5CF6"></span> Chat</span>
+        <span class="chip" style="top:54%;left:9%"><span class="cdot" style="background:#10B981"></span> Events</span>
+        <div class="shots">
+          <div class="shot s-side" style="width:clamp(120px,12vw,190px);aspect-ratio:10/13;border-radius:22px">
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#8FD3BC,#4FA98A)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231124_3fed6e62-5ade-4dd4-a9e5-f4b3776a38c7_min.webp" alt="Un groupe d'amies qui rient ensemble" onerror="this.remove()">
+          </div>
+          <div class="shot s-main">
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F8CE46,#D9A73A)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Profil BFF d'Alice" onerror="this.remove()">
+            <span class="shot-name">Alice, 23</span>
+          </div>
         </div>
-      </article>
-      <article class="buzz-card">
-        <div class="buzz-thumb bt2" aria-hidden="true">☕</div>
-        <div class="buzz-body">
-          <small>Rendez-vous</small>
-          <h3>Les meilleures idées de premier rendez-vous à Paris</h3>
-          <p>Du café de quartier à la balade sur les quais&nbsp;: nos spots préférés pour un premier date réussi.</p>
-          <a href="#">Lire l'article →</a>
-        </div>
-      </article>
-      <article class="buzz-card">
-        <div class="buzz-thumb bt3" aria-hidden="true">🛡️</div>
-        <div class="buzz-body">
-          <small>Bien-être</small>
-          <h3>Rencontres en ligne&nbsp;: nos conseils pour se lancer en toute sécurité</h3>
-          <p>Vérification photo, lieux publics, confiance en soi&nbsp;: le guide pour des rencontres sereines.</p>
-          <a href="#">Lire l'article →</a>
-        </div>
-      </article>
+        <span class="flower" aria-hidden="true">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="#2E2D29"><circle cx="32" cy="14" r="10"/><circle cx="50" cy="26" r="10"/><circle cx="44" cy="46" r="10"/><circle cx="20" cy="46" r="10"/><circle cx="14" cy="26" r="10"/><circle cx="32" cy="31" r="9" fill="#F8CE46"/><rect x="24" y="27" width="16" height="4" rx="2"/><rect x="27" y="33" width="10" height="4" rx="2"/></svg>
+        </span>
+      </div>
+      <h3>BFF</h3>
+      <p>Tu viens d'arriver dans une nouvelle ville ou tu as envie de nouer de nouvelles amitiés&nbsp;? BFF t'aide à rencontrer facilement des personnes compatibles.</p>
+      <a class="go" href="#">Trouver des amis</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIAL ================= -->
+<section class="testi" id="histoires">
+  <div class="wrap testi-grid">
+    <div>
+      <span class="qmark" aria-hidden="true">"</span>
+      <blockquote>On est des personnes naturellement positives et optimistes. Quand on est ensemble, on a l'impression que rien ne peut nous arrêter</blockquote>
+      <cite>Leslie &amp; Thomas, mariage célébré en 2025</cite>
+      <a class="btn-dark" href="#">Lire plus d'histoires</a>
+    </div>
+    <div class="testi-photo">
+      <div class="ph" style="background:linear-gradient(160deg,#999,#555)"></div>
+      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235155_341fb94f-d8ab-443b-855e-f1ef70592516_min.webp" alt="Leslie et Thomas, un couple qui rit, portrait en noir et blanc" onerror="this.remove()">
     </div>
   </div>
 </section>
 
 <!-- ================= DOWNLOAD ================= -->
-<section class="section dl center" id="telecharger">
-  <svg class="bee-deco d1" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFC629"/></svg>
-  <svg class="bee-deco d2" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFC629"/></svg>
+<section class="dl" id="telecharger">
   <div class="wrap">
-    <h2>Prêt·e à faire le premier pas&nbsp;?</h2>
-    <p>Téléchargez Bumble gratuitement sur iOS et Android, et faites de votre prochaine rencontre la bonne.</p>
-    <div class="badges">
+    <h2>Fais le premier pas. Télécharge Bumble.</h2>
+    <p>Disponible gratuitement sur iOS et Android.</p>
+    <div class="stores">
       <a class="store" href="#" aria-label="Télécharger sur l'App Store">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.54c-.03-2.89 2.36-4.27 2.47-4.34-1.35-1.97-3.44-2.24-4.18-2.27-1.78-.18-3.47 1.05-4.37 1.05-.9 0-2.29-1.02-3.77-1-1.94.03-3.72 1.13-4.72 2.86-2.01 3.49-.51 8.65 1.45 11.48.96 1.39 2.1 2.94 3.6 2.88 1.44-.06 1.99-.93 3.73-.93s2.23.93 3.76.9c1.56-.03 2.54-1.41 3.49-2.8 1.1-1.61 1.55-3.17 1.58-3.25-.04-.02-3.02-1.16-3.04-4.58ZM14.16 4.06c.8-.96 1.33-2.3 1.18-3.64-1.14.05-2.53.76-3.35 1.72-.73.85-1.38 2.21-1.2 3.52 1.27.1 2.58-.65 3.37-1.6Z"/></svg>
         <span><small>Télécharger sur</small><b>l'App Store</b></span>
@@ -431,31 +400,15 @@
   <div class="wrap">
     <div class="fgrid">
       <div class="fbrand">
-        <a class="logo" href="#" aria-label="Bumble">
-          <svg class="bee" viewBox="0 0 40 40" aria-hidden="true">
-            <circle cx="20" cy="20" r="20" fill="#FFC629"/>
-            <rect x="10" y="13" width="20" height="4.2" rx="2.1" fill="#282017"/>
-            <rect x="13" y="20.5" width="14" height="4.2" rx="2.1" fill="#282017"/>
-            <rect x="16" y="28" width="8" height="4.2" rx="2.1" fill="#282017"/>
-          </svg>
-          bumble
-        </a>
-        <p>L'appli de rencontres où les femmes font le premier pas. Amour, amitiés et réseautage.</p>
-        <div class="socials">
-          <a class="soc" href="#" aria-label="Instagram">◎</a>
-          <a class="soc" href="#" aria-label="X">𝕏</a>
-          <a class="soc" href="#" aria-label="Facebook">f</a>
-          <a class="soc" href="#" aria-label="TikTok">♪</a>
-          <a class="soc" href="#" aria-label="YouTube">▶</a>
-        </div>
+        <span class="wordmark">Bumble</span>
+        <p>L'appli où l'on fait le premier pas. Rencontres sincères, nouvelles amitiés.</p>
       </div>
       <div>
         <h4>L'appli</h4>
         <ul>
-          <li><a href="#lappli">Bumble Date</a></li>
-          <li><a href="#lappli">Bumble BFF</a></li>
-          <li><a href="#lappli">Bumble Bizz</a></li>
-          <li><a href="#premier-pas">Comment ça marche</a></li>
+          <li><a href="#duo">Bumble Date</a></li>
+          <li><a href="#duo">BFF</a></li>
+          <li><a href="#histoires">Histoires</a></li>
           <li><a href="#telecharger">Télécharger</a></li>
         </ul>
       </div>
@@ -466,16 +419,14 @@
           <li><a href="#">Carrières</a></li>
           <li><a href="#">Presse</a></li>
           <li><a href="#">Événements</a></li>
-          <li><a href="#buzz">Le Buzz</a></li>
         </ul>
       </div>
       <div>
         <h4>Ressources</h4>
         <ul>
-          <li><a href="#">Assistance</a></li>
-          <li><a href="#">Sécurité &amp; bien-être</a></li>
+          <li><a href="#">Aide</a></li>
+          <li><a href="#">Sécurité</a></li>
           <li><a href="#">Directives de la communauté</a></li>
-          <li><a href="#">Conseils de rencontre</a></li>
           <li><a href="#">Le Shop</a></li>
         </ul>
       </div>
@@ -487,12 +438,6 @@
         <a href="#">Cookies</a>
         <a href="#">Accessibilité</a>
       </div>
-      <select class="lang" aria-label="Choisir la langue">
-        <option selected>Français (FR)</option>
-        <option>English (UK)</option>
-        <option>Español</option>
-        <option>Deutsch</option>
-      </select>
       <span>© 2026 Bumble — Tous droits réservés.</span>
       <span class="disclaim">Reproduction non officielle à des fins de démonstration. Sans affiliation avec Bumble Inc. Photos générées par IA — personnes fictives.</span>
     </div>
@@ -500,24 +445,6 @@
 </footer>
 
 <script>
-  const track = document.getElementById('storyTrack');
-  const dotsBox = document.getElementById('storyDots');
-  const count = track.children.length;
-  let idx = 0;
-
-  for (let i = 0; i < count; i++) {
-    const d = document.createElement('span');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.addEventListener('click', () => { idx = i; render(); });
-    dotsBox.appendChild(d);
-  }
-  function render() {
-    track.style.transform = `translateX(-${idx * 100}%)`;
-    [...dotsBox.children].forEach((d, i) => d.classList.toggle('active', i === idx));
-  }
-  function moveStory(dir) { idx = (idx + dir + count) % count; render(); }
-  setInterval(() => moveStory(1), 7000);
-
   document.querySelectorAll('.mobile-menu a').forEach(a =>
     a.addEventListener('click', () => document.querySelector('.mobile-menu').classList.remove('open'))
   );

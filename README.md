@@ -8,15 +8,17 @@ Reproduction de la page d'accueil de **bumble.com/fr** en un seul fichier HTML a
 
 ## Fonctionnalités
 
-- Header sticky avec navigation et menu mobile (burger)
-- Section hero avec mockup de téléphone animé (CSS/SVG uniquement, aucune image externe)
-- Bandeau défilant (marquee)
-- Cartes des trois modes : Bumble Date, BFF et Bizz
+- Header blanc sticky avec navigation, CTA jaune « Rejoignez Bumble » et menu mobile (burger)
+- Hero photo pleine largeur « Faites le premier pas » avec séparateur festonné (scallop) signature
+- Bandeau de statistiques sur fond jaune
+- Trois tuiles photo : Bumble Date, BFF et Bizz
 - Section « Comment ça marche » avec le principe des 24 h
-- Section sécurité
-- Carrousel de témoignages (auto-play + navigation manuelle)
-- Bandeau de téléchargement avec badges App Store / Google Play (SVG)
-- Footer complet avec colonnes de liens, réseaux sociaux et sélecteur de langue
+- Carrousel de témoignages photo (auto-play + navigation manuelle)
+- Section « Le Buzz » (blog) avec cartes d'articles
+- Bandeau de téléchargement sombre avec badges App Store / Google Play (SVG)
+- Footer clair avec colonnes de liens, réseaux sociaux et sélecteur de langue
+- Typographie arrondie type Bumble (Poppins via Google Fonts)
+- Photos lifestyle générées par IA (personnes fictives), servies depuis un CDN avec fallback dégradé
 - Entièrement responsive (desktop, tablette, mobile)
 
 ## Utilisation

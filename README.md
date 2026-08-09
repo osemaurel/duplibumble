@@ -1,29 +1,27 @@
-# duplibumble
+# duplibumble → Palab
 
-Reproduction de la page d'accueil de **bumble.com/fr** en un seul fichier HTML autonome — réalisée comme démonstration technique de Claude Code.
+Landing page d'une appli de rencontres fictive, **Palab**, en un seul fichier HTML autonome — réalisée comme démonstration technique de Claude Code. La mise en page s'inspire du design 2026 de bumble.com/fr, rebrandée avec un nom propre et une palette rouge passion.
 
 ## Contenu
 
-- `index.html` — la page complète : HTML, CSS et JS inline, aucune dépendance externe.
+- `index.html` — la page complète : HTML, CSS et JS inline.
 
 ## Fonctionnalités
 
-- Header blanc sticky avec navigation, CTA jaune « Rejoignez Bumble » et menu mobile (burger)
-- Hero photo pleine largeur « Faites le premier pas » avec séparateur festonné (scallop) signature
-- Bandeau de statistiques sur fond jaune
-- Trois tuiles photo : Bumble Date, BFF et Bizz
-- Section « Comment ça marche » avec le principe des 24 h
-- Carrousel de témoignages photo (auto-play + navigation manuelle)
-- Section « Le Buzz » (blog) avec cartes d'articles
-- Bandeau de téléchargement sombre avec badges App Store / Google Play (SVG)
-- Footer clair avec colonnes de liens, réseaux sociaux et sélecteur de langue
-- Typographie arrondie type Bumble (Poppins via Google Fonts)
+- Header flottant : wordmark « Palab », navigation en pilule blanche centrée, sélecteur de langue, bouton « Se connecter »
+- Hero rouge avec wordmark géant traversé par des cartes de profils qui se chevauchent
+- Section mission avec collage photo et étiquettes verticales
+- Carte « Member Circle » avec tampon circulaire animé en rotation
+- Doubles cartes Palab Date / BFF avec mockups d'app et badges « ID verified »
+- Témoignage en noir et blanc
+- Bandeau de téléchargement et footer clair
+- Typo Outfit (Google Fonts), palette rouge amour (#E0314B)
 - Photos lifestyle générées par IA (personnes fictives), servies depuis un CDN avec fallback dégradé
-- Entièrement responsive (desktop, tablette, mobile)
+- Entièrement responsive
 
 ## Utilisation
 
-Ouvrir `index.html` dans un navigateur, ou :
+Ouvrir `index.html` dans un navigateur **connecté à internet** (photos CDN + police Google Fonts), ou :
 
 ```bash
 python3 -m http.server 8000
@@ -32,4 +30,4 @@ python3 -m http.server 8000
 
 ## Note
 
-Reproduction non officielle réalisée à des fins de démonstration et d'apprentissage. Aucune affiliation avec Bumble Inc. Les visuels sont recréés en CSS/SVG et les textes réécrits ; aucun asset original n'est utilisé.
+Site fictif de démonstration. Les photos sont générées par IA — les personnes n'existent pas.

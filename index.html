@@ -67,8 +67,8 @@
   /* ================= Hero : éventail de profils ================= */
   .hero{background:var(--yellow);margin-top:-104px;padding-top:104px;position:relative;overflow:hidden}
   .hero-stage{padding:2.5rem 0 3.2rem;display:flex;flex-direction:column;align-items:center;gap:1.8rem}
-  .fan{--cw:clamp(180px,19vw,290px);position:relative;width:100%;
-       height:calc(var(--cw) * 1.72);perspective:1200px}
+  .fan{--cw:clamp(170px,15vw,250px);position:relative;width:100%;
+       height:calc(var(--cw) * 2.05)}
   .fcard{position:absolute;top:50%;left:50%;width:var(--cw);aspect-ratio:10/14;margin:0;
          border-radius:26px;overflow:hidden;background:#C9743F;opacity:0;pointer-events:none;
          box-shadow:0 26px 60px rgba(46,45,41,.34);transform:translate(-50%,-50%) scale(.6);
@@ -290,7 +290,7 @@
   @media (max-width:900px){
     .hero{margin-top:-88px;padding-top:88px}
     .hero-stage{padding:2rem 0 2.6rem;gap:1.4rem}
-    .fan{--cw:clamp(150px,36vw,230px);height:calc(var(--cw) * 1.68)}
+    .fan{--cw:clamp(140px,26vw,200px);height:calc(var(--cw) * 1.95)}
     .fcard{border-radius:22px;box-shadow:0 18px 42px rgba(46,45,41,.32)}
     .fcard figcaption{font-size:.9rem;left:.8rem;right:.8rem;bottom:.75rem}
     .fan-arrow{width:42px;height:42px}
@@ -988,11 +988,19 @@
     const dotsBox = document.getElementById('fanDots');
     cards.forEach(() => dotsBox.appendChild(document.createElement('i')));
     const dots = Array.from(dotsBox.children);
-    const small = window.matchMedia('(max-width:900px)');
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let center = 0, hovered = null, timer = null;
-    const visible = () => small.matches ? 3 : 4;
+
+    // Nombre de cartes visibles et amplitude de l'éventail selon la largeur
+    function cfg(){
+      const w = window.innerWidth;
+      if (w < 640)  return { n:3, spread:0.62, arc:0.13 };
+      if (w < 900)  return { n:3, spread:0.80, arc:0.16 };
+      if (w < 1200) return { n:5, spread:1.45, arc:0.30 };
+      return          { n:7, spread:2.05, arc:0.40 };
+    }
+    const visible = () => cfg().n;
 
     const slotOf = (i, n) => {
       const shift = Math.floor((n - 1) / 2);
@@ -1001,8 +1009,8 @@
     };
 
     function layout(){
-      const n = visible();
-      const cw = cards[0].offsetWidth || 220;
+      const { n, spread, arc } = cfg();
+      const cw = cards[0].offsetWidth || 200;
       const half = (n - 1) / 2;
       cards.forEach((card, i) => {
         const s = slotOf(i, n);
@@ -1013,19 +1021,23 @@
           card.classList.remove('is-live');
           return;
         }
-        const d = half ? (s - half) / half : 0;
-        let x = d * cw * 0.72, y = d * d * cw * 0.10;
-        let rot = d * 19, sc = 1 - 0.2 * d * d, lift = 0;
+        const d = half ? (s - half) / half : 0;      // -1 … 1
+        let x = d * cw * spread;
+        let y = d * d * cw * arc;
+        let rot = d * 21;
+        let sc = 1 - 0.2244 * d * d;
+        let lift = 0;
         if (hovered !== null){
-          if (hovered === s){ y -= cw * 0.07; sc *= 1.07; lift = 6; }
+          if (hovered === s){ y -= cw * 0.09; sc *= 1.08; lift = 8; }
           else {
-            const push = cw * 0.11 / Math.abs(s - hovered);
+            const dist = Math.abs(s - hovered);
+            const push = cw * 0.13 * (1 - Math.abs(d) * 0.5) / dist;
             x += s < hovered ? -push : push;
-            rot += s < hovered ? -2.5 : 2.5;
+            rot += s < hovered ? -3 / dist : 3 / dist;
           }
         }
         card.style.opacity = '1';
-        card.style.zIndex = String(10 - Math.round(Math.abs(d) * 8) + lift);
+        card.style.zIndex = String(10 - Math.round(Math.abs(d) * 6) + lift);
         card.style.transform =
           `translate(-50%,-50%) translate(${x}px,${y}px) rotate(${rot}deg) scale(${sc})`;
         card.classList.add('is-live');

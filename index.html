@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palab France | L'appli de rencontres pour trouver l'amour et des amis</title>
-<meta name="description" content="Notre mission : te faire (re)découvrir l'amour. Rencontres sincères, nouvelles amitiés — fais le premier pas sur Palab.">
-<!-- Palab — marque fictive de démonstration, mise en page inspirée de bumble.com/fr (2026). Photos générées par IA — personnes fictives. -->
+<title>Palab | Rencontres internationales — profils vérifiés, chat et vidéo</title>
+<meta name="description" content="Palab met en relation des hommes du monde entier avec des femmes vérifiées une à une. Messages, lettres et chat vidéo en direct, en toute sécurité.">
+<!-- Palab — maquette de démonstration. Profils fictifs, photos générées par IA. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -167,6 +167,73 @@
   .flegal a:hover{color:var(--ink)}
   .disclaim{width:100%;text-align:center;font-size:.74rem;color:#B5B1A6;margin-top:1rem}
 
+
+  /* ================= Galerie de profils ================= */
+  .gal{padding:5.5rem 0 6rem}
+  .gal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;flex-wrap:wrap;margin-bottom:2rem}
+  .gal-head h2{font-size:clamp(2.2rem,3.6vw,3.4rem)}
+  .gal-head p{color:var(--ink-soft);font-size:1.1rem;margin-top:.8rem;max-width:52ch}
+  .live-count{display:inline-flex;align-items:center;gap:.6rem;background:#fff;border:1px solid var(--line);
+              border-radius:999px;padding:.7rem 1.3rem;font-weight:600;box-shadow:0 8px 24px rgba(46,45,41,.07)}
+  .live-dot{width:10px;height:10px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.2);
+            animation:pulse 2s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+  .filters{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;background:#FBFAF7;border:1px solid var(--line);
+           border-radius:22px;padding:1rem;margin-bottom:2.4rem}
+  .filters select{appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232E2D29' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
+                  border:1px solid var(--line);border-radius:999px;padding:.75rem 2.4rem .75rem 1.2rem;
+                  font-family:inherit;font-size:.97rem;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s}
+  .filters select:hover{border-color:var(--yellow)}
+  .filters select:focus{outline:2px solid var(--yellow);outline-offset:1px}
+  .filters .f-go{margin-left:auto;background:var(--yellow);color:#fff;border:none;border-radius:999px;
+                 padding:.8rem 1.9rem;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.15s}
+  .filters .f-go:hover{background:var(--yellow-pill);transform:translateY(-1px)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.4rem}
+  .pcard{border-radius:24px;overflow:hidden;background:#fff;border:1px solid var(--line);display:flex;
+         flex-direction:column;transition:transform .2s,box-shadow .2s}
+  .pcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .pcard-photo{position:relative;aspect-ratio:10/12;overflow:hidden}
+  .pcard-photo img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .pcard:hover .pcard-photo img{transform:scale(1.05)}
+  .pcard-photo .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)}
+  .badge-live{position:absolute;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.4rem;
+              background:rgba(255,255,255,.94);border-radius:999px;padding:.3rem .7rem;font-size:.76rem;font-weight:700}
+  .badge-ok{position:absolute;top:.8rem;right:.8rem;background:#3B7BF6;color:#fff;border-radius:999px;
+            padding:.3rem .6rem;font-size:.72rem;font-weight:700;display:inline-flex;align-items:center;gap:.25rem}
+  .pcard-body{padding:1rem 1.1rem 1.2rem}
+  .pcard-body h3{font-size:1.18rem;margin-bottom:.15rem}
+  .pcard-body .loc{color:var(--ink-soft);font-size:.88rem;display:block;margin-bottom:.9rem}
+  .pcard-acts{display:flex;gap:.5rem}
+  .p-msg{flex:1;background:var(--yellow);color:#fff;border:none;border-radius:12px;padding:.65rem .8rem;
+         font-family:inherit;font-weight:700;font-size:.92rem;cursor:pointer;transition:.15s}
+  .p-msg:hover{background:var(--yellow-pill)}
+  .p-vid{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:.65rem .8rem;cursor:pointer;
+         font-size:1rem;line-height:1;transition:.15s}
+  .p-vid:hover{border-color:var(--yellow);background:#FFF4F6}
+  .gal-more{display:flex;justify-content:center;margin-top:2.8rem}
+
+  /* ================= Modal inscription ================= */
+  .modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1.2rem;
+         background:rgba(46,45,41,.55);backdrop-filter:blur(4px)}
+  .modal.open{display:flex}
+  .modal-box{background:#fff;border-radius:26px;max-width:440px;width:100%;padding:2.4rem;position:relative;
+             box-shadow:0 30px 80px rgba(0,0,0,.3)}
+  .modal-box h3{font-size:1.7rem;margin-bottom:.6rem}
+  .modal-box p{color:var(--ink-soft);margin-bottom:1.6rem}
+  .modal-box .who{display:flex;align-items:center;gap:.8rem;background:#FBFAF7;border:1px solid var(--line);
+                  border-radius:16px;padding:.7rem;margin-bottom:1.4rem}
+  .modal-box .who img{width:52px;height:52px;border-radius:12px;object-fit:cover}
+  .modal-box .who b{display:block;font-size:1rem}
+  .modal-box .who span{font-size:.85rem;color:var(--ink-soft)}
+  .modal-box input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:.9rem 1.1rem;
+                   font-family:inherit;font-size:1rem;margin-bottom:.8rem}
+  .modal-box input:focus{outline:2px solid var(--yellow);outline-offset:1px;border-color:transparent}
+  .modal-box .terms{display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;color:var(--ink-soft);margin:.6rem 0 1.3rem}
+  .modal-box .terms input{width:auto;margin:.15rem 0 0}
+  .modal-box .btn-dark{width:100%;background:var(--yellow)}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:#F4F2EC;border:none;width:36px;height:36px;
+               border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1}
+
   /* ================= Responsive ================= */
   @media (max-width:1280px){
     .nav-pill a{font-weight:600;font-size:.9rem;padding:.6rem .95rem}
@@ -186,6 +253,8 @@
     .hero-stage{height:70vh;min-height:480px}
   }
   @media (max-width:640px){
+    .filters .f-go{margin-left:0;width:100%}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
     .nav-right .login{padding:.75rem 1.3rem;font-size:.95rem}
     .wordmark{font-size:1.7rem}
     .fgrid{grid-template-columns:1fr 1fr}
@@ -202,10 +271,10 @@
   <div class="wrap nav">
     <a class="wordmark" href="#" aria-label="Palab — accueil">Palab</a>
     <nav class="nav-pill" aria-label="Navigation principale">
-      <a href="#duo">Date</a>
-      <a href="#duo">BFF</a>
-      <a href="#histoires">Histoires</a>
-      <a href="#">Sécurité</a>
+      <a href="#profils">Profils</a>
+      <a href="#fonctionnement">Comment ça marche</a>
+      <a href="#communication">Communication</a>
+      <a href="#securite">Sécurité</a>
       <a href="#">Aide</a>
     </nav>
     <div class="nav-right">
@@ -220,10 +289,10 @@
     </div>
   </div>
   <div class="mobile-menu">
-    <a href="#duo">Date</a>
-    <a href="#duo">BFF</a>
-    <a href="#histoires">Histoires</a>
-    <a href="#">Sécurité</a>
+    <a href="#profils">Profils</a>
+    <a href="#fonctionnement">Comment ça marche</a>
+    <a href="#communication">Communication</a>
+    <a href="#securite">Sécurité</a>
     <a href="#">Aide</a>
   </div>
 </header>
@@ -235,13 +304,13 @@
     <div class="hero-cards">
       <div class="hcard hc1">
         <div class="ph"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Danna, 28 ans" onerror="this.remove()">
-        <span class="hname">Danna, 28</span>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Daniela, 28 ans" onerror="this.remove()">
+        <span class="hname">Daniela, 28</span>
       </div>
       <div class="hcard hc2">
-        <div class="ph" style="background:linear-gradient(160deg,#7FB069,#3E7C4F)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234704_e94fc7fb-5fe7-4ee7-9e61-283c8491ea11_min.webp" alt="Josh, 34 ans" onerror="this.remove()">
-        <span class="hname">Josh, 34</span>
+        <div class="ph" style="background:linear-gradient(160deg,#F2788C,#B8324B)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Sofia, 30 ans" onerror="this.remove()">
+        <span class="hname">Sofia, 30</span>
       </div>
       <div class="hcard hc3">
         <div class="ph" style="background:linear-gradient(160deg,#E88BB5,#C85A8E)"></div>
@@ -252,149 +321,379 @@
   </div>
 </section>
 
+<!-- ================= GALERIE DE PROFILS ================= -->
+<section class="gal" id="profils">
+  <div class="wrap">
+    <div class="gal-head">
+      <div>
+        <h2>Elles sont en ligne maintenant</h2>
+        <p>Parcourez les profils vérifiés de femmes du monde entier, puis lancez la conversation. Chaque profil est validé par notre équipe avant publication.</p>
+      </div>
+      <span class="live-count"><span class="live-dot"></span> 1 248 membres connectées</span>
+    </div>
+
+    <form class="filters" onsubmit="event.preventDefault();filterProfiles()">
+      <select id="f-age" aria-label="Âge">
+        <option value="">Âge</option><option>18 – 25</option><option>26 – 35</option><option>36 – 45</option><option>46 et +</option>
+      </select>
+      <select id="f-pays" aria-label="Pays">
+        <option value="">Pays</option><option>Afrique de l'Ouest</option><option>Afrique centrale</option><option>Europe</option><option>Amérique latine</option><option>Asie</option>
+      </select>
+      <select id="f-statut" aria-label="Situation">
+        <option value="">Situation</option><option>Célibataire</option><option>Divorcée</option><option>Veuve</option>
+      </select>
+      <select id="f-langue" aria-label="Langue parlée">
+        <option value="">Langue</option><option>Français</option><option>Anglais</option><option>Espagnol</option><option>Portugais</option>
+      </select>
+      <select id="f-objectif" aria-label="Recherche">
+        <option value="">Recherche</option><option>Relation sérieuse</option><option>Mariage</option><option>Amitié</option><option>Correspondance</option>
+      </select>
+      <select id="f-online" aria-label="Disponibilité">
+        <option value="">Toutes</option><option>En ligne maintenant</option>
+      </select>
+      <button class="f-go" type="submit">Rechercher</button>
+    </form>
+
+    <div class="grid" id="profileGrid">
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp" alt="Profil de Amina, 28 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Amina, 28</h3>
+            <span class="loc">Abidjan, Côte d’Ivoire</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Amina','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Amina','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp')" aria-label="Chat vidéo avec Amina">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Profil de Daniela, 28 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Daniela, 28</h3>
+            <span class="loc">Lisbonne, Portugal</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Daniela','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Daniela','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp')" aria-label="Chat vidéo avec Daniela">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp" alt="Profil de Fatou, 33 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Fatou, 33</h3>
+            <span class="loc">Dakar, Sénégal</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Fatou','33','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Fatou','33','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp')" aria-label="Chat vidéo avec Fatou">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp" alt="Profil de Mei, 25 ans" loading="lazy" onerror="this.remove()">
+            
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Mei, 25</h3>
+            <span class="loc">Manille, Philippines</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Mei','25','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Mei','25','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp')" aria-label="Chat vidéo avec Mei">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp" alt="Profil de Katarina, 38 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Katarina, 38</h3>
+            <span class="loc">Varsovie, Pologne</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Katarina','38','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Katarina','38','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp')" aria-label="Chat vidéo avec Katarina">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Profil de Sofia, 30 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Sofia, 30</h3>
+            <span class="loc">Bogotá, Colombie</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Sofia','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Sofia','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp')" aria-label="Chat vidéo avec Sofia">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Profil de Léa, 24 ans" loading="lazy" onerror="this.remove()">
+            
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Léa, 24</h3>
+            <span class="loc">Montréal, Canada</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Léa','24','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Léa','24','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp')" aria-label="Chat vidéo avec Léa">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp" alt="Profil de Hélène, 42 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Hélène, 42</h3>
+            <span class="loc">Lyon, France</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Hélène','42','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Hélène','42','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp')" aria-label="Chat vidéo avec Hélène">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Profil de Tiana, 30 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Tiana, 30</h3>
+            <span class="loc">Antananarivo, Madagascar</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Tiana','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Tiana','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp')" aria-label="Chat vidéo avec Tiana">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Profil de Alice, 23 ans" loading="lazy" onerror="this.remove()">
+            
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Alice, 23</h3>
+            <span class="loc">Bruxelles, Belgique</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Alice','23','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Alice','23','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp')" aria-label="Chat vidéo avec Alice">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Profil de Nadia, 27 ans" loading="lazy" onerror="this.remove()">
+            <span class="badge-live"><span class="live-dot"></span> En ligne</span>
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Nadia, 27</h3>
+            <span class="loc">Casablanca, Maroc</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Nadia','27','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Nadia','27','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp')" aria-label="Chat vidéo avec Nadia">🎥</button>
+            </div>
+          </div>
+        </article>
+        <article class="pcard">
+          <div class="pcard-photo">
+            <div class="ph"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Profil de Clara, 35 ans" loading="lazy" onerror="this.remove()">
+            
+            <span class="badge-ok">✓ Vérifié</span>
+          </div>
+          <div class="pcard-body">
+            <h3>Clara, 35</h3>
+            <span class="loc">São Paulo, Brésil</span>
+            <div class="pcard-acts">
+              <button class="p-msg" onclick="openSignup('Clara','35','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp')">Envoyer un message</button>
+              <button class="p-vid" onclick="openSignup('Clara','35','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp')" aria-label="Chat vidéo avec Clara">🎥</button>
+            </div>
+          </div>
+        </article>
+    </div>
+
+    <div class="gal-more"><button class="btn-dark" onclick="openSignup()">Voir tous les profils</button></div>
+  </div>
+</section>
+
 <!-- ================= MISSION ================= -->
 <section class="mission">
   <div class="wrap mission-grid">
     <div>
-      <h2>Notre mission&nbsp;: te faire (re)découvrir l'amour.</h2>
-      <p>Nous avons à cœur que nos membres tissent en toute confiance des relations sincères, authentiques et joyeuses.</p>
-      <a class="btn-dark" href="#telecharger">Télécharger Palab</a>
+      <h2>Notre mission&nbsp;: rapprocher ceux que la distance sépare.</h2>
+      <p>Palab met en relation des hommes du monde entier avec des femmes sérieuses, vérifiées une à une par notre équipe. Messagerie, lettres et chat vidéo&nbsp;: vous avancez à votre rythme, en toute sécurité.</p>
+      <a class="btn-dark" href="#profils">Découvrir les profils</a>
     </div>
     <div class="collage">
       <div class="ccard cc1">
-        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#E0314B,#A81F33)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Une jeune femme souriante avec son skateboard dans un parc" onerror="this.remove()">
-        <span class="vpill">Sports de plein air</span>
+        <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)"></div>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Membre de Palab en extérieur" onerror="this.remove()">
+        <span class="vpill">Profil vérifié</span>
       </div>
       <div class="ccard cc2">
         <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#A8C6E8,#5E8AC0)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Une coureuse en ville" onerror="this.remove()">
-        <span class="vpill">Course à pied</span>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Membre de Palab" onerror="this.remove()">
+        <span class="vpill">Chat vidéo</span>
       </div>
       <div class="ccard cc3">
         <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#EAD9C6,#C9A87F)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Une personne avec son petit chien" onerror="this.remove()">
-        <span class="vpill">J'ai un chien</span>
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Membre de Palab" onerror="this.remove()">
+        <span class="vpill">Traduction</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= MEMBER CIRCLE ================= -->
-<section class="circle-sec">
+<!-- ================= VÉRIFICATION ================= -->
+<section class="circle-sec" id="securite">
   <div class="wrap">
     <div class="circle-card">
       <div class="circle-photo">
         <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#B98A5E,#7C5638)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235128_5cf5654a-1a81-4364-bc96-35b3f65940bf_min.webp" alt="Deux personnes qui rient en partageant des frites au restaurant" onerror="this.remove()">
+        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235128_5cf5654a-1a81-4364-bc96-35b3f65940bf_min.webp" alt="Deux membres de Palab en visioconférence" onerror="this.remove()">
         <svg class="stamp" viewBox="0 0 200 200" aria-hidden="true">
           <defs><path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
           <circle cx="100" cy="100" r="98" fill="rgba(46,45,41,.35)"/>
           <circle cx="100" cy="100" r="56" fill="#E0314B"/>
-          <g fill="#2E2D29">
+          <g fill="#fff">
             <rect x="72" y="82" width="56" height="9" rx="4.5"/>
             <rect x="80" y="97" width="40" height="9" rx="4.5"/>
             <rect x="88" y="112" width="24" height="9" rx="4.5"/>
           </g>
-          <text font-size="17" font-weight="700" letter-spacing="3.5" fill="#FFFFFF" font-family="Outfit,sans-serif">
-            <textPath href="#circ">MEMBER CIRCLE • MEMBER CIRCLE •</textPath>
+          <text font-size="16" font-weight="700" letter-spacing="3" fill="#FFFFFF" font-family="Outfit,sans-serif">
+            <textPath href="#circ">PROFIL VÉRIFIÉ • PROFIL VÉRIFIÉ •</textPath>
           </text>
         </svg>
       </div>
       <div class="circle-body">
-        <h2>Fais-nous part de tes idées</h2>
-        <p>Rejoins notre Cercle de membres et construis avec nous l'avenir de Palab. Entre en contact direct avec nos équipes et fais-nous part de tes idées et de ton avis lors de discussions et de tests de produits.</p>
-        <p>En rejoignant notre Cercle des membres, tu accèdes en exclusivité à de nouvelles fonctionnalités, tu découvres en avant-première les campagnes à venir et tu participes à améliorer l'expérience des membres de Palab.</p>
-        <a class="btn-dark" href="#">S'inscrire</a>
+        <h2>Chaque profil est vérifié, un par un</h2>
+        <p>Les femmes qui souhaitent rejoindre Palab déposent une candidature. Notre équipe contrôle l'identité, les photos et les intentions de chacune avant toute publication&nbsp;: pas de robots, pas de faux profils, pas de photos trompeuses.</p>
+        <p>Vos échanges et vos données de paiement restent privés. Une modération humaine surveille la plateforme en continu et notre support vous répond 7&nbsp;j/7, de votre premier message à votre première rencontre.</p>
+        <a class="btn-dark" href="#">Notre charte de sécurité</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= DATE / BFF ================= -->
-<section class="duo" id="duo">
+<!-- ================= COMMUNICATION ================= -->
+<section class="duo" id="communication">
   <div class="wrap duo-grid">
     <div class="ycard">
       <div class="ycard-visual">
         <div class="shots">
           <div class="shot s-side">
             <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F5A65B,#C97B3F)"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231238_9a848674-ecba-4336-9294-8ad6fcbc1b8e_min.webp" alt="" onerror="this.remove()">
-            <span class="idv">✓ ID verified</span>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp" alt="" onerror="this.remove()">
+            <span class="idv">✓ Vérifiée</span>
           </div>
           <div class="shot s-main">
             <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#E9805E,#B85538)"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Profil de Tiana, 30 ans" onerror="this.remove()">
-            <span class="shot-name">Tiana, 30</span>
-            <span class="idv">✓ ID verified</span>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp" alt="Conversation avec Amina, 28 ans" onerror="this.remove()">
+            <span class="shot-name">Amina, 28</span>
+            <span class="idv">✓ Vérifiée</span>
           </div>
           <div class="shot s-side">
             <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#8FB57C,#5C8049)"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231332_636281e2-794b-45f5-8b37-a926636db1a2_min.webp" alt="" onerror="this.remove()">
-            <span class="idv">✓ ID verified</span>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp" alt="" onerror="this.remove()">
+            <span class="idv">✓ Vérifiée</span>
           </div>
         </div>
       </div>
-      <h3>Palab Date</h3>
-      <p>Que tu fasses tes premiers pas dans le dating ou que tu aies envie de t'y remettre, le mode Date de Palab est conçu pour te permettre de (re)découvrir l'amour dans la sincérité et la sécurité.</p>
-      <a class="go" href="#">Trouver mon match</a>
+      <h3>Messages &amp; lettres</h3>
+      <p>Écrivez, envoyez des photos, offrez un cadeau virtuel. La traduction automatique gomme la barrière de la langue&nbsp;: elle vous lit dans la sienne, vous la lisez dans la vôtre.</p>
+      <a class="go" href="#profils">Commencer une conversation</a>
     </div>
     <div class="ycard">
       <div class="ycard-visual">
-        <span class="chip" style="top:14%;left:8%"><span class="cdot"></span> Book club</span>
-        <span class="chip" style="top:34%;left:5%"><span class="cdot" style="background:#8B5CF6"></span> Chat</span>
-        <span class="chip" style="top:54%;left:9%"><span class="cdot" style="background:#10B981"></span> Events</span>
+        <span class="chip" style="top:14%;left:8%"><span class="cdot"></span> Appel en cours</span>
+        <span class="chip" style="top:34%;left:5%"><span class="cdot" style="background:#8B5CF6"></span> Traduction</span>
+        <span class="chip" style="top:54%;left:9%"><span class="cdot" style="background:#10B981"></span> HD sécurisé</span>
         <div class="shots">
           <div class="shot s-side" style="width:clamp(120px,12vw,190px);aspect-ratio:10/13;border-radius:22px">
             <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#8FD3BC,#4FA98A)"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_231124_3fed6e62-5ade-4dd4-a9e5-f4b3776a38c7_min.webp" alt="Un groupe d'amies qui rient ensemble" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp" alt="Membre en appel vidéo" onerror="this.remove()">
           </div>
           <div class="shot s-main">
-            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#E0314B,#A81F33)"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Profil BFF d'Alice" onerror="this.remove()">
-            <span class="shot-name">Alice, 23</span>
+            <div class="ph" style="position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)"></div>
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp" alt="Appel vidéo avec Mei, 25 ans" onerror="this.remove()">
+            <span class="shot-name">Mei, 25</span>
           </div>
         </div>
         <span class="flower" aria-hidden="true">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="#2E2D29"><circle cx="32" cy="14" r="10"/><circle cx="50" cy="26" r="10"/><circle cx="44" cy="46" r="10"/><circle cx="20" cy="46" r="10"/><circle cx="14" cy="26" r="10"/><circle cx="32" cy="31" r="9" fill="#E0314B"/><rect x="24" y="27" width="16" height="4" rx="2"/><rect x="27" y="33" width="10" height="4" rx="2"/></svg>
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="#fff"><circle cx="32" cy="14" r="10"/><circle cx="50" cy="26" r="10"/><circle cx="44" cy="46" r="10"/><circle cx="20" cy="46" r="10"/><circle cx="14" cy="26" r="10"/><circle cx="32" cy="31" r="9" fill="#E0314B"/><rect x="24" y="27" width="16" height="4" rx="2"/><rect x="27" y="33" width="10" height="4" rx="2"/></svg>
         </span>
       </div>
-      <h3>BFF</h3>
-      <p>Tu viens d'arriver dans une nouvelle ville ou tu as envie de nouer de nouvelles amitiés&nbsp;? BFF t'aide à rencontrer facilement des personnes compatibles.</p>
-      <a class="go" href="#">Trouver des amis</a>
+      <h3>Chat vidéo en direct</h3>
+      <p>Quand la conversation devient sérieuse, passez en vidéo. Vous voyez à qui vous parlez, elle vous voit&nbsp;: c'est la meilleure preuve qu'il y a bien quelqu'un de réel en face.</p>
+      <a class="go" href="#profils">Lancer un appel vidéo</a>
     </div>
   </div>
 </section>
 
-<!-- ================= TESTIMONIAL ================= -->
-<section class="testi" id="histoires">
+<!-- ================= COMMENT ÇA MARCHE ================= -->
+<section class="testi" id="fonctionnement">
   <div class="wrap testi-grid">
     <div>
       <span class="qmark" aria-hidden="true">"</span>
-      <blockquote>On est des personnes naturellement positives et optimistes. Quand on est ensemble, on a l'impression que rien ne peut nous arrêter</blockquote>
-      <cite>Leslie &amp; Thomas, mariage célébré en 2025</cite>
-      <a class="btn-dark" href="#">Lire plus d'histoires</a>
+      <blockquote>On s'est écrit pendant quatre mois avant le premier appel vidéo. Aujourd'hui, je prépare mon voyage pour la rencontrer</blockquote>
+      <cite>Marc, 41 ans — membre depuis 2025</cite>
+      <a class="btn-dark" href="#">Lire d'autres histoires</a>
     </div>
     <div class="testi-photo">
       <div class="ph" style="background:linear-gradient(160deg,#999,#555)"></div>
-      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235155_341fb94f-d8ab-443b-855e-f1ef70592516_min.webp" alt="Leslie et Thomas, un couple qui rit, portrait en noir et blanc" onerror="this.remove()">
+      <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235155_341fb94f-d8ab-443b-855e-f1ef70592516_min.webp" alt="Un couple réuni, portrait en noir et blanc" onerror="this.remove()">
     </div>
   </div>
 </section>
 
-<!-- ================= DOWNLOAD ================= -->
-<section class="dl" id="telecharger">
+<!-- ================= INSCRIPTION ================= -->
+<section class="dl" id="inscription">
   <div class="wrap">
-    <h2>Fais le premier pas. Télécharge Palab.</h2>
-    <p>Disponible gratuitement sur iOS et Android.</p>
+    <h2>Créez votre compte et écrivez-lui aujourd'hui</h2>
+    <p>L'inscription prend deux minutes et ne coûte rien. Vous ne payez que la communication, à l'unité, sans abonnement forcé.</p>
     <div class="stores">
-      <a class="store" href="#" aria-label="Télécharger sur l'App Store">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.54c-.03-2.89 2.36-4.27 2.47-4.34-1.35-1.97-3.44-2.24-4.18-2.27-1.78-.18-3.47 1.05-4.37 1.05-.9 0-2.29-1.02-3.77-1-1.94.03-3.72 1.13-4.72 2.86-2.01 3.49-.51 8.65 1.45 11.48.96 1.39 2.1 2.94 3.6 2.88 1.44-.06 1.99-.93 3.73-.93s2.23.93 3.76.9c1.56-.03 2.54-1.41 3.49-2.8 1.1-1.61 1.55-3.17 1.58-3.25-.04-.02-3.02-1.16-3.04-4.58ZM14.16 4.06c.8-.96 1.33-2.3 1.18-3.64-1.14.05-2.53.76-3.35 1.72-.73.85-1.38 2.21-1.2 3.52 1.27.1 2.58-.65 3.37-1.6Z"/></svg>
-        <span><small>Télécharger sur</small><b>l'App Store</b></span>
-      </a>
-      <a class="store" href="#" aria-label="Disponible sur Google Play">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5Zm0 0L14 12l3.2-3L6 2 4 2.5ZM4 21.5 14 12l3.2 3L6 22l-2-.5ZM17.2 9 20 12l-2.8 3L14 12l3.2-3Z"/></svg>
-        <span><small>Disponible sur</small><b>Google Play</b></span>
+      <button class="store" onclick="openSignup()" style="padding:1rem 2rem;border-radius:16px">
+        <span><b style="font-size:1.05rem">Je crée mon compte gratuitement</b></span>
+      </button>
+      <a class="store" href="#profils" style="padding:1rem 2rem;border-radius:16px;background:transparent;border:2px solid var(--ink);color:var(--ink)">
+        <span><b style="font-size:1.05rem">Parcourir les profils</b></span>
       </a>
     </div>
   </div>
@@ -406,33 +705,34 @@
     <div class="fgrid">
       <div class="fbrand">
         <span class="wordmark">Palab</span>
-        <p>L'appli où l'on fait le premier pas. Rencontres sincères, nouvelles amitiés.</p>
+        <p>La plateforme de rencontres internationales où chaque profil féminin est vérifié par une équipe humaine.</p>
       </div>
       <div>
-        <h4>L'appli</h4>
+        <h4>La plateforme</h4>
         <ul>
-          <li><a href="#duo">Palab Date</a></li>
-          <li><a href="#duo">BFF</a></li>
-          <li><a href="#histoires">Histoires</a></li>
-          <li><a href="#telecharger">Télécharger</a></li>
+          <li><a href="#profils">Femmes en ligne</a></li>
+          <li><a href="#communication">Messages &amp; lettres</a></li>
+          <li><a href="#communication">Chat vidéo</a></li>
+          <li><a href="#">Cadeaux virtuels</a></li>
+          <li><a href="#">Tarifs &amp; crédits</a></li>
         </ul>
       </div>
       <div>
-        <h4>L'entreprise</h4>
+        <h4>Vous êtes une femme&nbsp;?</h4>
         <ul>
-          <li><a href="#">À propos</a></li>
-          <li><a href="#">Carrières</a></li>
-          <li><a href="#">Presse</a></li>
-          <li><a href="#">Événements</a></li>
+          <li><a href="#">Déposer ma candidature</a></li>
+          <li><a href="#">Comment être vérifiée</a></li>
+          <li><a href="#">Charte des membres</a></li>
+          <li><a href="#">Questions fréquentes</a></li>
         </ul>
       </div>
       <div>
-        <h4>Ressources</h4>
+        <h4>Aide &amp; sécurité</h4>
         <ul>
-          <li><a href="#">Aide</a></li>
-          <li><a href="#">Sécurité</a></li>
-          <li><a href="#">Directives de la communauté</a></li>
-          <li><a href="#">Le Shop</a></li>
+          <li><a href="#securite">Vérification des profils</a></li>
+          <li><a href="#">Lutte anti-arnaque</a></li>
+          <li><a href="#">Conseils de rencontre</a></li>
+          <li><a href="#">Nous contacter</a></li>
         </ul>
       </div>
     </div>
@@ -441,18 +741,62 @@
         <a href="#">Confidentialité</a>
         <a href="#">Conditions</a>
         <a href="#">Cookies</a>
-        <a href="#">Accessibilité</a>
+        <a href="#">Remboursement</a>
       </div>
-      <span>© 2026 Palab — Tous droits réservés.</span>
-      <span class="disclaim">Palab — site fictif de démonstration. Photos générées par IA — personnes fictives.</span>
+      <span>© 2026 Palab — Tous droits réservés. Réservé aux personnes majeures (18+).</span>
+      <span class="disclaim">Palab — maquette de démonstration. Les profils affichés sont fictifs et les photos générées par IA&nbsp;; ils seront remplacés par de véritables membres ayant donné leur consentement.</span>
     </div>
   </div>
 </footer>
+
+<!-- ================= MODALE D'INSCRIPTION ================= -->
+<div class="modal" id="signupModal" onclick="if(event.target===this)closeSignup()">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="signupTitle">
+    <button class="modal-close" onclick="closeSignup()" aria-label="Fermer">✕</button>
+    <h3 id="signupTitle">Créez votre compte</h3>
+    <p>Inscription gratuite en 2 minutes pour envoyer votre premier message.</p>
+    <div class="who" id="signupWho" hidden>
+      <img id="signupWhoImg" src="" alt="">
+      <div><b id="signupWhoName"></b><span>vous répondra dès votre inscription</span></div>
+    </div>
+    <form onsubmit="event.preventDefault();alert('Démo — le formulaire d\'inscription sera relié au back-office.')">
+      <input type="text" placeholder="Votre prénom" required>
+      <input type="email" placeholder="Votre e-mail" required>
+      <input type="password" placeholder="Mot de passe" required>
+      <label class="terms"><input type="checkbox" required> J'accepte les conditions d'utilisation et la politique de confidentialité, et je confirme avoir 18 ans ou plus.</label>
+      <button class="btn-dark" type="submit">Créer mon compte</button>
+    </form>
+  </div>
+</div>
 
 <script>
   document.querySelectorAll('.mobile-menu a').forEach(a =>
     a.addEventListener('click', () => document.querySelector('.mobile-menu').classList.remove('open'))
   );
+
+  // Inscription requise avant tout message
+  function openSignup(name, age, img){
+    const who = document.getElementById('signupWho');
+    if(name){
+      document.getElementById('signupWhoImg').src = img;
+      document.getElementById('signupWhoName').textContent = name + ', ' + age;
+      who.hidden = false;
+    } else { who.hidden = true; }
+    document.getElementById('signupModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSignup(){
+    document.getElementById('signupModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSignup(); });
+
+  // Filtres (démo : la vraie requête viendra du back-office)
+  function filterProfiles(){
+    const grid = document.getElementById('profileGrid');
+    grid.style.opacity = '.4';
+    setTimeout(() => { grid.style.opacity = '1'; }, 350);
+  }
 </script>
 </body>
 </html>

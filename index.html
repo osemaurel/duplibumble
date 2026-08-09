@@ -36,13 +36,17 @@
   .btn-dark:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(46,45,41,.25)}
 
   /* ================= Header ================= */
-  header{position:sticky;top:0;z-index:80;pointer-events:none}
+  header{position:sticky;top:0;z-index:80;pointer-events:none;transition:background .25s,box-shadow .25s}
+  header.scrolled{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+                  box-shadow:0 2px 24px rgba(46,45,41,.12)}
+  header.scrolled .nav{padding:.85rem 0}
   .nav{display:flex;align-items:center;gap:1rem;padding:1.6rem 0;position:relative}
   .nav>*{pointer-events:auto}
   .wordmark{font-size:2.1rem;font-weight:700;letter-spacing:-.04em;color:var(--ink)}
   .nav-pill{position:absolute;left:50%;transform:translateX(-50%);display:flex;background:#fff;border-radius:999px;
             padding:.35rem;box-shadow:0 8px 30px rgba(46,45,41,.10)}
-  .nav-pill a{font-weight:600;font-size:1.02rem;padding:.75rem 1.5rem;border-radius:999px;transition:background .15s}
+  .nav-pill a{font-weight:600;font-size:1.02rem;padding:.75rem 1.5rem;border-radius:999px;
+            white-space:nowrap;transition:background .15s}
   .nav-pill a:hover{background:#F4F2EC}
   .nav-right{margin-left:auto;display:flex;gap:.9rem;align-items:center}
   .globe-pill{display:flex;align-items:center;gap:.55rem;background:#fff;border-radius:999px;padding:.85rem 1.4rem;
@@ -108,11 +112,13 @@
   /* ================= Date / BFF ================= */
   .duo{padding:0 0 6rem}
   .duo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+  .duo-grid>*{min-width:0}
+  .mission-grid>*,.testi-grid>*,.circle-card>*{min-width:0}
   .ycard{background:var(--yellow-card);border-radius:var(--r-xl);padding:clamp(1.6rem,2.5vw,2.6rem);
          display:flex;flex-direction:column;gap:1.6rem}
   .ycard-visual{background:#FFFDF4;border-radius:26px;padding:1.6rem;display:flex;align-items:center;
-                justify-content:center;gap:1rem;min-height:400px;position:relative;overflow:hidden}
-  .shots{display:flex;align-items:center;gap:.8rem}
+                justify-content:center;gap:1rem;min-height:400px;position:relative;overflow:hidden;max-width:100%}
+  .shots{display:flex;align-items:center;gap:.8rem;max-width:100%}
   .shot{border-radius:16px;overflow:hidden;position:relative;box-shadow:0 12px 30px rgba(46,45,41,.15);flex:0 0 auto}
   .shot img{width:100%;height:100%;object-fit:cover}
   .shot.s-side{width:clamp(70px,7vw,120px);aspect-ratio:10/14}
@@ -178,14 +184,15 @@
   .live-dot{width:10px;height:10px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.2);
             animation:pulse 2s infinite}
   @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
-  .filters{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;background:#FBFAF7;border:1px solid var(--line);
+  .filters{display:flex;gap:.7rem;align-items:center;background:#FBFAF7;border:1px solid var(--line);
            border-radius:22px;padding:1rem;margin-bottom:2.4rem}
-  .filters select{appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232E2D29' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
+  .filters-row{display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;flex:1;min-width:0}
+  .filters select{white-space:nowrap;appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232E2D29' stroke-width='3'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 1rem center;
                   border:1px solid var(--line);border-radius:999px;padding:.75rem 2.4rem .75rem 1.2rem;
                   font-family:inherit;font-size:.97rem;font-weight:600;color:var(--ink);cursor:pointer;transition:.15s}
   .filters select:hover{border-color:var(--yellow)}
   .filters select:focus{outline:2px solid var(--yellow);outline-offset:1px}
-  .filters .f-go{margin-left:auto;background:var(--yellow);color:#fff;border:none;border-radius:999px;
+  .filters .f-go{flex:0 0 auto;background:var(--yellow);color:#fff;border:none;border-radius:999px;
                  padding:.8rem 1.9rem;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.15s}
   .filters .f-go:hover{background:var(--yellow-pill);transform:translateY(-1px)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.4rem}
@@ -204,10 +211,11 @@
   .pcard-body h3{font-size:1.18rem;margin-bottom:.15rem}
   .pcard-body .loc{color:var(--ink-soft);font-size:.88rem;display:block;margin-bottom:.9rem}
   .pcard-acts{display:flex;gap:.5rem}
-  .p-msg{flex:1;background:var(--yellow);color:#fff;border:none;border-radius:12px;padding:.65rem .8rem;
+  .lbl-s{display:none}
+  .p-msg{flex:1;min-height:44px;background:var(--yellow);color:#fff;border:none;border-radius:12px;padding:.65rem .8rem;
          font-family:inherit;font-weight:700;font-size:.92rem;cursor:pointer;transition:.15s}
   .p-msg:hover{background:var(--yellow-pill)}
-  .p-vid{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:.65rem .8rem;cursor:pointer;
+  .p-vid{min-height:44px;min-width:44px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:.65rem .8rem;cursor:pointer;
          font-size:1rem;line-height:1;transition:.15s}
   .p-vid:hover{border-color:var(--yellow);background:#FFF4F6}
   .gal-more{display:flex;justify-content:center;margin-top:2.8rem}
@@ -234,6 +242,7 @@
   .modal-close{position:absolute;top:1rem;right:1rem;background:#F4F2EC;border:none;width:36px;height:36px;
                border-radius:50%;cursor:pointer;font-size:1.1rem;line-height:1}
 
+
   /* ================= Responsive ================= */
   @media (max-width:1280px){
     .nav-pill a{font-weight:600;font-size:.9rem;padding:.6rem .95rem}
@@ -241,7 +250,7 @@
     .wordmark{font-size:1.8rem}
     .nav-right .login{padding:.8rem 1.4rem;font-size:.95rem}
   }
-  @media (max-width:720px){
+  @media (max-width:900px){
     .nav-pill{display:none}
     .burger{display:block}
   }
@@ -262,6 +271,144 @@
     .hc2,.cc3{display:none}
   }
   @media (max-width:480px){.fgrid{grid-template-columns:1fr}}
+  /* ===== Tablette & mobile : hero empilé (le mot passe au-dessus des cartes) ===== */
+  @media (max-width:900px){
+    .hero{margin-top:-88px;padding-top:88px}
+    .hero-stage{height:auto;min-height:0;padding:1.6rem 0 3rem;display:flex;
+                flex-direction:column;align-items:center}
+    .hero-word{position:static;inset:auto;display:block;width:100%}
+    .hero-word span{font-size:clamp(3.4rem,16vw,7.5rem);display:block;text-align:center;line-height:.95}
+    .hero-cards{position:static;inset:auto;margin-top:-.6rem}
+    .hc1{width:clamp(140px,30vw,260px);border-radius:22px;border-top-left-radius:50% 22%;border-top-right-radius:50% 22%}
+    .hc2{width:clamp(72px,14vw,125px);border-radius:70px;margin-left:-1rem}
+    .hc3{width:clamp(64px,12.5vw,110px);border-radius:18px;margin-left:-.8rem}
+    .hcard{box-shadow:0 16px 40px rgba(46,45,41,.28)}
+    .hcard .hname{font-size:1rem;left:.7rem;bottom:.7rem}
+    .hc2 .hname,.hc3 .hname{font-size:.72rem;left:.5rem;bottom:.5rem}
+  }
+
+  /* ================= Mobile first : ajustements ================= */
+  @media (max-width:720px){
+    /* Header */
+    .nav{padding:1rem 0;gap:.6rem}
+    .wordmark{font-size:1.6rem}
+    .nav-right .login{padding:.7rem 1.2rem;font-size:.92rem;border-radius:14px}
+    .burger{padding:.75rem}
+    .mobile-menu{margin:0 4% .6rem}
+
+
+    /* Rythme vertical resserré */
+    .gal{padding:3rem 0 3.2rem}
+    .mission{padding:3.5rem 0 3rem}
+    .circle-sec{padding:0 0 3.2rem}
+    .duo{padding:0 0 3.2rem}
+    .testi{padding:2rem 0 3.5rem}
+    .dl{padding:3.5rem 0}
+    footer{padding:3rem 0 2rem}
+
+    /* Galerie */
+    .gal-head{gap:1rem;margin-bottom:1.4rem}
+    .gal-head h2{font-size:clamp(1.9rem,7.5vw,2.4rem)}
+    .gal-head p{font-size:1rem}
+    .live-count{font-size:.92rem;padding:.6rem 1.1rem}
+    .filters{flex-direction:column;align-items:stretch;gap:.7rem;padding:.8rem;border-radius:18px;margin-bottom:1.6rem}
+    .filters-row{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;
+                 -webkit-overflow-scrolling:touch;padding-bottom:.15rem;scrollbar-width:none}
+    .filters-row::-webkit-scrollbar{display:none}
+    .filters select{flex:0 0 auto;scroll-snap-align:start;font-size:.92rem;
+                    padding:.7rem 2.1rem .7rem 1rem;min-height:44px}
+    .filters .f-go{width:100%;min-height:48px}
+    .grid{grid-template-columns:repeat(2,1fr);gap:.9rem}
+    .pcard{border-radius:18px}
+    .pcard-photo{aspect-ratio:10/11}
+    .pcard-body{padding:.75rem .8rem .9rem}
+    .pcard-body h3{font-size:1rem}
+    .pcard-body .loc{font-size:.78rem;margin-bottom:.7rem}
+    .lbl-l{display:none} .lbl-s{display:inline}
+    .p-msg{font-size:.86rem;padding:.6rem .5rem}
+    .p-vid{padding:.6rem .55rem;font-size:.9rem}
+    .badge-live,.badge-ok{font-size:.65rem;padding:.22rem .5rem;top:.5rem}
+    .badge-live{left:.5rem} .badge-ok{right:.5rem}
+    .gal-more{margin-top:2rem}
+    .gal-more .btn-dark{width:100%}
+
+    /* Mission */
+    .mission-grid{gap:2.2rem}
+    .mission h2{font-size:clamp(2rem,8.5vw,2.8rem)}
+    .mission p{font-size:1.05rem;margin:1.1rem 0 1.8rem}
+    .cc1{width:clamp(150px,42vw,240px)}
+    .cc2{width:clamp(62px,17vw,100px)}
+    .vpill{font-size:.8rem;padding:.8rem .45rem;top:.6rem;right:.6rem}
+
+    /* Vérification */
+    .circle-card{border-radius:26px}
+    .circle-photo{min-height:260px}
+    .circle-body{padding:1.8rem 1.3rem 2rem}
+    .circle-body h2{font-size:clamp(1.8rem,7.5vw,2.3rem);margin-bottom:1.1rem}
+    .circle-body p{font-size:1rem;margin-bottom:1rem}
+    .circle-body .btn-dark{align-self:stretch;text-align:center}
+    .stamp{width:104px;height:104px;left:6%;bottom:5%}
+
+    /* Communication */
+    .ycard{border-radius:26px;padding:1.2rem;gap:1.1rem}
+    .ycard-visual{min-height:280px;padding:1rem;border-radius:20px}
+    .ycard h3{font-size:clamp(1.6rem,7vw,2rem)}
+    .ycard p{font-size:1rem}
+    .ycard .go{font-size:1rem}
+    .shot.s-main{width:clamp(105px,30vw,165px);border-width:4px;border-radius:18px}
+    .shot.s-side{width:clamp(50px,14vw,88px)}
+    .shots{gap:.5rem}
+    .chip{font-size:.72rem;padding:.32rem .65rem;gap:.3rem}
+    .chip .cdot{width:7px;height:7px}
+    .flower{width:66px;height:66px;border-radius:18px}
+    .flower svg{width:40px;height:40px}
+    .shot.s-side .idv{display:none}
+    /* Carte vidéo : on garde le téléphone + les pastilles, sans vignette latérale */
+    .duo-grid .ycard:nth-child(2) .shot.s-side{display:none}
+    .duo-grid .ycard:nth-child(2) .shots{margin-left:auto;margin-right:.2rem}
+    .chip{left:.7rem!important}
+    .chip:nth-of-type(1){top:12%!important}
+    .chip:nth-of-type(2){top:34%!important}
+    .chip:nth-of-type(3){top:56%!important}
+    .flower{right:.8rem;bottom:.8rem;left:auto;top:auto}
+    .idv{font-size:.55rem;padding:.14rem .38rem;left:.35rem;bottom:.35rem}
+    .shot-name{font-size:.78rem;bottom:1.5rem;left:.45rem}
+
+    /* Témoignage */
+    .testi-grid{gap:2rem}
+    .qmark{font-size:3.4rem;margin-bottom:1.2rem}
+    .testi blockquote{font-size:clamp(1.45rem,6.4vw,2rem)}
+    .testi cite{font-size:1rem;margin:1.2rem 0 1.6rem}
+    .testi .btn-dark{width:100%}
+
+    /* Inscription */
+    .dl h2{font-size:clamp(1.9rem,7.5vw,2.5rem)}
+    .dl p{font-size:1.02rem;margin:1rem auto 1.8rem}
+    .stores{flex-direction:column;gap:.7rem}
+    .stores .store{width:100%;justify-content:center}
+
+    /* Footer */
+    .fgrid{grid-template-columns:1fr 1fr;gap:1.8rem;margin-bottom:2.2rem}
+    .fbrand{grid-column:1/-1}
+    footer h4{font-size:.78rem;margin-bottom:.8rem}
+    footer li{margin-bottom:.55rem}
+    footer li a{font-size:.94rem}
+  }
+
+  /* Bottom sheet pour l'inscription */
+  @media (max-width:560px){
+    .modal{align-items:flex-end;padding:0}
+    .modal-box{border-radius:24px 24px 0 0;padding:1.8rem 1.25rem 2rem;max-height:92vh;overflow-y:auto}
+    .modal-box h3{font-size:1.45rem}
+    .modal-box input{min-height:48px}
+    .modal-box .btn-dark{min-height:50px}
+  }
+
+  @media (max-width:360px){
+    .grid{grid-template-columns:1fr}
+    .fgrid{grid-template-columns:1fr}
+  }
+
 </style>
 </head>
 <body>
@@ -333,6 +480,7 @@
     </div>
 
     <form class="filters" onsubmit="event.preventDefault();filterProfiles()">
+      <div class="filters-row">
       <select id="f-age" aria-label="Âge">
         <option value="">Âge</option><option>18 – 25</option><option>26 – 35</option><option>36 – 45</option><option>46 et +</option>
       </select>
@@ -351,6 +499,7 @@
       <select id="f-online" aria-label="Disponibilité">
         <option value="">Toutes</option><option>En ligne maintenant</option>
       </select>
+      </div>
       <button class="f-go" type="submit">Rechercher</button>
     </form>
 
@@ -366,7 +515,7 @@
             <h3>Amina, 28</h3>
             <span class="loc">Abidjan, Côte d’Ivoire</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Amina','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Amina','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Amina','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp')" aria-label="Chat vidéo avec Amina">🎥</button>
             </div>
           </div>
@@ -382,7 +531,7 @@
             <h3>Daniela, 28</h3>
             <span class="loc">Lisbonne, Portugal</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Daniela','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Daniela','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Daniela','28','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp')" aria-label="Chat vidéo avec Daniela">🎥</button>
             </div>
           </div>
@@ -398,7 +547,7 @@
             <h3>Fatou, 33</h3>
             <span class="loc">Dakar, Sénégal</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Fatou','33','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Fatou','33','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Fatou','33','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp')" aria-label="Chat vidéo avec Fatou">🎥</button>
             </div>
           </div>
@@ -414,7 +563,7 @@
             <h3>Mei, 25</h3>
             <span class="loc">Manille, Philippines</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Mei','25','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Mei','25','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Mei','25','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp')" aria-label="Chat vidéo avec Mei">🎥</button>
             </div>
           </div>
@@ -430,7 +579,7 @@
             <h3>Katarina, 38</h3>
             <span class="loc">Varsovie, Pologne</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Katarina','38','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Katarina','38','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Katarina','38','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp')" aria-label="Chat vidéo avec Katarina">🎥</button>
             </div>
           </div>
@@ -446,7 +595,7 @@
             <h3>Sofia, 30</h3>
             <span class="loc">Bogotá, Colombie</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Sofia','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Sofia','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Sofia','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp')" aria-label="Chat vidéo avec Sofia">🎥</button>
             </div>
           </div>
@@ -462,7 +611,7 @@
             <h3>Léa, 24</h3>
             <span class="loc">Montréal, Canada</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Léa','24','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Léa','24','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Léa','24','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp')" aria-label="Chat vidéo avec Léa">🎥</button>
             </div>
           </div>
@@ -478,7 +627,7 @@
             <h3>Hélène, 42</h3>
             <span class="loc">Lyon, France</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Hélène','42','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Hélène','42','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Hélène','42','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp')" aria-label="Chat vidéo avec Hélène">🎥</button>
             </div>
           </div>
@@ -494,7 +643,7 @@
             <h3>Tiana, 30</h3>
             <span class="loc">Antananarivo, Madagascar</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Tiana','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Tiana','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Tiana','30','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp')" aria-label="Chat vidéo avec Tiana">🎥</button>
             </div>
           </div>
@@ -510,7 +659,7 @@
             <h3>Alice, 23</h3>
             <span class="loc">Bruxelles, Belgique</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Alice','23','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Alice','23','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Alice','23','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp')" aria-label="Chat vidéo avec Alice">🎥</button>
             </div>
           </div>
@@ -526,7 +675,7 @@
             <h3>Nadia, 27</h3>
             <span class="loc">Casablanca, Maroc</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Nadia','27','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Nadia','27','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Nadia','27','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp')" aria-label="Chat vidéo avec Nadia">🎥</button>
             </div>
           </div>
@@ -542,7 +691,7 @@
             <h3>Clara, 35</h3>
             <span class="loc">São Paulo, Brésil</span>
             <div class="pcard-acts">
-              <button class="p-msg" onclick="openSignup('Clara','35','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp')">Envoyer un message</button>
+              <button class="p-msg" onclick="openSignup('Clara','35','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp')"><span class="lbl-l">Envoyer un message</span><span class="lbl-s">Message</span></button>
               <button class="p-vid" onclick="openSignup('Clara','35','https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp')" aria-label="Chat vidéo avec Clara">🎥</button>
             </div>
           </div>
@@ -770,6 +919,10 @@
 </div>
 
 <script>
+  const hdr = document.querySelector('header');
+  const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 24);
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
   document.querySelectorAll('.mobile-menu a').forEach(a =>
     a.addEventListener('click', () => document.querySelector('.mobile-menu').classList.remove('open'))
   );

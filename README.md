@@ -1,33 +1,59 @@
-# duplibumble → Palab
+# Palab
 
-Landing page d'une appli de rencontres fictive, **Palab**, en un seul fichier HTML autonome — réalisée comme démonstration technique de Claude Code. La mise en page s'inspire du design 2026 de bumble.com/fr, rebrandée avec un nom propre et une palette rouge passion.
+Plateforme de rencontres internationales : des hommes du monde entier échangent avec des femmes dont chaque profil est vérifié, un par un, par l'équipe Palab.
 
-## Contenu
+Ce dépôt contient l'application Next.js (App Router). L'étape en cours est la landing publique ; la base de données, les espaces membre / admin / agent arrivent ensuite.
 
-- `index.html` — la page complète : HTML, CSS et JS inline.
+## Stack
 
-## Fonctionnalités
+- **Next.js 16** (App Router, Turbopack) + **React 19** + **TypeScript**
+- **Tailwind CSS v4** (installé ; la landing utilise encore la feuille de styles portée depuis la maquette)
+- Police **Outfit** auto-hébergée (`public/fonts/outfit.woff2`) — aucune dépendance externe au runtime
+- Photos en **AVIF** servies depuis `public/profiles/`
 
-- Header flottant : wordmark « Palab », navigation en pilule blanche centrée, sélecteur de langue, bouton « Se connecter »
-- Hero rouge avec wordmark géant traversé par des cartes de profils qui se chevauchent
-- Section mission avec collage photo et étiquettes verticales
-- Carte « Member Circle » avec tampon circulaire animé en rotation
-- Doubles cartes Palab Date / BFF avec mockups d'app et badges « ID verified »
-- Témoignage en noir et blanc
-- Bandeau de téléchargement et footer clair
-- Typo Outfit (Google Fonts), palette rouge amour (#E0314B)
-- Photos lifestyle générées par IA (personnes fictives), servies depuis un CDN avec fallback dégradé
-- Entièrement responsive
-
-## Utilisation
-
-Ouvrir `index.html` dans un navigateur **connecté à internet** (photos CDN + police Google Fonts), ou :
+## Démarrer
 
 ```bash
-python3 -m http.server 8000
-# puis http://localhost:8000
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # build de production
+npm run start    # sert le build
+npm run lint
 ```
+
+## Structure
+
+```
+src/
+  app/
+    layout.tsx          métadonnées, viewport, thème
+    page.tsx            assemblage de la landing
+    globals.css         feuille de styles complète (tokens, responsive, animations)
+  components/site/
+    header.tsx          en-tête collant + menu burger (< 900 px)
+    hero-fan.tsx        carrousel en éventail (7 cartes desktop / 5 tablette / 3 mobile)
+    gallery.tsx         filtres + grille de profils
+    signup-modal.tsx    contexte d'inscription + modale
+    signup-cta.tsx      bandeau d'appel à l'action final
+    static-sections.tsx mission, vérification, communication, témoignage, footer
+  lib/
+    profiles.ts         données de démonstration (forme calquée sur la future table `ladies`)
+public/
+  fonts/, profiles/
+legacy/
+  index.html            maquette d'origine en un seul fichier, conservée comme référence
+```
+
+## Points d'attention
+
+- **Mobile first** : aucun débordement horizontal à 390 / 768 / 1440 px ; le nombre de cartes de l'éventail s'adapte à la largeur.
+- Le défilement automatique du hero se met en pause au survol et se désactive avec `prefers-reduced-motion`.
+- `src/lib/profiles.ts` est volontairement typé comme la future table Supabase `ladies` : le passage aux données réelles se fera sans toucher aux composants.
+
+## Déploiement
+
+Déployé sur **Vercel**. Aucune variable d'environnement n'est requise à ce stade ; le framework est détecté automatiquement.
 
 ## Note
 
-Site fictif de démonstration. Les photos sont générées par IA — les personnes n'existent pas.
+Maquette de démonstration : les profils affichés sont fictifs et les photos générées par IA. Ils seront remplacés par de véritables membres ayant donné leur consentement.

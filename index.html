@@ -71,7 +71,7 @@
   .hero-word span{font-size:clamp(9rem,23.5vw,26rem);font-weight:700;letter-spacing:-.045em;color:#45141D;line-height:1;white-space:nowrap}
   .hero-cards{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
   .hcard{position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(46,45,41,.25)}
-  .hcard img{width:100%;height:100%;object-fit:cover}
+  .hcard img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
   .hcard .hname{position:absolute;left:1.2rem;bottom:1.2rem;color:#fff;font-weight:600;font-size:1.5rem;
                 transform:rotate(-6deg);text-shadow:0 2px 14px rgba(0,0,0,.35);font-style:italic}
   .hc1{width:clamp(240px,29vw,420px);aspect-ratio:10/17;border-radius:26px;border-top-left-radius:50% 22%;border-top-right-radius:50% 22%;z-index:3}
@@ -87,7 +87,7 @@
   .mission p{font-size:clamp(1.05rem,1.4vw,1.35rem);color:var(--ink-soft);margin:1.8rem 0 3rem;max-width:34rem}
   .collage{display:flex;justify-content:center;align-items:center}
   .ccard{position:relative;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
-  .ccard img{width:100%;height:100%;object-fit:cover}
+  .ccard img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
   .cc1{width:clamp(240px,24vw,380px);aspect-ratio:10/13;z-index:3}
   .cc2{width:clamp(90px,9vw,140px);aspect-ratio:10/22;margin-left:-1.2rem;z-index:2}
   .cc3{width:clamp(80px,8vw,120px);aspect-ratio:10/20;margin-left:-.8rem;z-index:1}
@@ -120,7 +120,7 @@
                 justify-content:center;gap:1rem;min-height:400px;position:relative;overflow:hidden;max-width:100%}
   .shots{display:flex;align-items:center;gap:.8rem;max-width:100%}
   .shot{border-radius:16px;overflow:hidden;position:relative;box-shadow:0 12px 30px rgba(46,45,41,.15);flex:0 0 auto}
-  .shot img{width:100%;height:100%;object-fit:cover}
+  .shot img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
   .shot.s-side{width:clamp(70px,7vw,120px);aspect-ratio:10/14}
   .shot.s-main{width:clamp(150px,14vw,220px);aspect-ratio:10/19;border-radius:26px;border:6px solid var(--ink);z-index:2}
   .idv{position:absolute;left:.5rem;bottom:.5rem;background:#3B7BF6;color:#fff;font-size:.62rem;font-weight:600;
@@ -200,7 +200,7 @@
          flex-direction:column;transition:transform .2s,box-shadow .2s}
   .pcard:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
   .pcard-photo{position:relative;aspect-ratio:10/12;overflow:hidden}
-  .pcard-photo img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+  .pcard-photo img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1;transition:transform .4s}
   .pcard:hover .pcard-photo img{transform:scale(1.05)}
   .pcard-photo .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)}
   .badge-live{position:absolute;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.4rem;
@@ -507,7 +507,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp" alt="Profil de Amina, 28 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp" alt="Profil de Amina, 28 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -523,7 +523,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Profil de Daniela, 28 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Profil de Daniela, 28 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -539,7 +539,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp" alt="Profil de Fatou, 33 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp" alt="Profil de Fatou, 33 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -555,7 +555,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp" alt="Profil de Mei, 25 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp" alt="Profil de Mei, 25 ans" onerror="this.remove()">
             
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -571,7 +571,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp" alt="Profil de Katarina, 38 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp" alt="Profil de Katarina, 38 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -587,7 +587,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Profil de Sofia, 30 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Profil de Sofia, 30 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -603,7 +603,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Profil de Léa, 24 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Profil de Léa, 24 ans" onerror="this.remove()">
             
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -619,7 +619,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp" alt="Profil de Hélène, 42 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp" alt="Profil de Hélène, 42 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -635,7 +635,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Profil de Tiana, 30 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Profil de Tiana, 30 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -651,7 +651,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Profil de Alice, 23 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Profil de Alice, 23 ans" onerror="this.remove()">
             
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -667,7 +667,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Profil de Nadia, 27 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Profil de Nadia, 27 ans" onerror="this.remove()">
             <span class="badge-live"><span class="live-dot"></span> En ligne</span>
             <span class="badge-ok">✓ Vérifié</span>
           </div>
@@ -683,7 +683,7 @@
         <article class="pcard">
           <div class="pcard-photo">
             <div class="ph"></div>
-            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Profil de Clara, 35 ans" loading="lazy" onerror="this.remove()">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Profil de Clara, 35 ans" onerror="this.remove()">
             
             <span class="badge-ok">✓ Vérifié</span>
           </div>

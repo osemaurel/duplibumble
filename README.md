@@ -50,9 +50,34 @@ legacy/
 - Le défilement automatique du hero se met en pause au survol et se désactive avec `prefers-reduced-motion`.
 - `src/lib/profiles.ts` est volontairement typé comme la future table Supabase `ladies` : le passage aux données réelles se fera sans toucher aux composants.
 
+## Base de données
+
+Projet Supabase `palab` (référence `lwkhkhyqhkubtthmvfkx`, région `eu-west-3`). Le schéma vit
+dans `supabase/migrations/`, en SQL numéroté et rejouable.
+
+```bash
+npx supabase link --project-ref lwkhkhyqhkubtthmvfkx
+npx supabase db push        # applique les migrations en attente
+npx supabase gen types typescript --project-id lwkhkhyqhkubtthmvfkx > src/lib/supabase/types.ts
+```
+
+Trois clients selon le contexte, dans `src/lib/supabase/` :
+
+| Fichier | Usage | RLS |
+|---|---|---|
+| `client.ts` | navigateur | appliqué |
+| `server.ts` | composants serveur, actions, route handlers | appliqué |
+| `admin.ts` | webhooks, imports, tâches d'administration | **contourné** |
+
+`admin.ts` importe `server-only` : toute tentative de l'utiliser depuis un composant client
+casse la compilation, la clé de service ne peut donc pas fuir vers le navigateur.
+
+Le modèle et les règles d'accès sont décrits dans `docs/modele-donnees.md`.
+
 ## Déploiement
 
-Déployé sur **Vercel**. Aucune variable d'environnement n'est requise à ce stade ; le framework est détecté automatiquement.
+Déployé sur **Vercel**. Copiez `.env.example` en `.env.local` pour le développement, et
+reportez les mêmes variables dans Vercel pour la production.
 
 ## Note
 

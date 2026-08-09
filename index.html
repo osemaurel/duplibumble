@@ -72,13 +72,21 @@
   .hero-cards{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2}
   .hcard{position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(46,45,41,.25)}
   .hcard img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
-  .hcard .hname{position:absolute;left:1.2rem;bottom:1.2rem;color:#fff;font-weight:600;font-size:1.5rem;
+  .hcard .hname{position:absolute;z-index:2;left:1.2rem;bottom:1.2rem;color:#fff;font-weight:600;font-size:1.5rem;
                 transform:rotate(-6deg);text-shadow:0 2px 14px rgba(0,0,0,.35);font-style:italic}
   .hc1{width:clamp(240px,29vw,420px);aspect-ratio:10/17;border-radius:26px;border-top-left-radius:50% 22%;border-top-right-radius:50% 22%;z-index:3}
   .hc2{width:clamp(120px,13.5vw,190px);aspect-ratio:10/26;border-radius:100px;margin-left:-1.5rem;z-index:2;align-self:center}
   .hc3{width:clamp(110px,12vw,175px);aspect-ratio:10/24;border-radius:22px;margin-left:-1rem;transform:rotate(6deg);z-index:1}
   .hc3 .hname,.hc2 .hname{font-size:1rem;left:.9rem;bottom:.9rem}
   .hcard .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F5A65B,#E9805E)}
+  .hslides{position:absolute;inset:0;z-index:1}
+  .hslide{position:absolute;inset:0;margin:0;opacity:0;transform:translateY(14%) scale(1.05);
+          transition:opacity .85s ease,transform 1.15s cubic-bezier(.22,.61,.36,1);will-change:opacity,transform}
+  .hslide.is-on{opacity:1;transform:none}
+  .hslide img{width:100%;height:100%;object-fit:cover}
+  @media (prefers-reduced-motion:reduce){
+    .hslide{transition:opacity .3s linear;transform:none}
+  }
 
   /* ================= Mission ================= */
   .mission{padding:8rem 0 7rem}
@@ -91,7 +99,7 @@
   .cc1{width:clamp(240px,24vw,380px);aspect-ratio:10/13;z-index:3}
   .cc2{width:clamp(90px,9vw,140px);aspect-ratio:10/22;margin-left:-1.2rem;z-index:2}
   .cc3{width:clamp(80px,8vw,120px);aspect-ratio:10/20;margin-left:-.8rem;z-index:1}
-  .vpill{position:absolute;top:1rem;right:1rem;background:var(--yellow-pill);color:#fff;font-weight:600;
+  .vpill{position:absolute;z-index:2;top:1rem;right:1rem;background:var(--yellow-pill);color:#fff;font-weight:600;
          font-size:1.05rem;padding:1.1rem .6rem;border-radius:999px;writing-mode:vertical-rl;letter-spacing:.01em;
          box-shadow:0 8px 22px rgba(46,45,41,.18)}
   .cc2 .vpill,.cc3 .vpill{font-size:.85rem;padding:.9rem .45rem;top:.7rem;right:.55rem}
@@ -123,9 +131,9 @@
   .shot img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
   .shot.s-side{width:clamp(70px,7vw,120px);aspect-ratio:10/14}
   .shot.s-main{width:clamp(150px,14vw,220px);aspect-ratio:10/19;border-radius:26px;border:6px solid var(--ink);z-index:2}
-  .idv{position:absolute;left:.5rem;bottom:.5rem;background:#3B7BF6;color:#fff;font-size:.62rem;font-weight:600;
+  .idv{position:absolute;z-index:2;left:.5rem;bottom:.5rem;background:#3B7BF6;color:#fff;font-size:.62rem;font-weight:600;
        padding:.18rem .5rem;border-radius:999px;display:flex;align-items:center;gap:.25rem;white-space:nowrap}
-  .shot-name{position:absolute;left:.6rem;bottom:1.6rem;color:#fff;font-weight:600;font-size:.95rem;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+  .shot-name{position:absolute;z-index:2;left:.6rem;bottom:1.6rem;color:#fff;font-weight:600;font-size:.95rem;text-shadow:0 2px 10px rgba(0,0,0,.4)}
   .chip{position:absolute;background:#FCC6E2;color:var(--ink);font-weight:600;font-size:.95rem;padding:.5rem 1.1rem;
         border-radius:999px;box-shadow:0 8px 20px rgba(46,45,41,.15);display:flex;gap:.45rem;align-items:center;z-index:3}
   .chip .cdot{width:10px;height:10px;border-radius:50%;background:#E64FA0}
@@ -203,9 +211,9 @@
   .pcard-photo img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1;transition:transform .4s}
   .pcard:hover .pcard-photo img{transform:scale(1.05)}
   .pcard-photo .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)}
-  .badge-live{position:absolute;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.4rem;
+  .badge-live{position:absolute;z-index:2;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.4rem;
               background:rgba(255,255,255,.94);border-radius:999px;padding:.3rem .7rem;font-size:.76rem;font-weight:700}
-  .badge-ok{position:absolute;top:.8rem;right:.8rem;background:#3B7BF6;color:#fff;border-radius:999px;
+  .badge-ok{position:absolute;z-index:2;top:.8rem;right:.8rem;background:#3B7BF6;color:#fff;border-radius:999px;
             padding:.3rem .6rem;font-size:.72rem;font-weight:700;display:inline-flex;align-items:center;gap:.25rem}
   .pcard-body{padding:1rem 1.1rem 1.2rem}
   .pcard-body h3{font-size:1.18rem;margin-bottom:.15rem}
@@ -451,18 +459,66 @@
     <div class="hero-cards">
       <div class="hcard hc1">
         <div class="ph"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Daniela, 28 ans" onerror="this.remove()">
-        <span class="hname">Daniela, 28</span>
+        <div class="hslides" aria-live="off">
+          <figure class="hslide is-on">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021038_bd2acefd-a92c-4220-942d-cab33dbc1ef6_min.webp" alt="Amina, 28" onerror="this.remove()">
+            <figcaption class="hname">Amina, 28</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234353_eac645f2-3de5-49f9-8e89-ea44b8a3ad5a_min.webp" alt="Daniela, 28" onerror="this.remove()">
+            <figcaption class="hname">Daniela, 28</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Sofia, 30" onerror="this.remove()">
+            <figcaption class="hname">Sofia, 30</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021101_e254f6b8-9106-4cbc-b000-91d27d04b772_min.webp" alt="Fatou, 33" onerror="this.remove()">
+            <figcaption class="hname">Fatou, 33</figcaption>
+          </figure>
+        </div>
       </div>
       <div class="hcard hc2">
         <div class="ph" style="background:linear-gradient(160deg,#F2788C,#B8324B)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021220_1e1434c8-c999-452f-af5f-7902962548a5_min.webp" alt="Sofia, 30 ans" onerror="this.remove()">
-        <span class="hname">Sofia, 30</span>
+        <div class="hslides" aria-live="off">
+          <figure class="hslide is-on">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021126_16d82f45-eca4-486a-8628-4e1deb0f041d_min.webp" alt="Mei, 25" onerror="this.remove()">
+            <figcaption class="hname">Mei, 25</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021151_579242a2-cbf5-4efd-85b2-4eb93cb234a3_min.webp" alt="Katarina, 38" onerror="this.remove()">
+            <figcaption class="hname">Katarina, 38</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235300_e4350fa6-c349-4acc-8e7c-b434cf8a7343_min.webp" alt="Alice, 23" onerror="this.remove()">
+            <figcaption class="hname">Alice, 23</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235040_88e1f796-c124-48b6-94af-346bf9815a8a_min.webp" alt="Nadia, 27" onerror="this.remove()">
+            <figcaption class="hname">Nadia, 27</figcaption>
+          </figure>
+        </div>
       </div>
       <div class="hcard hc3">
         <div class="ph" style="background:linear-gradient(160deg,#E88BB5,#C85A8E)"></div>
-        <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Tiana, 30 ans" onerror="this.remove()">
-        <span class="hname">Tiana, 30</span>
+        <div class="hslides" aria-live="off">
+          <figure class="hslide is-on">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234730_1ce6ee71-3214-4165-a6d3-623267ae7e2c_min.webp" alt="Tiana, 30" onerror="this.remove()">
+            <figcaption class="hname">Tiana, 30</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_234925_670d293c-65a4-4f1b-956e-22c52c370994_min.webp" alt="Léa, 24" onerror="this.remove()">
+            <figcaption class="hname">Léa, 24</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260809_021246_436f17c4-0ed9-4b8f-b6e4-70a12d01410d_min.webp" alt="Hélène, 42" onerror="this.remove()">
+            <figcaption class="hname">Hélène, 42</figcaption>
+          </figure>
+          <figure class="hslide">
+            <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3GF2uxQTPWV2BWmxcR4eoNDeUU9/hf_20260808_235105_c5d22180-0737-42e6-9a1a-3a4840eda2bb_min.webp" alt="Clara, 35" onerror="this.remove()">
+            <figcaption class="hname">Clara, 35</figcaption>
+          </figure>
+        </div>
       </div>
     </div>
   </div>
@@ -919,6 +975,21 @@
 </div>
 
 <script>
+  // Carrousel du hero : les cartes font défiler les profils en continu
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.hslides').forEach((strip, idx) => {
+    const slides = Array.from(strip.children);
+    if (slides.length < 2) return;
+    let i = 0;
+    const step = () => {
+      slides[i].classList.remove('is-on');
+      i = (i + 1) % slides.length;
+      slides[i].classList.add('is-on');
+    };
+    const delay = 3600 + idx * 900;          // décalage d'une carte à l'autre
+    setTimeout(() => { step(); setInterval(step, delay); }, reduced ? 6000 : 1400 + idx * 900);
+  });
+
   const hdr = document.querySelector('header');
   const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 24);
   onScroll(); window.addEventListener('scroll', onScroll, {passive:true});

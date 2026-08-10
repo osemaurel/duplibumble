@@ -1,20 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import FilMessages from "@/components/backoffice/fil-messages";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 import FormulaireReponse from "./formulaire-reponse";
-
-function heure(date: string) {
-  return new Date(date).toLocaleString("fr-FR", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default async function Conversation({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -99,48 +91,26 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <div className="bo-conv-flux">
-          {!messages?.length ? (
-            <p
-              style={{
-                textAlign: "center",
-                padding: "2.5rem 0",
-                fontSize: "0.9rem",
-                color: "var(--ink-3)",
-              }}
-            >
-              Aucun message. Vous pouvez ouvrir la conversation.
-            </p>
-          ) : (
-            messages.map((message) => {
-              const deLaFemme = message.sender === "lady";
-              const auteur = message.authored_by_agent_id
-                ? agentParId.get(message.authored_by_agent_id)
-                : null;
-              const ecritParUnAutre = Boolean(auteur && auteur.id !== agent.id);
-
-              return (
-                <div
-                  key={message.id}
-                  className={`bo-bulle-rangee ${deLaFemme ? "mienne" : "sienne"}`}
-                >
-                  <div className="bo-bulle">
-                    <div className="texte">{message.body}</div>
-                    <p className="meta">
-                      {heure(message.created_at)}
-                      {deLaFemme && auteur && (
-                        <span className={ecritParUnAutre ? "autre-auteur" : undefined}>
-                          {" · rédigé par "}
-                          {ecritParUnAutre ? auteur.code : "vous"}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+        <FilMessages
+          conversationId={conversation.id}
+          monCote="lady"
+          vide="Aucun message. Vous pouvez ouvrir la conversation."
+          initiaux={(messages ?? []).map((m) => {
+            const auteur = m.authored_by_agent_id
+              ? agentParId.get(m.authored_by_agent_id)
+              : null;
+            const ecritParUnAutre = Boolean(auteur && auteur.id !== agent.id);
+            return {
+              id: m.id,
+              body: m.body,
+              created_at: m.created_at,
+              mienne: m.sender === "lady",
+              signature:
+                m.sender === "lady" && auteur ? (ecritParUnAutre ? auteur.code : "vous") : null,
+              signatureAutre: ecritParUnAutre,
+            };
+          })}
+        />
 
         <FormulaireReponse conversationId={conversation.id} prenom={femme.display_name} />
       </div>

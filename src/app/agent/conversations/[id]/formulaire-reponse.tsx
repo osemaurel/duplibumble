@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
+
+import ZoneMessage from "@/components/backoffice/zone-message";
 
 import { repondre } from "../../actions";
 
@@ -12,13 +14,6 @@ export default function FormulaireReponse({
   prenom: string;
 }) {
   const [resultat, action, enCours] = useActionState(repondre, null);
-  const champ = useRef<HTMLTextAreaElement>(null);
-
-  // Vider le champ une fois le message parti, pour ne pas risquer de le
-  // renvoyer deux fois.
-  useEffect(() => {
-    if (resultat?.ok && champ.current) champ.current.value = "";
-  }, [resultat]);
 
   return (
     <form action={action} className="bo-repondre">
@@ -30,17 +25,15 @@ export default function FormulaireReponse({
         </p>
       )}
 
-      <textarea
-        ref={champ}
-        name="corps"
-        rows={3}
-        required
+      <ZoneMessage
         placeholder={`Répondre au nom de ${prenom}…`}
+        reinitialiser={resultat?.ok ? resultat.message : null}
       />
 
       <div className="pied">
         <p>
           Envoyé au nom de {prenom}. Votre code d&apos;agent reste attaché au message.
+          <span className="bo-astuce">Entrée pour envoyer, Maj+Entrée pour aller à la ligne</span>
         </p>
         <button type="submit" className="bo-btn" disabled={enCours}>
           {enCours ? "Envoi…" : "Envoyer"}

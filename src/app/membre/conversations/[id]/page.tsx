@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import FilMessages from "@/components/backoffice/fil-messages";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
 import { COUT_MESSAGE } from "@/lib/credits";
@@ -8,15 +9,6 @@ import { photosSignees } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 import FormulaireMessage from "./formulaire-message";
-
-function heure(date: string) {
-  return new Date(date).toLocaleString("fr-FR", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default async function Conversation({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -81,33 +73,17 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <div className="bo-conv-flux">
-          {!messages?.length ? (
-            <p
-              style={{
-                textAlign: "center",
-                padding: "2.5rem 0",
-                fontSize: "0.9rem",
-                color: "var(--ink-3)",
-              }}
-            >
-              Écrivez le premier message. Présentez-vous simplement, cela fonctionne mieux
-              qu&apos;un compliment.
-            </p>
-          ) : (
-            messages.map((message) => {
-              const deMoi = message.sender === "member";
-              return (
-                <div key={message.id} className={`bo-bulle-rangee ${deMoi ? "mienne" : "sienne"}`}>
-                  <div className="bo-bulle">
-                    <div className="texte">{message.body}</div>
-                    <p className="meta">{heure(message.created_at)}</p>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
+        <FilMessages
+          conversationId={conversation.id}
+          monCote="member"
+          vide="Écrivez le premier message. Présentez-vous simplement, cela fonctionne mieux qu'un compliment."
+          initiaux={(messages ?? []).map((m) => ({
+            id: m.id,
+            body: m.body,
+            created_at: m.created_at,
+            mienne: m.sender === "member",
+          }))}
+        />
 
         <FormulaireMessage
           conversationId={conversation.id}

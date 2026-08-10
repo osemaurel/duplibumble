@@ -22,7 +22,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className={scrolled ? "scrolled" : undefined}>
+    <header className={scrolled ? "site-header scrolled" : "site-header"}>
       <div className="wrap nav">
         <a className="wordmark" href="#" aria-label="Palab — accueil">
           Palab

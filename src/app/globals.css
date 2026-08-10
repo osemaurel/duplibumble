@@ -38,10 +38,13 @@
   .btn-dark:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(46,45,41,.25)}
 
   /* ================= Header ================= */
-  header{position:sticky;top:0;z-index:80;pointer-events:none;transition:background .25s,box-shadow .25s}
-  header.scrolled{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+  /* Portée limitée à l'en-tête de la landing : `pointer-events:none` laisse
+     cliquer le hero au travers, mais appliqué à tout `header` il rendait
+     inertes les en-têtes des autres espaces. */
+  header.site-header{position:sticky;top:0;z-index:80;pointer-events:none;transition:background .25s,box-shadow .25s}
+  header.site-header.scrolled{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
                   box-shadow:0 2px 24px rgba(46,45,41,.12)}
-  header.scrolled .nav{padding:.85rem 0}
+  header.site-header.scrolled .nav{padding:.85rem 0}
   .nav{display:flex;align-items:center;gap:1rem;padding:1.6rem 0;position:relative}
   .nav>*{pointer-events:auto}
   .wordmark{font-size:2.1rem;font-weight:700;letter-spacing:-.04em;color:var(--ink)}

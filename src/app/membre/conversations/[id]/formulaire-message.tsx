@@ -1,6 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState } from "react";
+
+import ZoneMessage from "@/components/backoffice/zone-message";
 
 import { envoyerMessage } from "../../actions";
 
@@ -16,12 +18,6 @@ export default function FormulaireMessage({
   solde: number;
 }) {
   const [resultat, action, enCours] = useActionState(envoyerMessage, null);
-  const champ = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (resultat?.ok && champ.current) champ.current.value = "";
-  }, [resultat]);
-
   const soldeInsuffisant = solde < cout;
 
   return (
@@ -40,18 +36,16 @@ export default function FormulaireMessage({
         </p>
       )}
 
-      <textarea
-        ref={champ}
-        name="corps"
-        rows={3}
-        required
-        disabled={soldeInsuffisant}
+      <ZoneMessage
         placeholder={`Écrire à ${prenom}…`}
+        desactive={soldeInsuffisant}
+        reinitialiser={resultat?.ok ? resultat.message + solde : null}
       />
 
       <div className="pied">
         <p>
           {cout} crédit{cout > 1 ? "s" : ""} par message · il vous en reste {solde}
+          <span className="bo-astuce">Entrée pour envoyer, Maj+Entrée pour aller à la ligne</span>
         </p>
         <button type="submit" className="bo-btn" disabled={enCours || soldeInsuffisant}>
           {enCours ? "Envoi…" : "Envoyer"}

@@ -1327,6 +1327,14 @@
   body.plein-ecran .bo-side {
     display: none;
   }
+  /* Rien ne doit défiler derrière le panneau : sans ce verrou, la
+     compensation du décalage lutterait contre un document qui bouge
+     encore, et l'en-tête tremblerait à chaque ouverture du clavier. */
+  body.plein-ecran {
+    overflow: hidden;
+    height: 100%;
+    overscroll-behavior: none;
+  }
   body.plein-ecran .bo-main,
   body.plein-ecran .mb-contenu {
     padding: 0;
@@ -1336,8 +1344,11 @@
 
   .bo-conv.plein {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 60;
+    transform-origin: top center;
     height: 100dvh;
     min-height: 0;
     margin: 0;

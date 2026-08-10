@@ -26,9 +26,19 @@ export default async function Connexion({
     });
 
     if (error) {
+      // Un mot de passe erroné est une chose ; une panne du service
+      // d'authentification en est une autre. Les confondre sous un même
+      // message envoie chercher le problème là où il n'est pas.
+      const identifiantsRefuses =
+        error.code === "invalid_credentials" || error.status === 400;
+
+      const message = identifiantsRefuses
+        ? "Adresse ou mot de passe incorrect."
+        : `Le service d'authentification a répondu : ${error.message}`;
+
       redirect(
         `/connexion?suivant=${encodeURIComponent(destination)}&erreur=${encodeURIComponent(
-          "Identifiants incorrects.",
+          message,
         )}`,
       );
     }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import FilMessages from "@/components/backoffice/fil-messages";
+import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -65,12 +66,17 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
 
   return (
     <div style={{ maxWidth: "56rem", marginInline: "auto" }}>
-      <Link href="/agent" className="bo-retour">
+      <ModePleinEcran />
+
+      <Link href="/agent" className="bo-retour bo-retour-page">
         ← Tous les messages
       </Link>
 
-      <div className="bo-carte bo-conv">
+      <div className="bo-carte bo-conv plein">
         <div className="bo-conv-entete">
+          <Link href="/agent" className="bo-conv-retour" aria-label="Revenir aux messages">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 19 8 12l7-7" /></svg>
+          </Link>
           <Avatar nom={nomMembre} />
           <div style={{ minWidth: 0, flex: 1 }}>
             <p className="bo-h2">

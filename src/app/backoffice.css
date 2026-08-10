@@ -1308,3 +1308,76 @@
     border: 2px solid #fff;
   }
 }
+
+/* ================== Conversation en plein écran ====================
+   Sur téléphone, ouvrir une discussion doit la faire occuper tout
+   l'écran : plus d'en-tête, plus de barre d'onglets, une flèche de
+   retour en haut à gauche. C'est la convention de toutes les
+   messageries, et laisser un menu sous le clavier n'a aucun sens.
+
+   La hauteur est en dvh — l'unité qui suit la surface réellement
+   visible. Avec vh, le clavier recouvre la zone de saisie.
+   ------------------------------------------------------------------ */
+
+.bo-conv-retour { display: none; }
+
+@media (max-width: 720px) {
+  body.plein-ecran .mb-barre,
+  body.plein-ecran .mb-onglets,
+  body.plein-ecran .bo-side {
+    display: none;
+  }
+  body.plein-ecran .bo-main,
+  body.plein-ecran .mb-contenu {
+    padding: 0;
+    max-width: none;
+  }
+  body.plein-ecran .bo-retour-page { display: none; }
+
+  .bo-conv.plein {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .bo-conv.plein .bo-conv-entete {
+    padding: 0.7rem 0.9rem;
+    padding-top: max(0.7rem, env(safe-area-inset-top));
+  }
+  .bo-conv.plein .bo-conv-flux {
+    flex: 1;
+    max-height: none;
+    padding: 1.2rem 1rem;
+  }
+  .bo-conv.plein .bo-repondre {
+    padding: 0.75rem 0.9rem;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+  .bo-conv.plein .bo-repondre .pied p { display: none; }
+
+  .bo-conv-retour {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    margin-left: -0.35rem;
+    border-radius: 999px;
+    color: var(--ink);
+    transition: background 0.15s;
+  }
+  .bo-conv-retour:active { background: var(--line-soft); }
+  .bo-conv-retour svg { width: 22px; height: 22px; }
+
+  /* Le bouton de profil prend trop de place à côté du nom sur un
+     téléphone : le nom reste, l'accès à la fiche se fait en touchant
+     l'en-tête. */
+  .bo-conv.plein .bo-conv-entete .bo-btn { display: none; }
+}

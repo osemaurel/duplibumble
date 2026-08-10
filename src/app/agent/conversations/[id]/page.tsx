@@ -111,6 +111,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
               body: m.body,
               created_at: m.created_at,
               mienne: m.sender === "lady",
+              attachment_path: m.attachment_path,
               signature:
                 m.sender === "lady" && auteur ? (ecritParUnAutre ? auteur.code : "vous") : null,
               signatureAutre: ecritParUnAutre,

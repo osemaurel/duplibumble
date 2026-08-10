@@ -21,9 +21,10 @@ export async function repondre(_prev: Resultat | null, formData: FormData): Prom
 
   const conversationId = String(formData.get("conversation_id") ?? "");
   const corps = String(formData.get("corps") ?? "").trim();
+  const pieceJointe = String(formData.get("attachment_path") ?? "").trim() || null;
 
   if (!conversationId) return { ok: false, message: "Conversation introuvable." };
-  if (!corps) return { ok: false, message: "Le message est vide." };
+  if (!corps && !pieceJointe) return { ok: false, message: "Le message est vide." };
 
   const supabase = await createClient();
 
@@ -32,6 +33,7 @@ export async function repondre(_prev: Resultat | null, formData: FormData): Prom
     sender: "lady",
     authored_by_agent_id: agent.id,
     body: corps,
+    attachment_path: pieceJointe,
   });
 
   if (error) {

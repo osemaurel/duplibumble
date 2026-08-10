@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import ZoneMessage from "@/components/backoffice/zone-message";
+import Composeur from "@/components/backoffice/composeur";
 
 import { envoyerMessage } from "../../actions";
 
@@ -24,32 +24,21 @@ export default function FormulaireMessage({
     <form action={action} className="bo-repondre">
       <input type="hidden" name="conversation_id" value={conversationId} />
 
-      {resultat && !resultat.ok && (
-        <p className="bo-message erreur" style={{ marginBottom: "0.85rem" }}>
-          {resultat.message}
-        </p>
-      )}
+      {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
 
       {soldeInsuffisant && (
-        <p className="bo-message avertissement" style={{ marginBottom: "0.85rem" }}>
+        <p className="bo-message avertissement">
           Vos crédits sont épuisés. Le rechargement arrive très bientôt.
         </p>
       )}
 
-      <ZoneMessage
+      <Composeur
+        conversationId={conversationId}
         placeholder={`Écrire à ${prenom}…`}
         desactive={soldeInsuffisant}
-        reinitialiser={resultat?.ok ? resultat.message + solde : null}
+        enCours={enCours}
+        key={resultat?.ok ? `envoye-${solde}` : "saisie"}
       />
-
-      <div className="pied">
-        <p>
-          {cout} crédit{cout > 1 ? "s" : ""} par message · il vous en reste {solde}
-        </p>
-        <button type="submit" className="bo-btn" disabled={enCours || soldeInsuffisant}>
-          {enCours ? "Envoi…" : "Envoyer"}
-        </button>
-      </div>
     </form>
   );
 }

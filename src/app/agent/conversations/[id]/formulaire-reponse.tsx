@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import ZoneMessage from "@/components/backoffice/zone-message";
+import Composeur from "@/components/backoffice/composeur";
 
 import { repondre } from "../../actions";
 
@@ -19,25 +19,14 @@ export default function FormulaireReponse({
     <form action={action} className="bo-repondre">
       <input type="hidden" name="conversation_id" value={conversationId} />
 
-      {resultat && !resultat.ok && (
-        <p className="bo-message erreur" style={{ marginBottom: "0.85rem" }}>
-          {resultat.message}
-        </p>
-      )}
+      {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
 
-      <ZoneMessage
+      <Composeur
+        conversationId={conversationId}
         placeholder={`Répondre au nom de ${prenom}…`}
-        reinitialiser={resultat?.ok ? resultat.message : null}
+        enCours={enCours}
+        key={resultat?.ok ? "envoye" : "saisie"}
       />
-
-      <div className="pied">
-        <p>
-          Envoyé au nom de {prenom}. Votre code d&apos;agent reste attaché au message.
-        </p>
-        <button type="submit" className="bo-btn" disabled={enCours}>
-          {enCours ? "Envoi…" : "Envoyer"}
-        </button>
-      </div>
     </form>
   );
 }

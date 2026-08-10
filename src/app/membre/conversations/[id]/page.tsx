@@ -88,6 +88,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
             body: m.body,
             created_at: m.created_at,
             mienne: m.sender === "member",
+            attachment_path: m.attachment_path,
           }))}
         />
 

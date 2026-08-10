@@ -14,6 +14,8 @@ export type MessageAffiche = {
   signature?: string | null;
   /** Signature d'un confrère : soulignée pour ne pas passer inaperçue. */
   signatureAutre?: boolean;
+  /** Chemin de la pièce jointe dans le stockage, le cas échéant. */
+  attachment_path?: string | null;
 };
 
 function heure(date: string) {
@@ -61,6 +63,7 @@ export default function FilMessages({
   // Recopier le serveur dans l'état obligerait à les resynchroniser sans cesse,
   // et ferait diverger les deux à la moindre course.
   const [recus, setRecus] = useState<MessageAffiche[]>([]);
+  const [urls, setUrls] = useState<Record<string, string>>({});
   const bas = useRef<HTMLDivElement>(null);
 
   const connus = new Set(initiaux.map((m) => m.id));
@@ -87,6 +90,7 @@ export default function FilMessages({
             body: string;
             created_at: string;
             sender: "member" | "lady";
+            attachment_path: string | null;
           };
 
           setRecus((actuels) =>
@@ -99,6 +103,7 @@ export default function FilMessages({
                     body: ligne.body,
                     created_at: ligne.created_at,
                     mienne: ligne.sender === monCote,
+                    attachment_path: ligne.attachment_path,
                   },
                 ],
           );
@@ -110,6 +115,35 @@ export default function FilMessages({
       void supabase.removeChannel(canal);
     };
   }, [conversationId, monCote]);
+
+  const cheminsAsigner = messages
+    .map((m) => m.attachment_path)
+    .filter((c): c is string => Boolean(c) && !urls[c as string])
+    .join("|");
+
+  useEffect(() => {
+    if (!cheminsAsigner) return;
+    let vivant = true;
+
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase.storage
+        .from("message-attachments")
+        .createSignedUrls(cheminsAsigner.split("|"), 3600);
+
+      if (!vivant || !data) return;
+
+      const nouvelles: Record<string, string> = {};
+      for (const entree of data) {
+        if (entree.path && entree.signedUrl) nouvelles[entree.path] = entree.signedUrl;
+      }
+      setUrls((anciennes) => ({ ...anciennes, ...nouvelles }));
+    })();
+
+    return () => {
+      vivant = false;
+    };
+  }, [cheminsAsigner]);
 
   // Se coller au dernier message : c'est celui qu'on vient lire.
   useEffect(() => {
@@ -143,7 +177,17 @@ export default function FilMessages({
 
               <div className={`bo-bulle-rangee ${message.mienne ? "mienne" : "sienne"}`}>
                 <div className="bo-bulle">
-                  <div className="texte">{message.body}</div>
+                  {message.attachment_path && (
+                    <div className="bo-bulle-photo">
+                      {urls[message.attachment_path] ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={urls[message.attachment_path]} alt="Photo envoyée" />
+                      ) : (
+                        <span>Chargement de la photo…</span>
+                      )}
+                    </div>
+                  )}
+                  {message.body && <div className="texte">{message.body}</div>}
                   <p className="meta">
                     {heure(message.created_at)}
                     {message.signature && (

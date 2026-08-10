@@ -198,13 +198,20 @@ export type Report = {
   created_at: string;
 };
 
+/**
+ * `Relationships` est indispensable même vide : le client s'en sert pour
+ * analyser les listes de colonnes d'un `.select("a, b, c")`. Sans cette clé, il
+ * ne sait pas résoudre la table et renvoie `never` sur chaque champ.
+ */
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
   Update: Update;
+  Relationships: [];
 };
 
 export type Database = {
+  __InternalSupabase: { PostgrestVersion: "14.15" };
   public: {
     Tables: {
       profiles: Table<Profile>;

@@ -21,11 +21,11 @@ export default function FormulaireReponse({
   }, [resultat]);
 
   return (
-    <form action={action} className="border-t border-[#E9E7E1] bg-white p-4">
+    <form action={action} className="bo-repondre">
       <input type="hidden" name="conversation_id" value={conversationId} />
 
       {resultat && !resultat.ok && (
-        <p className="mb-3 rounded-xl bg-[#FDECEF] px-4 py-2.5 text-sm text-[#B8324B]">
+        <p className="bo-message erreur" style={{ marginBottom: "0.85rem" }}>
           {resultat.message}
         </p>
       )}
@@ -36,18 +36,13 @@ export default function FormulaireReponse({
         rows={3}
         required
         placeholder={`Répondre au nom de ${prenom}…`}
-        className="w-full resize-y rounded-xl border border-[#E9E7E1] px-4 py-3 text-[#2E2D29] outline-none focus:border-[#E0314B]"
       />
 
-      <div className="mt-3 flex items-center justify-between gap-4">
-        <p className="text-xs text-[#9A968D]">
+      <div className="pied">
+        <p>
           Envoyé au nom de {prenom}. Votre code d&apos;agent reste attaché au message.
         </p>
-        <button
-          type="submit"
-          disabled={enCours}
-          className="shrink-0 rounded-xl bg-[#E0314B] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#C42741] disabled:opacity-60"
-        >
+        <button type="submit" className="bo-btn" disabled={enCours}>
           {enCours ? "Envoi…" : "Envoyer"}
         </button>
       </div>

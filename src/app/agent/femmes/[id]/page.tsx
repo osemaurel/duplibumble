@@ -1,21 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Avatar, IconePhoto, PastilleStatut } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import type { LadyStatus } from "@/lib/supabase/types";
 
 import { soumettreFiche, supprimerPhoto } from "../../actions";
 import FormulaireFiche from "./formulaire-fiche";
 import TeleverserPhotos from "./televerser-photos";
-
-const LIBELLE: Record<LadyStatus, string> = {
-  draft: "Brouillon",
-  pending_review: "En attente de validation",
-  published: "Publiée",
-  rejected: "Refusée",
-  suspended: "Suspendue",
-};
 
 export default async function FicheFemmeAgent({
   params,
@@ -30,7 +22,8 @@ export default async function FicheFemmeAgent({
   if (!femme) notFound();
 
   // La galerie publique est lisible par tous : une fiche publiée d'un confrère
-  // remonterait donc ici sans être modifiable. On l'écarte explicitement.
+  // remonterait donc ici sans être modifiable. On l'écarte explicitement — un
+  // formulaire sans effet est pire qu'une porte fermée.
   if (femme.agent_id !== agent.id) notFound();
 
   const [{ data: prive }, { data: photos }] = await Promise.all([
@@ -46,8 +39,7 @@ export default async function FicheFemmeAgent({
     if (data?.signedUrl) vignettes.set(photo.id, data.signedUrl);
   }
 
-  const prochainePosition =
-    (photos ?? []).reduce((max, p) => Math.max(max, p.position), 0) + 1;
+  const prochainePosition = (photos ?? []).reduce((max, p) => Math.max(max, p.position), 0) + 1;
 
   const manques = [
     !femme.headline && "l'accroche",
@@ -61,31 +53,39 @@ export default async function FicheFemmeAgent({
   const soumissionPossible = femme.status === "draft" || femme.status === "rejected";
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: "grid", gap: "1.5rem" }}>
       <div>
-        <Link href="/agent/femmes" className="text-sm text-[#6B6A64] hover:text-[#E0314B]">
+        <Link href="/agent/femmes" className="bo-retour">
           ← Mes fiches
         </Link>
 
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-normal text-[#2E2D29]">
-              {femme.display_name}
-              {femme.age ? `, ${femme.age}` : ""}
-            </h1>
-            <span className="text-[#9A968D]">· {femme.code}</span>
-            <span className="rounded-full bg-[#F1EFEB] px-3 py-1 text-xs font-medium text-[#4C4B45]">
-              {LIBELLE[femme.status]}
-            </span>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <Avatar nom={femme.display_name} />
+            <div>
+              <h1 className="bo-titre" style={{ fontSize: "1.6rem" }}>
+                {femme.display_name}
+                {femme.age ? `, ${femme.age}` : ""}
+              </h1>
+              <p style={{ marginTop: "0.2rem", fontSize: "0.85rem", color: "var(--ink-3)" }}>
+                {femme.code}
+              </p>
+            </div>
+            <PastilleStatut statut={femme.status} />
           </div>
 
           {soumissionPossible && (
             <form action={soumettreFiche}>
               <input type="hidden" name="lady_id" value={femme.id} />
-              <button
-                type="submit"
-                className="rounded-xl bg-[#E0314B] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#C42741]"
-              >
+              <button type="submit" className="bo-btn">
                 Soumettre à la validation
               </button>
             </form>
@@ -94,28 +94,28 @@ export default async function FicheFemmeAgent({
       </div>
 
       {femme.status === "pending_review" && (
-        <p className="rounded-2xl border border-[#F0C36D] bg-[#FFF8E8] px-5 py-4 text-sm text-[#8A5A00]">
+        <p className="bo-message avertissement">
           Fiche transmise à l&apos;administration. Vous pouvez continuer à la modifier ; la
           publication ne dépend plus que de sa validation.
         </p>
       )}
 
       {femme.status === "rejected" && (
-        <p className="rounded-2xl border border-[#F2A7B5] bg-[#FDECEF] px-5 py-4 text-sm text-[#B8324B]">
+        <p className="bo-message erreur">
           Fiche refusée par l&apos;administration. Corrigez ce qui a été signalé, puis
           soumettez-la de nouveau.
         </p>
       )}
 
       {manques.length > 0 && femme.status !== "published" && (
-        <div className="rounded-2xl border border-[#E9E7E1] bg-white px-5 py-4">
-          <p className="text-sm font-medium text-[#2E2D29]">Il manque encore :</p>
-          <ul className="mt-2 space-y-1 text-sm text-[#6B6A64]">
+        <div className="bo-encadre">
+          <h3>Il manque encore</h3>
+          <ul>
             {manques.map((manque) => (
               <li key={manque}>— {manque}</li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-[#9A968D]">
+          <p>
             Rien ne vous empêche de soumettre malgré tout : une fiche incomplète a simplement
             peu de chances d&apos;être publiée.
           </p>
@@ -124,56 +124,47 @@ export default async function FicheFemmeAgent({
 
       <FormulaireFiche femme={femme} />
 
-      <section className="rounded-2xl border border-[#E9E7E1] bg-white p-6">
-        <h2 className="font-semibold tracking-normal text-[#2E2D29]">
-          Photos · {photos?.length ?? 0}
-        </h2>
-        <p className="mt-1 text-sm text-[#6B6A64]">
+      <section className="bo-carte bo-carte-p">
+        <h2 className="bo-h2">Photos · {photos?.length ?? 0}</h2>
+        <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
           Chaque photo est validée une par une par l&apos;administration avant d&apos;apparaître
           publiquement.
         </p>
 
-        <div className="mt-5">
+        <div style={{ marginTop: "1.3rem" }}>
           <TeleverserPhotos ladyId={femme.id} prochainePosition={prochainePosition} />
         </div>
 
         {photos?.length ? (
-          <div className="mt-6 grid gap-5 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="bo-photos" style={{ marginTop: "1.4rem" }}>
             {photos.map((photo) => {
               const url = vignettes.get(photo.id);
               return (
-                <figure
-                  key={photo.id}
-                  className="overflow-hidden rounded-xl border border-[#E9E7E1] bg-[#FAF9F7]"
-                >
-                  <div className="flex aspect-[3/4] items-center justify-center bg-[#F1EFEB]">
+                <figure key={photo.id} className="bo-photo">
+                  <div className="cadre">
                     {url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={url}
-                        alt={`Photo ${photo.position}`}
-                        className="h-full w-full object-cover"
-                      />
+                      <img src={url} alt={`Photo ${photo.position}`} />
                     ) : (
-                      <span className="px-3 text-center text-xs text-[#9A968D]">
-                        Aperçu indisponible
-                      </span>
+                      <span>Aperçu indisponible</span>
                     )}
                   </div>
 
-                  <figcaption className="p-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#9A968D]">
+                  <figcaption className="infos">
+                    <div className="rangee">
+                      <span className="pos">
                         {photo.position === 1 ? "Principale" : `Photo ${photo.position}`}
                       </span>
                       <span
-                        className={
-                          photo.status === "approved"
-                            ? "font-medium text-[#1B7A54]"
-                            : photo.status === "rejected"
-                              ? "text-[#B8324B]"
-                              : "text-[#A66300]"
-                        }
+                        style={{
+                          fontWeight: 600,
+                          color:
+                            photo.status === "approved"
+                              ? "var(--vert)"
+                              : photo.status === "rejected"
+                                ? "var(--brand-dark)"
+                                : "var(--ambre)",
+                        }}
                       >
                         {photo.status === "approved"
                           ? "Validée"
@@ -184,44 +175,52 @@ export default async function FicheFemmeAgent({
                     </div>
 
                     {photo.rejection_note && (
-                      <p className="mt-2 text-xs text-[#B8324B]">{photo.rejection_note}</p>
+                      <p
+                        style={{
+                          marginTop: "0.5rem",
+                          fontSize: "0.76rem",
+                          color: "var(--brand-dark)",
+                        }}
+                      >
+                        {photo.rejection_note}
+                      </p>
                     )}
 
-                    <form action={supprimerPhoto} className="mt-3">
-                      <input type="hidden" name="photo_id" value={photo.id} />
-                      <input type="hidden" name="lady_id" value={femme.id} />
-                      <input type="hidden" name="storage_path" value={photo.storage_path} />
-                      <button
-                        type="submit"
-                        className="w-full rounded-lg border border-[#E9E7E1] py-2 text-xs font-semibold text-[#B8324B] hover:border-[#B8324B]"
-                      >
-                        Retirer
-                      </button>
-                    </form>
+                    <div className="actions">
+                      <form action={supprimerPhoto}>
+                        <input type="hidden" name="photo_id" value={photo.id} />
+                        <input type="hidden" name="lady_id" value={femme.id} />
+                        <input type="hidden" name="storage_path" value={photo.storage_path} />
+                        <button type="submit" className="refuser">
+                          Retirer
+                        </button>
+                      </form>
+                    </div>
                   </figcaption>
                 </figure>
               );
             })}
           </div>
         ) : (
-          <p className="mt-6 text-sm text-[#6B6A64]">
-            Aucune photo pour l&apos;instant. Six à dix photos verticales donnent le meilleur
-            résultat.
-          </p>
+          <div className="bo-vide" style={{ padding: "2.5rem 1rem" }}>
+            <span className="rond">{IconePhoto}</span>
+            <h3>Aucune photo pour l&apos;instant</h3>
+            <p>Six à dix photos verticales donnent le meilleur résultat.</p>
+          </div>
         )}
       </section>
 
-      <section className="rounded-2xl border-2 border-dashed border-[#E9E7E1] bg-white p-6">
-        <h2 className="font-semibold tracking-normal text-[#2E2D29]">
+      <section className="bo-prive">
+        <h2 className="bo-h2">
           Dossier interne
-          <span className="ml-2 text-xs font-normal text-[#B8324B]">jamais publié</span>
+          <span className="etiquette">jamais publié</span>
         </h2>
-        <p className="mt-1 text-sm text-[#6B6A64]">
+        <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
           Ces informations servent à la vérification. Pour les corriger, passez par
           l&apos;administration.
         </p>
 
-        <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+        <dl className="bo-defs c3" style={{ marginTop: "1.2rem" }}>
           {(
             [
               ["Nom légal", prive?.legal_name ?? null],
@@ -237,8 +236,8 @@ export default async function FicheFemmeAgent({
             ] as [string, string | null][]
           ).map(([libelle, valeur]) => (
             <div key={libelle}>
-              <dt className="text-[#9A968D]">{libelle}</dt>
-              <dd className="mt-0.5 text-[#2E2D29]">{valeur || "—"}</dd>
+              <dt>{libelle}</dt>
+              <dd>{valeur || "—"}</dd>
             </div>
           ))}
         </dl>

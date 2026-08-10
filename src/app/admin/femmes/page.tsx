@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Avatar, EtatVide, IconeFemmes, PastilleStatut } from "@/components/backoffice/ui";
 import { createClient } from "@/lib/supabase/server";
 import type { LadyStatus } from "@/lib/supabase/types";
 
@@ -14,22 +15,6 @@ const FILTRES: { valeur: LadyStatus | "tous"; libelle: string }[] = [
   { valeur: "suspended", libelle: "Suspendues" },
 ];
 
-const COULEUR_STATUT: Record<LadyStatus, string> = {
-  draft: "bg-[#F1EFEB] text-[#6B6A64]",
-  pending_review: "bg-[#FFF3E0] text-[#A66300]",
-  published: "bg-[#E8F6EF] text-[#1B7A54]",
-  rejected: "bg-[#FDECEF] text-[#B8324B]",
-  suspended: "bg-[#EFEDFB] text-[#5B4BC4]",
-};
-
-const LIBELLE_STATUT: Record<LadyStatus, string> = {
-  draft: "Brouillon",
-  pending_review: "À valider",
-  published: "Publiée",
-  rejected: "Refusée",
-  suspended: "Suspendue",
-};
-
 export default async function Femmes({
   searchParams,
 }: {
@@ -40,17 +25,14 @@ export default async function Femmes({
 
   // Le filtre arrive de l'URL : on ne le passe à la requête qu'après l'avoir
   // reconnu, sinon n'importe quelle valeur atteindrait la base.
-  const statut =
-    FILTRES.find((f) => f.valeur === statutBrut)?.valeur ?? ("tous" as const);
+  const statut = FILTRES.find((f) => f.valeur === statutBrut)?.valeur ?? ("tous" as const);
 
   let requete = supabase
     .from("ladies")
     .select("id, code, display_name, age, display_city, display_country, status, agent_id")
     .order("created_at", { ascending: false });
 
-  if (statut !== "tous") {
-    requete = requete.eq("status", statut);
-  }
+  if (statut !== "tous") requete = requete.eq("status", statut);
 
   const [{ data: femmes }, { data: agents }, { data: photos }] = await Promise.all([
     requete,
@@ -69,28 +51,29 @@ export default async function Femmes({
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-normal text-[#2E2D29]">Femmes</h1>
-        <p className="mt-1 text-[#6B6A64]">
-          Une fiche n&apos;est visible du public qu&apos;une fois publiée par vous.
-        </p>
+    <div>
+      <div className="bo-entete">
+        <div>
+          <h1 className="bo-titre">Femmes</h1>
+          <p className="bo-sous-titre">
+            Une fiche n&apos;est visible du public qu&apos;une fois publiée par vous.
+          </p>
+        </div>
       </div>
 
       <FormulaireFemme agents={agents ?? []} />
 
-      <div className="flex flex-wrap gap-2">
+      <div
+        style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", margin: "1.6rem 0 1.2rem" }}
+      >
         {FILTRES.map((filtre) => {
           const actif = statut === filtre.valeur;
           return (
             <Link
               key={filtre.valeur}
               href={`/admin/femmes?statut=${filtre.valeur}`}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                actif
-                  ? "bg-[#E0314B] text-white"
-                  : "bg-white border border-[#E9E7E1] text-[#4C4B45] hover:border-[#E0314B]"
-              }`}
+              className={`bo-btn ${actif ? "" : "fantome"} petit`}
+              style={actif ? undefined : { fontWeight: 500 }}
             >
               {filtre.libelle}
             </Link>
@@ -98,21 +81,24 @@ export default async function Femmes({
         })}
       </div>
 
-      <div className="rounded-2xl bg-white border border-[#E9E7E1] overflow-hidden">
+      <div className="bo-carte">
         {!femmes?.length ? (
-          <p className="px-6 py-8 text-[#6B6A64]">Aucune fiche dans cette catégorie.</p>
+          <EtatVide
+            icone={IconeFemmes}
+            titre="Aucune fiche dans cette catégorie"
+            texte="Changez de filtre, ou créez une fiche avec le formulaire ci-dessus."
+          />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#FAF9F7] text-left text-[#6B6A64]">
+          <div className="bo-table-enveloppe">
+            <table className="bo-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 font-medium">Code</th>
-                  <th className="px-6 py-3 font-medium">Prénom</th>
-                  <th className="px-6 py-3 font-medium">Âge</th>
-                  <th className="px-6 py-3 font-medium">Localisation</th>
-                  <th className="px-6 py-3 font-medium">Agent</th>
-                  <th className="px-6 py-3 font-medium">Photos</th>
-                  <th className="px-6 py-3 font-medium">Statut</th>
+                  <th>Femme</th>
+                  <th>Âge</th>
+                  <th>Localisation</th>
+                  <th>Agent</th>
+                  <th>Photos</th>
+                  <th>Statut</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,46 +107,42 @@ export default async function Femmes({
                   const compte = photosParFemme.get(femme.id) ?? { total: 0, enAttente: 0 };
 
                   return (
-                    <tr key={femme.id} className="border-t border-[#F1EFEB] hover:bg-[#FAF9F7]">
-                      <td className="px-6 py-4 font-medium">
-                        <Link href={`/admin/femmes/${femme.id}`} className="hover:text-[#E0314B]">
-                          {femme.code}
-                        </Link>
+                    <tr key={femme.id}>
+                      <td>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+                          <Avatar nom={femme.display_name} petit />
+                          <div>
+                            <Link href={`/admin/femmes/${femme.id}`} className="lien">
+                              {femme.display_name}
+                            </Link>
+                            <span className="discret">{femme.code}</span>
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 text-[#2E2D29]">{femme.display_name}</td>
-                      <td className="px-6 py-4 text-[#6B6A64]">{femme.age ?? "—"}</td>
-                      <td className="px-6 py-4 text-[#6B6A64]">
+                      <td>{femme.age ?? "—"}</td>
+                      <td>
                         {[femme.display_city, femme.display_country].filter(Boolean).join(", ") ||
                           "—"}
                       </td>
-                      <td className="px-6 py-4 text-[#6B6A64]">
+                      <td>
                         {agent ? (
-                          <Link
-                            href={`/admin/agents/${agent.id}`}
-                            className="hover:text-[#E0314B]"
-                          >
+                          <Link href={`/admin/agents/${agent.id}`} className="lien">
                             {agent.code}
                           </Link>
                         ) : (
-                          <span className="text-[#B8324B]">non attribuée</span>
+                          <span style={{ color: "var(--brand)" }}>non attribuée</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-[#6B6A64]">
+                      <td>
                         {compte.total}
                         {compte.enAttente > 0 && (
-                          <span className="ml-1 text-[#A66300]">
-                            ({compte.enAttente} à modérer)
+                          <span className="discret" style={{ color: "var(--ambre)" }}>
+                            {compte.enAttente} à modérer
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                            COULEUR_STATUT[femme.status]
-                          }`}
-                        >
-                          {LIBELLE_STATUT[femme.status]}
-                        </span>
+                      <td>
+                        <PastilleStatut statut={femme.status} />
                       </td>
                     </tr>
                   );

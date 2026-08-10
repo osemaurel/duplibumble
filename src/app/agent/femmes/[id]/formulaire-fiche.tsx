@@ -30,10 +30,10 @@ function Champ({
   obligatoire?: boolean;
 }) {
   return (
-    <div>
-      <label htmlFor={nom} className="mb-1.5 block text-sm font-medium text-[#2E2D29]">
+    <div className="bo-champ">
+      <label htmlFor={nom}>
         {libelle}
-        {obligatoire && <span className="text-[#E0314B]"> *</span>}
+        {obligatoire && <span className="oblig"> *</span>}
       </label>
       <input
         id={nom}
@@ -41,9 +41,8 @@ function Champ({
         type={type}
         required={obligatoire}
         defaultValue={valeur ?? ""}
-        className="w-full rounded-xl border border-[#E9E7E1] px-4 py-2.5 text-[#2E2D29] outline-none focus:border-[#E0314B]"
       />
-      {aide && <p className="mt-1 text-xs text-[#9A968D]">{aide}</p>}
+      {aide && <p className="bo-aide">{aide}</p>}
     </div>
   );
 }
@@ -62,18 +61,10 @@ function Zone({
   lignes?: number;
 }) {
   return (
-    <div className="sm:col-span-2">
-      <label htmlFor={nom} className="mb-1.5 block text-sm font-medium text-[#2E2D29]">
-        {libelle}
-      </label>
-      <textarea
-        id={nom}
-        name={nom}
-        rows={lignes}
-        defaultValue={valeur ?? ""}
-        className="w-full resize-y rounded-xl border border-[#E9E7E1] px-4 py-2.5 text-[#2E2D29] outline-none focus:border-[#E0314B]"
-      />
-      {aide && <p className="mt-1 text-xs text-[#9A968D]">{aide}</p>}
+    <div className="bo-champ" style={{ gridColumn: "1 / -1" }}>
+      <label htmlFor={nom}>{libelle}</label>
+      <textarea id={nom} name={nom} rows={lignes} defaultValue={valeur ?? ""} />
+      {aide && <p className="bo-aide">{aide}</p>}
     </div>
   );
 }
@@ -82,47 +73,49 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
   const [resultat, action, enCours] = useActionState(enregistrerFiche, null);
 
   return (
-    <form action={action} className="rounded-2xl border border-[#E9E7E1] bg-white p-6">
+    <form action={action} className="bo-carte bo-carte-p">
       <input type="hidden" name="lady_id" value={femme.id} />
 
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="font-semibold tracking-normal text-[#2E2D29]">Fiche publique</h2>
-        <p className="text-xs text-[#9A968D]">
-          L&apos;âge se calcule tout seul et n&apos;est pas modifiable ici.
-        </p>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+        }}
+      >
+        <h2 className="bo-h2">Fiche publique</h2>
+        <p className="bo-aide">L&apos;âge se calcule tout seul et n&apos;est pas modifiable ici.</p>
       </div>
 
       {resultat && (
         <p
-          className={`mt-4 rounded-xl px-4 py-3 text-sm ${
-            resultat.ok
-              ? "bg-[#E8F6EF] font-medium text-[#1B7A54]"
-              : "bg-[#FDECEF] text-[#B8324B]"
-          }`}
+          className={`bo-message ${resultat.ok ? "succes" : "erreur"}`}
+          style={{ marginTop: "1rem" }}
         >
           {resultat.message}
         </p>
       )}
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <Champ nom="display_name" libelle="Prénom affiché" valeur={femme.display_name} obligatoire />
-        <div className="grid grid-cols-2 gap-4">
+      <div className="bo-grille bo-grille-2" style={{ marginTop: "1.4rem" }}>
+        <Champ
+          nom="display_name"
+          libelle="Prénom affiché"
+          valeur={femme.display_name}
+          obligatoire
+        />
+        <div className="bo-grille bo-grille-2">
           <Champ nom="display_city" libelle="Ville" valeur={femme.display_city} />
           <Champ nom="display_country" libelle="Pays" valeur={femme.display_country} />
         </div>
 
-        <div>
-          <label
-            htmlFor="marital_status"
-            className="mb-1.5 block text-sm font-medium text-[#2E2D29]"
-          >
-            Situation
-          </label>
+        <div className="bo-champ">
+          <label htmlFor="marital_status">Situation</label>
           <select
             id="marital_status"
             name="marital_status"
             defaultValue={femme.marital_status ?? ""}
-            className="w-full rounded-xl border border-[#E9E7E1] px-4 py-2.5 text-[#2E2D29] outline-none focus:border-[#E0314B]"
           >
             {SITUATIONS.map((s) => (
               <option key={s.valeur} value={s.valeur}>
@@ -136,17 +129,17 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
         <Champ nom="profession" libelle="Profession" valeur={femme.profession} />
         <Champ nom="education" libelle="Niveau d'études" valeur={femme.education} />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="bo-grille bo-grille-2">
           <Champ nom="height_cm" libelle="Taille (cm)" valeur={femme.height_cm} type="number" />
           <Champ nom="weight_kg" libelle="Poids (kg)" valeur={femme.weight_kg} type="number" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="bo-grille bo-grille-2">
           <Champ nom="eyes" libelle="Yeux" valeur={femme.eyes} />
           <Champ nom="hair" libelle="Cheveux" valeur={femme.hair} />
         </div>
 
         <Champ nom="religion" libelle="Religion" valeur={femme.religion} />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="bo-grille bo-grille-2">
           <Champ nom="smoking" libelle="Tabac" valeur={femme.smoking} />
           <Champ nom="drinking" libelle="Alcool" valeur={femme.drinking} />
         </div>
@@ -157,7 +150,7 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
           valeur={femme.seeking}
           aide="Relation sérieuse, mariage, amitié, correspondance."
         />
-        <div className="grid grid-cols-3 gap-4">
+        <div className="bo-grille bo-grille-3">
           <Champ
             nom="seeking_age_min"
             libelle="Âge min."
@@ -184,7 +177,6 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
           aide="Cinq au maximum, séparés par un point-virgule."
           lignes={2}
         />
-
         <Zone
           nom="headline"
           libelle="Accroche"
@@ -208,15 +200,13 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
         />
       </div>
 
-      <div className="mt-6 flex items-center gap-4">
-        <button
-          type="submit"
-          disabled={enCours}
-          className="rounded-xl bg-[#2E2D29] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#4C4B45] disabled:opacity-60"
-        >
+      <div
+        style={{ marginTop: "1.6rem", display: "flex", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}
+      >
+        <button type="submit" className="bo-btn sombre" disabled={enCours}>
           {enCours ? "Enregistrement…" : "Enregistrer"}
         </button>
-        <p className="text-xs text-[#9A968D]">
+        <p className="bo-aide">
           Enregistrer ne publie rien : la fiche part à la validation depuis le bouton en haut.
         </p>
       </div>

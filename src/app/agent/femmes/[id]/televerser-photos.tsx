@@ -86,14 +86,11 @@ export default function TeleverserPhotos({
   }
 
   return (
-    <div className="rounded-xl border-2 border-dashed border-[#E9E7E1] p-5">
-      <label
-        htmlFor="photos"
-        className="block text-sm font-medium text-[#2E2D29] cursor-pointer"
-      >
+    <div className="bo-depot">
+      <label htmlFor="photos" className="bo-label" style={{ cursor: "pointer", marginBottom: 0 }}>
         Ajouter des photos
       </label>
-      <p className="mt-1 text-xs text-[#9A968D]">
+      <p className="bo-aide" style={{ marginTop: "0.3rem" }}>
         JPEG, PNG, WebP ou HEIC. 10 Mo maximum par fichier. Format vertical, visage net. La
         photo en position 1 est la principale.
       </p>
@@ -108,16 +105,18 @@ export default function TeleverserPhotos({
         onChange={(e) => {
           if (e.target.files?.length) void envoyer(e.target.files);
         }}
-        className="mt-3 block w-full text-sm text-[#4C4B45] file:mr-4 file:rounded-lg file:border-0 file:bg-[#2E2D29] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#4C4B45] disabled:opacity-60"
       />
 
-      {enCours && <p className="mt-3 text-sm text-[#6B6A64]">Envoi en cours…</p>}
+      {enCours && (
+        <p className="bo-aide" style={{ marginTop: "0.8rem" }}>
+          Envoi en cours…
+        </p>
+      )}
 
       {message && (
         <p
-          className={`mt-3 rounded-lg px-3 py-2 text-sm ${
-            message.ok ? "bg-[#E8F6EF] text-[#1B7A54]" : "bg-[#FDECEF] text-[#B8324B]"
-          }`}
+          className={`bo-message ${message.ok ? "succes" : "erreur"}`}
+          style={{ marginTop: "0.8rem" }}
         >
           {message.texte}
         </p>

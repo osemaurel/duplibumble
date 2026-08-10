@@ -5,101 +5,122 @@ import { createClient } from "@/lib/supabase/server";
 export default async function TableauDeBord() {
   const supabase = await createClient();
 
-  const [
-    fichesAttente,
-    fichesPubliees,
-    photosAttente,
-    agentsActifs,
-    membres,
-    signalements,
-  ] = await Promise.all([
-    supabase.from("ladies").select("*", { count: "exact", head: true }).eq("status", "pending_review"),
-    supabase.from("ladies").select("*", { count: "exact", head: true }).eq("status", "published"),
-    supabase.from("lady_photos").select("*", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("agents").select("*", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "member"),
-    supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "open"),
-  ]);
+  const [fichesAttente, fichesPubliees, photosAttente, agentsActifs, membres, signalements] =
+    await Promise.all([
+      supabase
+        .from("ladies")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending_review"),
+      supabase
+        .from("ladies")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "published"),
+      supabase
+        .from("lady_photos")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending"),
+      supabase.from("agents").select("*", { count: "exact", head: true }).eq("status", "active"),
+      supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "member"),
+      supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "open"),
+    ]);
 
-  const tuiles = [
-    {
-      libelle: "Fiches à valider",
-      valeur: fichesAttente.count ?? 0,
-      href: "/admin/femmes?statut=pending_review",
-      accent: true,
-    },
-    {
-      libelle: "Photos à modérer",
-      valeur: photosAttente.count ?? 0,
-      href: "/admin/femmes",
-      accent: true,
-    },
-    { libelle: "Signalements ouverts", valeur: signalements.count ?? 0, href: "/admin/signalements", accent: true },
+  const aDecider = [
+    { libelle: "Fiches à valider", valeur: fichesAttente.count ?? 0, href: "/admin/femmes?statut=pending_review" },
+    { libelle: "Photos à modérer", valeur: photosAttente.count ?? 0, href: "/admin/femmes" },
+    { libelle: "Signalements ouverts", valeur: signalements.count ?? 0, href: "/admin/signalements" },
+  ];
+
+  const etat = [
     { libelle: "Fiches publiées", valeur: fichesPubliees.count ?? 0, href: "/admin/femmes?statut=published" },
     { libelle: "Agents actifs", valeur: agentsActifs.count ?? 0, href: "/admin/agents" },
     { libelle: "Membres inscrits", valeur: membres.count ?? 0, href: "/admin" },
   ];
 
-  const rienAFaire =
-    (fichesAttente.count ?? 0) === 0 &&
-    (photosAttente.count ?? 0) === 0 &&
-    (signalements.count ?? 0) === 0;
+  const rienAFaire = aDecider.every((t) => t.valeur === 0);
+
+  const etapes = [
+    "Créez l'agent qui représente la femme, dans l'onglet Agents. Ses identifiants s'affichent une seule fois.",
+    "Créez sa fiche, ou laissez l'agent la créer, puis attribuez-la-lui.",
+    "L'agent complète la fiche, dépose les photos, et la soumet.",
+    "Vous validez les photos une par une, puis vous publiez la fiche.",
+  ];
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-normal text-[#2E2D29]">Tableau de bord</h1>
-      <p className="mt-1 text-[#6B6A64]">
-        Ce qui attend une décision de votre part apparaît en premier.
-      </p>
+      <div className="bo-entete">
+        <div>
+          <h1 className="bo-titre">Tableau de bord</h1>
+          <p className="bo-sous-titre">
+            Ce qui attend une décision de votre part apparaît en premier.
+          </p>
+        </div>
+      </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {tuiles.map((tuile) => (
+      <div className="bo-grille bo-grille-3">
+        {aDecider.map((tuile) => (
           <Link
             key={tuile.libelle}
             href={tuile.href}
-            className={`rounded-2xl bg-white p-6 border transition-shadow hover:shadow-md ${
-              tuile.accent && tuile.valeur > 0 ? "border-[#E0314B]" : "border-[#E9E7E1]"
-            }`}
+            className={`bo-tuile${tuile.valeur > 0 ? " actif" : ""}`}
           >
-            <span className="block text-sm font-medium text-[#6B6A64]">{tuile.libelle}</span>
-            <span
-              className={`mt-2 block text-4xl font-bold tracking-normal ${
-                tuile.accent && tuile.valeur > 0 ? "text-[#E0314B]" : "text-[#2E2D29]"
-              }`}
-            >
-              {tuile.valeur}
-            </span>
+            <span className="libelle">{tuile.libelle}</span>
+            <span className="valeur">{tuile.valeur}</span>
           </Link>
         ))}
       </div>
 
       {rienAFaire && (
-        <p className="mt-6 rounded-2xl bg-white border border-[#E9E7E1] p-6 text-[#6B6A64]">
-          Rien en attente. Les fiches soumises par les agents et les photos à modérer
-          apparaîtront ici.
+        <p className="bo-message succes" style={{ marginTop: "1.2rem" }}>
+          Rien en attente. Les fiches soumises et les photos à modérer apparaîtront ici.
         </p>
       )}
 
-      <div className="mt-10 rounded-2xl bg-white border border-[#E9E7E1] p-6">
-        <h2 className="text-lg font-semibold tracking-normal text-[#2E2D29]">
-          Comment se déroule l&apos;entrée d&apos;une femme
-        </h2>
-        <ol className="mt-4 space-y-3 text-[#4C4B45] text-sm leading-relaxed">
-          <li>
-            <b>1.</b> Vous créez l&apos;agent qui la représente, dans l&apos;onglet Agents. Ses
-            identifiants de connexion s&apos;affichent une seule fois.
-          </li>
-          <li>
-            <b>2.</b> Vous créez sa fiche, ou l&apos;agent la crée depuis son espace, et vous la
-            lui attribuez.
-          </li>
-          <li>
-            <b>3.</b> L&apos;agent complète la fiche et dépose les photos, puis la soumet.
-          </li>
-          <li>
-            <b>4.</b> Vous validez les photos une par une, puis vous publiez la fiche. Elle
-            apparaît alors dans la galerie publique.
-          </li>
+      <h2 className="bo-h2" style={{ margin: "2.4rem 0 1rem" }}>
+        État de la plateforme
+      </h2>
+      <div className="bo-grille bo-grille-3">
+        {etat.map((tuile) => (
+          <Link key={tuile.libelle} href={tuile.href} className="bo-tuile">
+            <span className="libelle">{tuile.libelle}</span>
+            <span className="valeur">{tuile.valeur}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="bo-carte bo-carte-p" style={{ marginTop: "2.4rem" }}>
+        <h2 className="bo-h2">Comment se déroule l&apos;entrée d&apos;une femme</h2>
+        <ol
+          style={{
+            listStyle: "none",
+            display: "grid",
+            gap: "0.85rem",
+            marginTop: "1.1rem",
+            fontSize: "0.93rem",
+            color: "var(--ink-2)",
+            lineHeight: 1.6,
+          }}
+        >
+          {etapes.map((etape, index) => (
+            <li key={etape} style={{ display: "flex", gap: "0.85rem", alignItems: "flex-start" }}>
+              <span
+                style={{
+                  display: "grid",
+                  placeItems: "center",
+                  width: 26,
+                  height: 26,
+                  flex: "none",
+                  borderRadius: 999,
+                  background: "var(--brand-soft)",
+                  color: "var(--brand)",
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                }}
+              >
+                {index + 1}
+              </span>
+              {etape}
+            </li>
+          ))}
         </ol>
       </div>
     </div>

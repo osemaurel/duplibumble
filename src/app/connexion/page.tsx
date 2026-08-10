@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { espaceDuRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
+import "../backoffice.css";
+
 export const metadata = { title: "Connexion | Palab" };
 
 export default async function Connexion({
@@ -57,71 +59,73 @@ export default async function Connexion({
 
     const espace = espaceDuRole(profil?.role ?? "member");
 
-    // On honore la destination demandée seulement si elle relève de cet espace.
     redirect(demande.startsWith(espace) && espace !== "/" ? demande : espace);
   }
 
   return (
-    <main className="min-h-screen bg-[#F6F4F1] flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
-        <Link href="/" className="text-2xl font-bold text-[#E0314B] tracking-tight">
-          Palab
-        </Link>
-        <h1 className="mt-6 text-xl font-semibold tracking-normal text-[#2E2D29]">
-          Connexion à votre espace
-        </h1>
-        <p className="mt-2 text-sm text-[#6B6A64]">
-          Réservé à l&apos;administration et aux agents mandatés.
-        </p>
+    <div className="bo" style={{ display: "grid", gridTemplateColumns: "1fr" }}>
+      <div className="cx">
+        <section className="cx-recit">
+          <Link href="/" className="cx-mark">
+            Palab
+          </Link>
 
-        {erreur && (
-          <p className="mt-5 rounded-xl bg-[#FDECEF] text-[#B8324B] text-sm px-4 py-3">
-            {erreur}
-          </p>
-        )}
-
-        <form action={seConnecter} className="mt-6 space-y-4">
-          <input type="hidden" name="suivant" value={suivant} />
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-[#2E2D29] mb-1.5">
-              Adresse e-mail
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              className="w-full rounded-xl border border-[#E9E7E1] px-4 py-3 text-[#2E2D29] outline-none focus:border-[#E0314B]"
-            />
+          <div className="cx-recit-corps">
+            <h1>
+              Chaque profil est vérifié,
+              <br />
+              un par un.
+            </h1>
+            <p>
+              L&apos;espace de travail des équipes Palab : validation des dossiers, gestion des
+              portefeuilles et suivi des conversations.
+            </p>
           </div>
 
-          <div>
-            <label
-              htmlFor="motDePasse"
-              className="block text-sm font-medium text-[#2E2D29] mb-1.5"
-            >
-              Mot de passe
-            </label>
-            <input
-              id="motDePasse"
-              name="motDePasse"
-              type="password"
-              required
-              autoComplete="current-password"
-              className="w-full rounded-xl border border-[#E9E7E1] px-4 py-3 text-[#2E2D29] outline-none focus:border-[#E0314B]"
-            />
-          </div>
+          <p className="cx-pied">Réservé à l&apos;administration et aux agents mandatés.</p>
+        </section>
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-[#E0314B] text-white font-semibold py-3 hover:bg-[#C42741] transition-colors"
-          >
-            Se connecter
-          </button>
-        </form>
+        <section className="cx-form">
+          <div className="cx-boite">
+            <h2>Connexion</h2>
+            <p className="cx-intro">Entrez les identifiants qui vous ont été transmis.</p>
+
+            {erreur && (
+              <p className="bo-message erreur" style={{ marginTop: "1.3rem" }}>
+                {erreur}
+              </p>
+            )}
+
+            <form action={seConnecter} style={{ marginTop: "1.5rem", display: "grid", gap: "1rem" }}>
+              <input type="hidden" name="suivant" value={suivant} />
+
+              <div className="bo-champ">
+                <label htmlFor="email">Adresse e-mail</label>
+                <input id="email" name="email" type="email" required autoComplete="email" />
+              </div>
+
+              <div className="bo-champ">
+                <label htmlFor="motDePasse">Mot de passe</label>
+                <input
+                  id="motDePasse"
+                  name="motDePasse"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <button type="submit" className="bo-btn" style={{ marginTop: "0.35rem" }}>
+                Se connecter
+              </button>
+            </form>
+
+            <p className="cx-retour">
+              <Link href="/">← Retour au site</Link>
+            </p>
+          </div>
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

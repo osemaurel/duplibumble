@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Avatar } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,7 +35,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   const [{ data: femme }, { data: membre }, { data: messages }] = await Promise.all([
     supabase
       .from("ladies")
-      .select("id, code, display_name, age, display_city, display_country, status")
+      .select("id, code, display_name, age")
       .eq("id", conversation.lady_id)
       .single(),
     supabase
@@ -68,40 +69,46 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
     : { data: [] as { id: string; code: string }[] };
   const agentParId = new Map((agents ?? []).map((a) => [a.id, a]));
 
+  const nomMembre = membre?.display_name ?? "Membre";
+
   return (
-    <div className="mx-auto max-w-3xl">
-      <Link href="/agent" className="text-sm text-[#6B6A64] hover:text-[#E0314B]">
+    <div style={{ maxWidth: "56rem", marginInline: "auto" }}>
+      <Link href="/agent" className="bo-retour">
         ← Tous les messages
       </Link>
 
-      <div className="mt-3 overflow-hidden rounded-2xl border border-[#E9E7E1] bg-white">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E9E7E1] px-6 py-4">
-          <div>
-            <p className="font-semibold tracking-normal text-[#2E2D29]">
-              {membre?.display_name ?? "Membre"}
-              <span className="font-normal text-[#9A968D]"> — conversation avec </span>
-              <span className="text-[#E0314B]">
+      <div className="bo-carte bo-conv">
+        <div className="bo-conv-entete">
+          <Avatar nom={nomMembre} />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p className="bo-h2">
+              {nomMembre}
+              <span style={{ fontWeight: 400, color: "var(--ink-3)" }}> — conversation avec </span>
+              <span style={{ color: "var(--brand)" }}>
                 {femme.display_name}
                 {femme.age ? `, ${femme.age}` : ""}
               </span>
             </p>
-            <p className="mt-0.5 text-xs text-[#9A968D]">
+            <p style={{ marginTop: "0.15rem", fontSize: "0.78rem", color: "var(--ink-3)" }}>
               {femme.code}
               {membre?.country ? ` · membre en ${membre.country}` : ""}
             </p>
           </div>
-
-          <Link
-            href={`/agent/femmes/${femme.id}`}
-            className="rounded-lg border border-[#E9E7E1] px-3 py-1.5 text-sm font-medium text-[#4C4B45] hover:border-[#E0314B]"
-          >
+          <Link href={`/agent/femmes/${femme.id}`} className="bo-btn fantome petit">
             Voir la fiche
           </Link>
         </div>
 
-        <div className="max-h-[60vh] space-y-4 overflow-y-auto bg-[#FAF9F7] px-6 py-6">
+        <div className="bo-conv-flux">
           {!messages?.length ? (
-            <p className="py-8 text-center text-sm text-[#9A968D]">
+            <p
+              style={{
+                textAlign: "center",
+                padding: "2.5rem 0",
+                fontSize: "0.9rem",
+                color: "var(--ink-3)",
+              }}
+            >
               Aucun message. Vous pouvez ouvrir la conversation.
             </p>
           ) : (
@@ -115,27 +122,14 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
               return (
                 <div
                   key={message.id}
-                  className={`flex ${deLaFemme ? "justify-end" : "justify-start"}`}
+                  className={`bo-bulle-rangee ${deLaFemme ? "mienne" : "sienne"}`}
                 >
-                  <div className="max-w-[80%]">
-                    <div
-                      className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                        deLaFemme
-                          ? "bg-[#E0314B] text-white"
-                          : "border border-[#E9E7E1] bg-white text-[#2E2D29]"
-                      }`}
-                    >
-                      {message.body}
-                    </div>
-
-                    <p
-                      className={`mt-1 text-xs text-[#9A968D] ${
-                        deLaFemme ? "text-right" : ""
-                      }`}
-                    >
+                  <div className="bo-bulle">
+                    <div className="texte">{message.body}</div>
+                    <p className="meta">
                       {heure(message.created_at)}
                       {deLaFemme && auteur && (
-                        <span className={ecritParUnAutre ? " text-[#B8324B]" : ""}>
+                        <span className={ecritParUnAutre ? "autre-auteur" : undefined}>
                           {" · rédigé par "}
                           {ecritParUnAutre ? auteur.code : "vous"}
                         </span>

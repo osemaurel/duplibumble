@@ -48,3 +48,25 @@ export async function requireRole(role: UserRole, chemin: string) {
 }
 
 export const requireAdmin = (chemin = "/admin") => requireRole("admin", chemin);
+
+/**
+ * Exige un agent, et renvoie sa fiche agence en plus de la session.
+ *
+ * Un compte au rôle `agent` sans fiche agence ne peut rien faire : toutes les
+ * politiques passent par `agent_id`. On préfère donc le renvoyer à l'accueil
+ * plutôt que de le laisser devant des écrans vides et incompréhensibles.
+ */
+export async function requireAgent(chemin = "/agent") {
+  const session = await requireRole("agent", chemin);
+  const supabase = await createClient();
+
+  const { data: agent } = await supabase
+    .from("agents")
+    .select("*")
+    .eq("profile_id", session.userId)
+    .maybeSingle();
+
+  if (!agent) redirect("/");
+
+  return { ...session, agent };
+}

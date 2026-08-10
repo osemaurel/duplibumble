@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import TeleverserPhotos from "@/components/backoffice/televerser-photos";
 import { Avatar, IconePhoto, PastilleStatut } from "@/components/backoffice/ui";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { LadyStatus } from "@/lib/supabase/types";
 
 import { attribuerFemme, changerStatutFemme, changerStatutPhoto } from "../../actions";
+import FormulaireEdition from "./formulaire-edition";
 
 const TRANSITIONS: { statut: LadyStatus; libelle: string; principal?: boolean }[] = [
   { statut: "published", libelle: "Publier", principal: true },
@@ -40,44 +42,7 @@ export default async function FicheFemme({ params }: { params: Promise<{ id: str
     if (data?.signedUrl) vignettes.set(photo.id, data.signedUrl);
   }
 
-  const champsPublics: [string, string | number | null][] = [
-    ["Ville", femme.display_city],
-    ["Pays", femme.display_country],
-    ["Situation", femme.marital_status],
-    ["Enfants", femme.children],
-    ["Profession", femme.profession],
-    ["Études", femme.education],
-    ["Taille", femme.height_cm ? `${femme.height_cm} cm` : null],
-    ["Recherche", femme.seeking],
-    [
-      "Âge recherché",
-      femme.seeking_age_min ? `${femme.seeking_age_min} – ${femme.seeking_age_max}` : null,
-    ],
-    ["Prête à déménager", femme.willing_to_relocate],
-  ];
-
-  const champsPrives: [string, string | null][] = [
-    ["Nom légal", prive?.legal_name ?? null],
-    ["Date de naissance", prive?.birth_date ?? null],
-    ["Nationalité", prive?.nationality ?? null],
-    [
-      "Résidence",
-      [prive?.residence_city, prive?.residence_country].filter(Boolean).join(", ") || null,
-    ],
-    ["E-mail", prive?.email ?? null],
-    ["Téléphone", prive?.phone ?? null],
-    [
-      "Pièce d'identité",
-      prive?.id_document_type
-        ? `${prive.id_document_type} · ${prive.id_document_number ?? "—"}`
-        : null,
-    ],
-    [
-      "Mandat signé",
-      prive?.mandate_signed ? `Oui${prive.mandate_date ? ` — ${prive.mandate_date}` : ""}` : "Non",
-    ],
-    ["Consentement photos", prive?.photo_consent ? "Oui" : "Non"],
-  ];
+  const prochainePosition = (photos ?? []).reduce((max, p) => Math.max(max, p.position), 0) + 1;
 
   const bloquants = [
     !prive && "le dossier privé est absent",
@@ -104,7 +69,7 @@ export default async function FicheFemme({ params }: { params: Promise<{ id: str
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <Avatar nom={femme.display_name} />
+            <Avatar nom={femme.display_name} url={vignettes.get(photos?.[0]?.id ?? "")} />
             <div>
               <h1 className="bo-titre" style={{ fontSize: "1.6rem" }}>
                 {femme.display_name}
@@ -149,86 +114,37 @@ export default async function FicheFemme({ params }: { params: Promise<{ id: str
         </div>
       )}
 
-      <div className="bo-grille bo-grille-2">
-        <section className="bo-carte bo-carte-p">
-          <h2 className="bo-h2">Fiche publique</h2>
-          <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
-            {champsPublics.map(([libelle, valeur]) => (
-              <div key={libelle}>
-                <dt>{libelle}</dt>
-                <dd>{valeur || "—"}</dd>
-              </div>
-            ))}
-          </dl>
+      <section className="bo-carte bo-carte-p">
+        <h2 className="bo-h2">Agent mandaté</h2>
+        <form
+          action={attribuerFemme}
+          style={{
+            marginTop: "1rem",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-end",
+            gap: "0.75rem",
+          }}
+        >
+          <input type="hidden" name="lady_id" value={femme.id} />
+          <div className="bo-champ" style={{ flex: 1, minWidth: 220 }}>
+            <label htmlFor="agent_id">Qui la représente</label>
+            <select id="agent_id" name="agent_id" defaultValue={femme.agent_id ?? ""}>
+              <option value="">Aucun</option>
+              {(agents ?? []).map((agent) => (
+                <option key={agent.id} value={agent.id}>
+                  {agent.code} — {agent.agency_name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="submit" className="bo-btn sombre">
+            Attribuer
+          </button>
+        </form>
+      </section>
 
-          {femme.headline && (
-            <p
-              style={{
-                marginTop: "1.3rem",
-                fontSize: "0.95rem",
-                fontStyle: "italic",
-                color: "var(--ink-2)",
-              }}
-            >
-              « {femme.headline} »
-            </p>
-          )}
-          {femme.bio && (
-            <p
-              style={{
-                marginTop: "0.7rem",
-                fontSize: "0.92rem",
-                lineHeight: 1.65,
-                color: "var(--ink-2)",
-              }}
-            >
-              {femme.bio}
-            </p>
-          )}
-        </section>
-
-        <section className="bo-prive">
-          <h2 className="bo-h2">
-            Dossier interne
-            <span className="etiquette">jamais publié</span>
-          </h2>
-          <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
-            {champsPrives.map(([libelle, valeur]) => (
-              <div key={libelle}>
-                <dt>{libelle}</dt>
-                <dd>{valeur || "—"}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <form
-            action={attribuerFemme}
-            style={{
-              marginTop: "1.5rem",
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "flex-end",
-              gap: "0.75rem",
-            }}
-          >
-            <input type="hidden" name="lady_id" value={femme.id} />
-            <div className="bo-champ" style={{ flex: 1, minWidth: 200 }}>
-              <label htmlFor="agent_id">Agent mandaté</label>
-              <select id="agent_id" name="agent_id" defaultValue={femme.agent_id ?? ""}>
-                <option value="">Aucun</option>
-                {(agents ?? []).map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.code} — {agent.agency_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button type="submit" className="bo-btn sombre">
-              Attribuer
-            </button>
-          </form>
-        </section>
-      </div>
+      <FormulaireEdition femme={femme} prive={prive ?? null} />
 
       <section className="bo-carte bo-carte-p">
         <h2 className="bo-h2">Photos · {photos?.length ?? 0}</h2>
@@ -237,11 +153,22 @@ export default async function FicheFemme({ params }: { params: Promise<{ id: str
           publiée.
         </p>
 
+        <div style={{ marginTop: "1.3rem" }}>
+          <TeleverserPhotos
+            ladyId={femme.id}
+            prochainePosition={prochainePosition}
+            valideDOffice
+          />
+        </div>
+
         {!photos?.length ? (
           <div className="bo-vide" style={{ padding: "2.5rem 1rem" }}>
             <span className="rond">{IconePhoto}</span>
             <h3>Aucune photo déposée</h3>
-            <p>C&apos;est à l&apos;agent de les envoyer depuis son espace.</p>
+            <p>
+              Déposez-les ci-dessus, ou laissez l&apos;agent mandaté les envoyer depuis son
+              espace.
+            </p>
           </div>
         ) : (
           <div className="bo-photos" style={{ marginTop: "1.4rem" }}>

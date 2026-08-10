@@ -230,3 +230,158 @@ export async function seDeconnecter() {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
 }
+
+/** Champs publics d'une fiche, modifiables par l'administration. */
+const CHAMPS_FICHE = [
+  "display_name",
+  "display_city",
+  "display_country",
+  "profession",
+  "education",
+  "children",
+  "eyes",
+  "hair",
+  "religion",
+  "smoking",
+  "drinking",
+  "seeking",
+  "willing_to_relocate",
+  "headline",
+  "bio",
+  "looking_for",
+] as const;
+
+/**
+ * Enregistre une fiche depuis l'administration : partie publique et dossier
+ * interne d'un seul coup.
+ *
+ * L'agent ne peut modifier que la partie publique. L'administration, elle, doit
+ * pouvoir compléter le dossier de vérification — c'est elle qui reçoit les
+ * pièces d'identité et les mandats.
+ */
+export async function enregistrerFicheAdmin(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireAdmin();
+
+  const ladyId = String(formData.get("lady_id") ?? "");
+  if (!ladyId) return { ok: false, message: "Fiche introuvable." };
+
+  const texte = (nom: string) => String(formData.get(nom) ?? "").trim() || null;
+  const nombre = (nom: string) => {
+    const valeur = String(formData.get(nom) ?? "").trim();
+    if (!valeur) return null;
+    const n = Number(valeur);
+    return Number.isFinite(n) ? n : null;
+  };
+  const coche = (nom: string) => formData.get(nom) === "on";
+
+  const situation = String(formData.get("marital_status") ?? "").trim();
+  const situationsValides = ["celibataire", "divorcee", "veuve", "separee"];
+
+  const fiche: Record<string, unknown> = Object.fromEntries(
+    CHAMPS_FICHE.map((champ) => [champ, texte(champ)]),
+  );
+  fiche.height_cm = nombre("height_cm");
+  fiche.weight_kg = nombre("weight_kg");
+  fiche.seeking_age_min = nombre("seeking_age_min");
+  fiche.seeking_age_max = nombre("seeking_age_max");
+  fiche.marital_status = situationsValides.includes(situation) ? situation : null;
+  fiche.interests = String(formData.get("interests") ?? "")
+    .split(";")
+    .map((i) => i.trim())
+    .filter(Boolean);
+
+  if (!fiche.display_name) {
+    return { ok: false, message: "Le prénom affiché est obligatoire." };
+  }
+
+  const supabase = await createClient();
+
+  const { error: erreurFiche } = await supabase
+    .from("ladies")
+    .update(fiche as never)
+    .eq("id", ladyId);
+
+  if (erreurFiche) {
+    return { ok: false, message: `Enregistrement refusé : ${erreurFiche.message}` };
+  }
+
+  const prive: Record<string, unknown> = {
+    legal_name: texte("legal_name"),
+    nationality: texte("nationality"),
+    residence_city: texte("residence_city"),
+    residence_country: texte("residence_country"),
+    email: texte("email"),
+    phone: texte("phone"),
+    id_document_type: texte("id_document_type"),
+    id_document_number: texte("id_document_number"),
+    mandate_signed: coche("mandate_signed"),
+    mandate_date: texte("mandate_date"),
+    photo_consent: coche("photo_consent"),
+    internal_notes: texte("internal_notes"),
+  };
+
+  const naissance = texte("birth_date");
+  if (naissance) prive.birth_date = naissance;
+
+  // Le nom légal est obligatoire en base : sans lui, inutile de tenter.
+  if (prive.legal_name) {
+    const { error: erreurPrive } = await supabase
+      .from("lady_private")
+      .update(prive as never)
+      .eq("lady_id", ladyId);
+
+    if (erreurPrive) {
+      return {
+        ok: false,
+        message: `Fiche publique enregistrée, mais le dossier interne a été refusé : ${erreurPrive.message}`,
+      };
+    }
+  }
+
+  revalidatePath(`/admin/femmes/${ladyId}`);
+  revalidatePath("/admin/femmes");
+
+  return { ok: true, message: "Fiche enregistrée." };
+}
+
+/** Modifie les coordonnées d'un agent. Le code reste figé : il sert de référence. */
+export async function enregistrerAgent(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireAdmin();
+
+  const agentId = String(formData.get("agent_id") ?? "");
+  if (!agentId) return { ok: false, message: "Agent introuvable." };
+
+  const texte = (nom: string) => String(formData.get(nom) ?? "").trim() || null;
+
+  const agencyName = texte("agency_name");
+  if (!agencyName) return { ok: false, message: "Le nom de l'agence est obligatoire." };
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("agents")
+    .update({
+      agency_name: agencyName,
+      contact_name: texte("contact_name"),
+      phone: texte("phone"),
+      country: texte("country"),
+      city: texte("city"),
+      contract_signed: formData.get("contract_signed") === "on",
+      contract_date: texte("contract_date"),
+      notes: texte("notes"),
+    })
+    .eq("id", agentId);
+
+  if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+
+  revalidatePath(`/admin/agents/${agentId}`);
+  revalidatePath("/admin/agents");
+
+  return { ok: true, message: "Agent enregistré." };
+}

@@ -99,6 +99,7 @@ export default async function Femmes({
                   <th>Agent</th>
                   <th>Photos</th>
                   <th>Statut</th>
+                  <th style={{ textAlign: "right" }}>Fiche</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,6 +144,11 @@ export default async function Femmes({
                       </td>
                       <td>
                         <PastilleStatut statut={femme.status} />
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <Link href={`/admin/femmes/${femme.id}`} className="bo-btn fantome petit">
+                          Ouvrir
+                        </Link>
                       </td>
                     </tr>
                   );

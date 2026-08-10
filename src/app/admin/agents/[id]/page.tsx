@@ -5,6 +5,7 @@ import { Avatar, EtatVide, IconeFemmes, Pastille, PastilleStatut } from "@/compo
 import { createClient } from "@/lib/supabase/server";
 
 import { changerStatutAgent } from "../../actions";
+import FormulaireEditionAgent from "./formulaire-edition";
 
 export default async function FicheAgent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -48,34 +49,13 @@ export default async function FicheAgent({ params }: { params: Promise<{ id: str
       </div>
 
       <div className="bo-grille" style={{ gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)" }}>
-        <section className="bo-carte bo-carte-p">
-          <h2 className="bo-h2">Coordonnées</h2>
-          <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
-            {(
-              [
-                ["Responsable", agent.contact_name],
-                ["E-mail de connexion", agent.email],
-                ["Téléphone", agent.phone],
-                ["Pays", agent.country],
-                ["Ville", agent.city],
-                [
-                  "Contrat cadre",
-                  agent.contract_signed
-                    ? `Signé le ${agent.contract_date ?? "—"}`
-                    : "Non signé",
-                ],
-              ] as [string, string | null][]
-            ).map(([libelle, valeur]) => (
-              <div key={libelle}>
-                <dt>{libelle}</dt>
-                <dd>{valeur || "—"}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+        <FormulaireEditionAgent agent={agent} />
 
         <section className="bo-carte bo-carte-p">
           <h2 className="bo-h2">Activité</h2>
+          <p style={{ marginTop: "0.6rem", fontSize: "0.82rem", color: "var(--ink-3)", wordBreak: "break-all" }}>
+            {agent.email}
+          </p>
           <p style={{ marginTop: "1.1rem", fontSize: "0.8rem", color: "var(--ink-3)" }}>
             Messages rédigés
           </p>

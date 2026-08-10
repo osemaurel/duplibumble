@@ -8,12 +8,21 @@ import { createClient } from "@/lib/supabase/client";
 const TAILLE_MAX = 10 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/heic"];
 
+/**
+ * Envoi des photos d'une femme, depuis le navigateur.
+ *
+ * Partagé par l'agent et l'administration : le RLS du stockage décide qui a le
+ * droit d'écrire dans le dossier, la même interface convient donc aux deux.
+ */
 export default function TeleverserPhotos({
   ladyId,
   prochainePosition,
+  valideDOffice = false,
 }: {
   ladyId: string;
   prochainePosition: number;
+  /** L'administration valide en déposant : elle n'a personne à attendre. */
+  valideDOffice?: boolean;
 }) {
   const router = useRouter();
   const champ = useRef<HTMLInputElement>(null);
@@ -57,6 +66,7 @@ export default function TeleverserPhotos({
         lady_id: ladyId,
         storage_path: chemin,
         position,
+        ...(valideDOffice ? { status: "approved" as const } : {}),
       });
 
       if (erreurLigne) {
@@ -93,6 +103,7 @@ export default function TeleverserPhotos({
       <p className="bo-aide" style={{ marginTop: "0.3rem" }}>
         JPEG, PNG, WebP ou HEIC. 10 Mo maximum par fichier. Format vertical, visage net. La
         photo en position 1 est la principale.
+        {valideDOffice && " Déposées ici, elles sont validées d'office."}
       </p>
 
       <input

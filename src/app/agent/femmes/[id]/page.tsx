@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import TeleverserPhotos from "@/components/backoffice/televerser-photos";
 import { Avatar, IconePhoto, PastilleStatut } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 import { soumettreFiche, supprimerPhoto } from "../../actions";
 import FormulaireFiche from "./formulaire-fiche";
-import TeleverserPhotos from "./televerser-photos";
 
 export default async function FicheFemmeAgent({
   params,

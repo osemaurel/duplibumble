@@ -33,7 +33,6 @@ export default function FormulaireReponse({
       <div className="pied">
         <p>
           Envoyé au nom de {prenom}. Votre code d&apos;agent reste attaché au message.
-          <span className="bo-astuce">Entrée pour envoyer, Maj+Entrée pour aller à la ligne</span>
         </p>
         <button type="submit" className="bo-btn" disabled={enCours}>
           {enCours ? "Envoi…" : "Envoyer"}

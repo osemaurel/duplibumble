@@ -45,7 +45,6 @@ export default function FormulaireMessage({
       <div className="pied">
         <p>
           {cout} crédit{cout > 1 ? "s" : ""} par message · il vous en reste {solde}
-          <span className="bo-astuce">Entrée pour envoyer, Maj+Entrée pour aller à la ligne</span>
         </p>
         <button type="submit" className="bo-btn" disabled={enCours || soldeInsuffisant}>
           {enCours ? "Envoi…" : "Envoyer"}

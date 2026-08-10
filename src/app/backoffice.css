@@ -1238,3 +1238,73 @@
   font-size: 0.72rem;
   color: var(--ink-3);
 }
+
+/* ==================== Champs : pas de zoom sur iOS ==================
+   iOS Safari zoome à la mise au point d'un champ dont le texte fait moins
+   de 16 px. Le désactiver par la balise viewport supprimerait aussi le
+   zoom manuel, dont certains ont besoin : on remonte donc la taille du
+   texte, seul remède qui ne retire rien à personne.
+   ------------------------------------------------------------------ */
+
+.bo input,
+.bo select,
+.bo textarea,
+.bo-champ input,
+.bo-champ select,
+.bo-champ textarea,
+.bo-repondre textarea,
+.bo-input {
+  font-size: 16px;
+}
+
+/* ===================== En-tête et onglets membre ==================== */
+
+.mb-onglets { display: none; }
+
+.mb-nav .sur-large { display: inline-flex; align-items: center; }
+
+@media (max-width: 720px) {
+  /* Sur téléphone, la navigation descend en bas : l'en-tête ne garde que
+     le nom et le solde, et cesse d'être une rangée de liens serrés. */
+  .mb-nav .sur-large { display: none; }
+
+  .mb-contenu { padding-bottom: 6.5rem; }
+
+  .mb-onglets {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mb-onglets a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.22rem;
+    padding: 0.65rem 0.25rem 0.7rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-3);
+    transition: color 0.15s;
+  }
+  .mb-onglets a[aria-current="page"] { color: var(--brand); }
+  .mb-onglets .ico { position: relative; display: block; }
+  .mb-onglets svg { width: 23px; height: 23px; display: block; }
+  .mb-onglets .point {
+    position: absolute;
+    top: -1px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--brand);
+    border: 2px solid #fff;
+  }
+}

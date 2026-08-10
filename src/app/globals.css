@@ -424,3 +424,8 @@
     .grid{grid-template-columns:1fr}
     .fgrid{grid-template-columns:1fr}
   }
+
+  /* iOS Safari zoome à la mise au point d'un champ dont le texte fait moins
+     de 16 px. Le désactiver par la balise viewport supprimerait aussi le zoom
+     manuel, dont certains ont besoin : on remonte donc la taille du texte. */
+  input, select, textarea { font-size: 16px; }

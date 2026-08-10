@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { espaceDuRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Connexion | Palab" };
@@ -10,14 +11,14 @@ export default async function Connexion({
 }: {
   searchParams: Promise<{ suivant?: string; erreur?: string }>;
 }) {
-  const { suivant = "/admin", erreur } = await searchParams;
+  const { suivant = "", erreur } = await searchParams;
 
   async function seConnecter(formData: FormData) {
     "use server";
 
     const email = String(formData.get("email") ?? "").trim();
     const motDePasse = String(formData.get("motDePasse") ?? "");
-    const destination = String(formData.get("suivant") ?? "/admin");
+    const demande = String(formData.get("suivant") ?? "");
 
     const supabase = await createClient();
     const { error } = await supabase.auth.signInWithPassword({
@@ -37,13 +38,27 @@ export default async function Connexion({
         : `Le service d'authentification a répondu : ${error.message}`;
 
       redirect(
-        `/connexion?suivant=${encodeURIComponent(destination)}&erreur=${encodeURIComponent(
+        `/connexion?suivant=${encodeURIComponent(demande)}&erreur=${encodeURIComponent(
           message,
         )}`,
       );
     }
 
-    redirect(destination);
+    // La destination dépend du rôle, pas de ce que l'URL demandait. Un agent
+    // envoyé vers /admin en serait refoulé jusqu'à l'accueil, et conclurait
+    // que sa connexion a échoué alors qu'elle a réussi.
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { data: profil } = user
+      ? await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+      : { data: null };
+
+    const espace = espaceDuRole(profil?.role ?? "member");
+
+    // On honore la destination demandée seulement si elle relève de cet espace.
+    redirect(demande.startsWith(espace) && espace !== "/" ? demande : espace);
   }
 
   return (

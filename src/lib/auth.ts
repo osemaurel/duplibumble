@@ -33,6 +33,13 @@ export async function getSessionProfile(): Promise<{
   return { userId: user.id, email: user.email ?? null, profile };
 }
 
+/** L'espace d'accueil correspondant à un rôle. */
+export function espaceDuRole(role: UserRole) {
+  if (role === "admin") return "/admin";
+  if (role === "agent") return "/agent";
+  return "/";
+}
+
 /** Exige un rôle précis, sinon redirige. À appeler au sommet de chaque espace. */
 export async function requireRole(role: UserRole, chemin: string) {
   const session = await getSessionProfile();
@@ -41,7 +48,9 @@ export async function requireRole(role: UserRole, chemin: string) {
     redirect(`/connexion?suivant=${encodeURIComponent(chemin)}`);
   }
   if (session.profile.role !== role) {
-    redirect("/");
+    // Vers son propre espace, pas vers l'accueil : renvoyer un agent sur la
+    // landing lui laisse croire que sa connexion a échoué.
+    redirect(espaceDuRole(session.profile.role));
   }
 
   return session;

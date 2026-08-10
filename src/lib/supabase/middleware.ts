@@ -45,13 +45,16 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const espacePrive = path.startsWith("/admin") || path.startsWith("/agent");
+  const espacePrive =
+    path.startsWith("/admin") || path.startsWith("/agent") || path.startsWith("/membre");
 
   if (!user && espacePrive) {
-    const connexion = request.nextUrl.clone();
-    connexion.pathname = "/connexion";
-    connexion.search = `?suivant=${encodeURIComponent(path)}`;
-    return NextResponse.redirect(connexion);
+    // Un visiteur qui voulait son espace membre a plus de chances de devoir
+    // s'inscrire que de se connecter : on l'envoie là où il aboutira.
+    const cible = request.nextUrl.clone();
+    cible.pathname = path.startsWith("/membre") ? "/inscription" : "/connexion";
+    cible.search = `?suivant=${encodeURIComponent(path)}`;
+    return NextResponse.redirect(cible);
   }
 
   return response;

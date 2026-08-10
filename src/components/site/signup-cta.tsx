@@ -1,10 +1,6 @@
-"use client";
-
-import { useSignup } from "./signup-modal";
+import Link from "next/link";
 
 export default function SignupCta() {
-  const { open } = useSignup();
-
   return (
     <section className="dl" id="inscription">
       <div className="wrap">
@@ -14,18 +10,14 @@ export default function SignupCta() {
           communication, à l&apos;unité, sans abonnement forcé.
         </p>
         <div className="stores">
-          <button
-            className="store"
-            onClick={() => open()}
-            style={{ padding: "1rem 2rem", borderRadius: 16 }}
-          >
+          <Link className="store" href="/inscription" style={{ padding: "1rem 2rem", borderRadius: 16 }}>
             <span>
               <b style={{ fontSize: "1.05rem" }}>Je crée mon compte gratuitement</b>
             </span>
-          </button>
-          <a
+          </Link>
+          <Link
             className="store"
-            href="#profils"
+            href="/profils"
             style={{
               padding: "1rem 2rem",
               borderRadius: 16,
@@ -37,7 +29,7 @@ export default function SignupCta() {
             <span>
               <b style={{ fontSize: "1.05rem" }}>Parcourir les profils</b>
             </span>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

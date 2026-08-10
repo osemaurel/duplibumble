@@ -37,6 +37,7 @@ export async function getSessionProfile(): Promise<{
 export function espaceDuRole(role: UserRole) {
   if (role === "admin") return "/admin";
   if (role === "agent") return "/agent";
+  if (role === "member") return "/membre";
   return "/";
 }
 
@@ -57,6 +58,7 @@ export async function requireRole(role: UserRole, chemin: string) {
 }
 
 export const requireAdmin = (chemin = "/admin") => requireRole("admin", chemin);
+export const requireMember = (chemin = "/membre") => requireRole("member", chemin);
 
 /**
  * Exige un agent, et renvoie sa fiche agence en plus de la session.

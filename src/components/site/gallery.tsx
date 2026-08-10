@@ -1,28 +1,62 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
-import { profiles } from "@/lib/profiles";
-import { useSignup } from "./signup-modal";
+import { profiles as demonstration } from "@/lib/profiles";
+import { photosSignees } from "@/lib/photos";
+import { createClient } from "@/lib/supabase/server";
 
-const FILTERS = [
-  { id: "f-age", label: "Âge", options: ["18 – 25", "26 – 35", "36 – 45", "46 et +"] },
-  { id: "f-pays", label: "Pays", options: ["Afrique de l'Ouest", "Afrique centrale", "Europe", "Amérique latine", "Asie"] },
-  { id: "f-statut", label: "Situation", options: ["Célibataire", "Divorcée", "Veuve"] },
-  { id: "f-langue", label: "Langue", options: ["Français", "Anglais", "Espagnol", "Portugais"] },
-  { id: "f-objectif", label: "Recherche", options: ["Relation sérieuse", "Mariage", "Amitié", "Correspondance"] },
-  { id: "f-online", label: "Toutes", options: ["En ligne maintenant"] },
+const FILTRES = [
+  { id: "age", label: "Âge", options: ["18-25", "26-35", "36-45", "46+"] },
+  {
+    id: "pays",
+    label: "Pays",
+    options: [] as string[],
+  },
 ];
 
-export default function Gallery() {
-  const { open } = useSignup();
-  const [pending, setPending] = useState(false);
+/**
+ * Galerie de la page d'accueil.
+ *
+ * Elle sert les fiches réellement publiées. Tant qu'il n'y en a aucune, elle
+ * retombe sur les profils de démonstration — la page reste présentable, et le
+ * bandeau du pied de page indique déjà que ces personnes sont fictives. Le
+ * basculement se fait tout seul dès la première publication.
+ */
+export default async function Gallery() {
+  const supabase = await createClient();
 
-  // Recherche factice tant que Supabase n'est pas branché : la requête
-  // partira ensuite côté serveur avec les valeurs des filtres.
-  const search = () => {
-    setPending(true);
-    window.setTimeout(() => setPending(false), 350);
-  };
+  const { data: publiees } = await supabase
+    .from("ladies")
+    .select("id, display_name, age, display_city, display_country, headline")
+    .order("last_seen_at", { ascending: false, nullsFirst: false })
+    .limit(12);
+
+  const reelles = publiees ?? [];
+  const photos = await photosSignees(
+    supabase,
+    reelles.map((f) => f.id),
+  );
+
+  const paysDisponibles = [
+    ...new Set(reelles.map((f) => f.display_country).filter(Boolean)),
+  ].sort() as string[];
+
+  const cartes = reelles.length
+    ? reelles.map((f) => ({
+        id: f.id,
+        href: `/profils/${f.id}`,
+        nom: f.display_name,
+        age: f.age,
+        lieu: [f.display_city, f.display_country].filter(Boolean).join(", "),
+        photo: photos.get(f.id)?.[0]?.url ?? null,
+      }))
+    : demonstration.map((p) => ({
+        id: p.id,
+        href: "/inscription",
+        nom: p.name,
+        age: p.age as number | null,
+        lieu: p.location,
+        photo: p.photo,
+      }));
 
   return (
     <section className="gal" id="profils">
@@ -36,23 +70,20 @@ export default function Gallery() {
             </p>
           </div>
           <span className="live-count">
-            <span className="live-dot" /> 1 248 membres connectées
+            <span className="live-dot" />
+            {reelles.length ? `${reelles.length} profils publiés` : "Bientôt en ligne"}
           </span>
         </div>
 
-        <form
-          className="filters"
-          onSubmit={(e) => {
-            e.preventDefault();
-            search();
-          }}
-        >
+        <form className="filters" action="/profils" method="get">
           <div className="filters-row">
-            {FILTERS.map((f) => (
-              <select key={f.id} id={f.id} aria-label={f.label} defaultValue="">
-                <option value="">{f.label}</option>
-                {f.options.map((o) => (
-                  <option key={o}>{o}</option>
+            {FILTRES.map((filtre) => (
+              <select key={filtre.id} name={filtre.id} defaultValue="" aria-label={filtre.label}>
+                <option value="">{filtre.label}</option>
+                {(filtre.id === "pays" ? paysDisponibles : filtre.options).map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
                 ))}
               </select>
             ))}
@@ -62,40 +93,29 @@ export default function Gallery() {
           </button>
         </form>
 
-        <div className="grid" style={{ opacity: pending ? 0.4 : 1, transition: "opacity .25s" }}>
-          {profiles.map((p) => (
-            <article className="pcard" key={p.id}>
-              <div className="pcard-photo">
+        <div className="grid">
+          {cartes.map((carte) => (
+            <article className="pcard" key={carte.id}>
+              <Link href={carte.href} className="pcard-photo">
                 <div className="ph" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.photo} alt={`Profil de ${p.name}, ${p.age} ans`} />
-                {p.online && (
-                  <span className="badge-live">
-                    <span className="live-dot" /> En ligne
-                  </span>
-                )}
-                {p.verified && <span className="badge-ok">✓ Vérifié</span>}
-              </div>
+                {carte.photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={carte.photo} alt={`Profil de ${carte.nom}`} />
+                ) : null}
+                <span className="badge-ok">✓ Vérifié</span>
+              </Link>
+
               <div className="pcard-body">
                 <h3>
-                  {p.name}, {p.age}
+                  {carte.nom}
+                  {carte.age ? `, ${carte.age}` : ""}
                 </h3>
-                <span className="loc">{p.location}</span>
+                <span className="loc">{carte.lieu}</span>
                 <div className="pcard-acts">
-                  <button
-                    className="p-msg"
-                    onClick={() => open({ name: p.name, age: p.age, photo: p.photo })}
-                  >
+                  <Link className="p-msg" href={carte.href}>
                     <span className="lbl-l">Envoyer un message</span>
                     <span className="lbl-s">Message</span>
-                  </button>
-                  <button
-                    className="p-vid"
-                    aria-label={`Chat vidéo avec ${p.name}`}
-                    onClick={() => open({ name: p.name, age: p.age, photo: p.photo })}
-                  >
-                    🎥
-                  </button>
+                  </Link>
                 </div>
               </div>
             </article>
@@ -103,9 +123,9 @@ export default function Gallery() {
         </div>
 
         <div className="gal-more">
-          <button className="btn-dark" onClick={() => open()}>
+          <Link className="btn-dark" href="/profils">
             Voir tous les profils
-          </button>
+          </Link>
         </div>
       </div>
     </section>

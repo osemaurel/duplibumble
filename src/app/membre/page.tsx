@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Avatar, EtatVide, IconeMessages } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
-import { photosSignees } from "@/lib/photos";
+import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 function ilYA(date: string | null) {
@@ -44,7 +44,7 @@ export default async function MesMessages() {
       .select("conversation_id, body, sender, created_at")
       .order("created_at", { ascending: false })
       .limit(300),
-    photosSignees(supabase, ladyIds),
+    photosPubliques(supabase, ladyIds),
   ]);
 
   const femmeParId = new Map((femmes ?? []).map((f) => [f.id, f]));

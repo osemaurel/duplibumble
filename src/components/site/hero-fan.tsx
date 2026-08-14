@@ -4,6 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { ProfilVitrine } from "@/lib/vitrine";
 
+import { usePhotosPretes } from "./groupe-photos";
+import Photo from "./photo";
+
+/** Largeur réelle d'une carte de l'éventail, cf. `--cw` dans globals.css. */
+const TAILLES = "(max-width:640px) 45vw, (max-width:1200px) 20vw, 250px";
+
 /** Nombre de cartes visibles et amplitude de l'éventail selon la largeur. */
 function fanConfig(width: number) {
   if (width < 640) return { n: 3, spread: 0.62, arc: 0.13 };
@@ -23,6 +29,7 @@ export default function HeroFan({ profils }: { profils: ProfilVitrine[] }) {
   const [center, setCenter] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   const total = profils.length;
+  const pretes = usePhotosPretes(fanRef);
 
   /** Place chaque carte selon sa position dans l'éventail. */
   const layout = useCallback(() => {
@@ -102,7 +109,12 @@ export default function HeroFan({ profils }: { profils: ProfilVitrine[] }) {
   return (
     <section className="hero">
       <div className="hero-stage">
-        <div className="fan" ref={fanRef} onMouseLeave={() => setHovered(null)}>
+        <div
+          className="fan"
+          ref={fanRef}
+          data-photos={pretes ? "pretes" : "attente"}
+          onMouseLeave={() => setHovered(null)}
+        >
           {profils.map((p, i) => (
             <figure
               key={p.id}
@@ -113,8 +125,12 @@ export default function HeroFan({ profils }: { profils: ProfilVitrine[] }) {
               }}
             >
               <span className="ph" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.photo} alt={`${p.nom}${p.age ? `, ${p.age}` : ""}`} />
+              <Photo
+                src={p.photo}
+                alt={`${p.nom}${p.age ? `, ${p.age}` : ""}`}
+                sizes={TAILLES}
+                prioritaire={i < 7}
+              />
               <figcaption>
                 {p.nom}
                 {p.age ? `, ${p.age}` : ""}

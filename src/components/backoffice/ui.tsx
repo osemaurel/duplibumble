@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import Photo from "@/components/site/photo";
 import type { LadyStatus } from "@/lib/supabase/types";
 
 /**
@@ -36,10 +37,22 @@ export function Avatar({
   const classe = `bo-avatar t${teinte(nom)}${petit ? " sm" : ""}`;
 
   if (url) {
+    // Une pastille de quarante pixels ne doit pas télécharger l'original de
+    // trois mégaoctets. Les photos servies par notre route passent donc par
+    // l'optimiseur. Les URL signées de Supabase, elles, ne peuvent pas y
+    // passer : elles changent à chaque rendu, et l'optimiseur ne saurait pas
+    // les mettre en cache. On ne les rencontre que côté modération, où le
+    // volume est faible et la fidélité de l'image compte davantage.
+    const optimisable = url.startsWith("/");
+
     return (
       <span className={classe}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="" />
+        {optimisable ? (
+          <Photo src={url} alt="" sizes={petit ? "34px" : "42px"} />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="" />
+        )}
       </span>
     );
   }

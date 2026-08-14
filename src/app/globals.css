@@ -20,6 +20,7 @@
     --ink-soft:#4C4B45;
     --paper:#FFFFFF;
     --line:#E9E7E1;
+    --attente:#EFECE6;
     --r-lg:28px;
     --r-xl:40px;
     --font:'Outfit','Segoe UI',system-ui,-apple-system,sans-serif;
@@ -30,6 +31,31 @@
   body{font-family:var(--font);color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased}
   img,svg{display:block;max-width:100%}
   a{text-decoration:none;color:inherit}
+
+  /* ================= Chargement des photos =================
+     Le cadre d'attente est volontairement neutre. Un aplat rouge vif sous une
+     image qui met une seconde à venir se lit comme une erreur d'affichage,
+     alors que ce n'en est pas une.
+
+     Les images d'un même bloc démarrent invisibles et sont révélées ensemble
+     par `data-photos="pretes"`. L'animation de secours les montre au bout de
+     trois secondes même si le script n'a jamais tourné : rien de visible ne
+     dépend de JavaScript. */
+  .ph{position:absolute;inset:0;background:var(--attente);
+      background-image:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.55) 50%,transparent 80%);
+      background-size:220% 100%;animation:attente-photo 1.5s ease-in-out infinite}
+  @keyframes attente-photo{from{background-position:120% 0}to{background-position:-120% 0}}
+
+  [data-photos] img{opacity:0;animation:photo-secours 0s 3s forwards}
+  [data-photos="pretes"] img{opacity:1;animation:none;
+                             transition:opacity .45s ease,transform .4s ease}
+  [data-photos="pretes"] .ph{opacity:0;transition:opacity .45s ease;animation:none}
+  @keyframes photo-secours{to{opacity:1}}
+
+  @media (prefers-reduced-motion:reduce){
+    .ph{animation:none}
+    [data-photos] img,[data-photos="pretes"] img{transition:none}
+  }
   .wrap{width:min(1680px,94%);margin-inline:auto}
   h1,h2,h3{font-weight:700;line-height:1.06;letter-spacing:-.025em}
   .btn-dark{display:inline-flex;align-items:center;justify-content:center;background:var(--ink);color:#fff;
@@ -75,12 +101,12 @@
   .fan{--cw:clamp(170px,15vw,250px);position:relative;width:100%;
        height:calc(var(--cw) * 2.05)}
   .fcard{position:absolute;top:50%;left:50%;width:var(--cw);aspect-ratio:10/14;margin:0;
-         border-radius:26px;overflow:hidden;background:#C9743F;opacity:0;pointer-events:none;
+         border-radius:26px;overflow:hidden;background:var(--attente);opacity:0;pointer-events:none;
          box-shadow:0 26px 60px rgba(46,45,41,.34);transform:translate(-50%,-50%) scale(.6);
          transition:transform .8s cubic-bezier(.22,.68,.28,1),opacity .45s ease;
          will-change:transform,opacity}
   .fcard.is-live{pointer-events:auto}
-  .fcard .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F5A65B,#E9805E)}
+  
   .fcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
   .fcard figcaption{position:absolute;z-index:2;left:1rem;right:1rem;bottom:.9rem;color:#fff;
                     font-weight:600;font-size:1.05rem;font-style:italic;
@@ -164,7 +190,6 @@
   .testi blockquote{font-size:clamp(1.9rem,3.4vw,3.4rem);font-weight:700;line-height:1.15;letter-spacing:-.02em}
   .testi cite{display:block;font-style:normal;font-size:1.2rem;color:var(--ink-soft);margin:2rem 0 2.6rem}
   .testi-photo{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);position:relative;aspect-ratio:10/11}
-  .testi-photo .ph{position:absolute;inset:0}
   .testi-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05)}
 
   /* ================= Download band ================= */
@@ -223,7 +248,7 @@
   .pcard-photo{position:relative;aspect-ratio:10/12;overflow:hidden}
   .pcard-photo img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1;transition:transform .4s}
   .pcard:hover .pcard-photo img{transform:scale(1.05)}
-  .pcard-photo .ph{position:absolute;inset:0;background:linear-gradient(160deg,#F2788C,#B8324B)}
+  
   .badge-live{position:absolute;z-index:2;top:.8rem;left:.8rem;display:inline-flex;align-items:center;gap:.4rem;
               background:rgba(255,255,255,.94);border-radius:999px;padding:.3rem .7rem;font-size:.76rem;font-weight:700}
   .badge-ok{position:absolute;z-index:2;top:.8rem;right:.8rem;background:#3B7BF6;color:#fff;border-radius:999px;

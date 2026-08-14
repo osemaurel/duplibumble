@@ -6,7 +6,7 @@ import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
 import { COUT_MESSAGE } from "@/lib/credits";
-import { photosSignees } from "@/lib/photos";
+import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 import FormulaireMessage from "./formulaire-message";
@@ -49,7 +49,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
     await supabase.from("conversations").update({ member_unread: 0 }).eq("id", id);
   }
 
-  const photo = (await photosSignees(supabase, [femme.id])).get(femme.id)?.[0];
+  const photo = (await photosPubliques(supabase, [femme.id])).get(femme.id)?.[0];
 
   return (
     <div style={{ maxWidth: "52rem", marginInline: "auto" }}>

@@ -1,8 +1,14 @@
 import Link from "next/link";
 
 import { profiles as demonstration } from "@/lib/profiles";
-import { photosSignees } from "@/lib/photos";
+import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
+
+import GroupePhotos from "./groupe-photos";
+import Photo from "./photo";
+
+/** Grille : deux colonnes sur mobile, jusqu'à six sur grand écran. */
+const TAILLES = "(max-width:640px) 47vw, (max-width:1100px) 30vw, 300px";
 
 const FILTRES = [
   { id: "age", label: "Âge", options: ["18-25", "26-35", "36-45", "46+"] },
@@ -31,7 +37,7 @@ export default async function Gallery() {
     .limit(12);
 
   const reelles = publiees ?? [];
-  const photos = await photosSignees(
+  const photos = await photosPubliques(
     supabase,
     reelles.map((f) => f.id),
   );
@@ -93,14 +99,18 @@ export default async function Gallery() {
           </button>
         </form>
 
-        <div className="grid">
-          {cartes.map((carte) => (
+        <GroupePhotos className="grid">
+          {cartes.map((carte, rang) => (
             <article className="pcard" key={carte.id}>
               <Link href={carte.href} className="pcard-photo">
                 <div className="ph" />
                 {carte.photo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={carte.photo} alt={`Profil de ${carte.nom}`} />
+                  <Photo
+                    src={carte.photo}
+                    alt={`Profil de ${carte.nom}`}
+                    sizes={TAILLES}
+                    prioritaire={rang < 6}
+                  />
                 ) : null}
                 <span className="badge-ok">✓ Vérifié</span>
               </Link>
@@ -120,7 +130,7 @@ export default async function Gallery() {
               </div>
             </article>
           ))}
-        </div>
+        </GroupePhotos>
 
         <div className="gal-more">
           <Link className="btn-dark" href="/profils">

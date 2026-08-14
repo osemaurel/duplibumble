@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getSessionProfile } from "@/lib/auth";
-import { photosSignees } from "@/lib/photos";
+import Photo from "@/components/site/photo";
+import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 import { ouvrirConversation } from "../../membre/actions";
@@ -27,7 +28,7 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
   const { data: femme } = await supabase.from("ladies").select("*").eq("id", id).maybeSingle();
   if (!femme) notFound();
 
-  const photos = (await photosSignees(supabase, [femme.id])).get(femme.id) ?? [];
+  const photos = (await photosPubliques(supabase, [femme.id])).get(femme.id) ?? [];
 
   const langues = Array.isArray(femme.languages)
     ? (femme.languages as unknown[]).map((l) => String(l))
@@ -83,8 +84,12 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
           <div>
             <div className="mb-photo-principale">
               {photos[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photos[0].url} alt={`${femme.display_name}, ${femme.age}`} />
+                <Photo
+                  src={photos[0].url}
+                  alt={`${femme.display_name}, ${femme.age}`}
+                  sizes="(max-width:900px) 92vw, 460px"
+                  prioritaire
+                />
               ) : (
                 <span className="sans-photo">Photo à venir</span>
               )}
@@ -93,8 +98,9 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
             {photos.length > 1 && (
               <div className="mb-vignettes">
                 {photos.slice(1).map((photo) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={photo.url} src={photo.url} alt="" />
+                  <span className="vignette" key={photo.url}>
+                    <Photo src={photo.url} alt="" sizes="120px" />
+                  </span>
                 ))}
               </div>
             )}

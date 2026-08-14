@@ -1,5 +1,8 @@
 import type { ProfilVitrine } from "@/lib/vitrine";
 
+import GroupePhotos from "./groupe-photos";
+import Photo from "./photo";
+
 /**
  * Sections éditoriales de la landing. Rendues côté serveur : aucun état.
  * Les textes seront à terme éditables depuis l'interface admin.
@@ -42,20 +45,19 @@ export function Mission({ profils = [] }: { profils?: ProfilVitrine[] }) {
           </a>
         </div>
 
-        <div className="collage">
+        <GroupePhotos className="collage">
           {[
-            { cls: "cc1", photo: portrait(profils, 0, "/profiles/sk.avif"), pill: "Profil vérifié", alt: "Membre de Palab", ph: "linear-gradient(160deg,#F2788C,#B8324B)" },
-            { cls: "cc2", photo: portrait(profils, 1, "/profiles/ru.avif"), pill: "Chat vidéo", alt: "Membre de Palab", ph: "linear-gradient(160deg,#A8C6E8,#5E8AC0)" },
-            { cls: "cc3", photo: portrait(profils, 2, "/profiles/dg.avif"), pill: "Traduction", alt: "Membre de Palab", ph: "linear-gradient(160deg,#EAD9C6,#C9A87F)" },
+            { cls: "cc1", photo: portrait(profils, 0, "/profiles/sk.avif"), pill: "Profil vérifié", tailles: "(max-width:900px) 60vw, 380px" },
+            { cls: "cc2", photo: portrait(profils, 1, "/profiles/ru.avif"), pill: "Chat vidéo", tailles: "140px" },
+            { cls: "cc3", photo: portrait(profils, 2, "/profiles/dg.avif"), pill: "Traduction", tailles: "220px" },
           ].map((c) => (
             <div className={`ccard ${c.cls}`} key={c.cls}>
-              <div className="ph" style={{ position: "absolute", inset: 0, background: c.ph }} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={c.photo} alt={c.alt} />
+              <span className="ph" />
+              <Photo src={c.photo} alt="Membre de Palab" sizes={c.tailles} />
               <span className="vpill">{c.pill}</span>
             </div>
           ))}
-        </div>
+        </GroupePhotos>
       </div>
     </section>
   );
@@ -66,10 +68,13 @@ export function Verification({ profils = [] }: { profils?: ProfilVitrine[] }) {
     <section className="circle-sec" id="securite">
       <div className="wrap">
         <div className="circle-card">
-          <div className="circle-photo">
-            <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#B98A5E,#7C5638)" }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={portrait(profils, 3, "/profiles/ci.avif")} alt="Membre de Palab vérifiée" />
+          <GroupePhotos className="circle-photo">
+            <span className="ph" />
+            <Photo
+              src={portrait(profils, 3, "/profiles/ci.avif")}
+              alt="Membre de Palab vérifiée"
+              sizes="(max-width:900px) 100vw, 45vw"
+            />
             <svg className="stamp" viewBox="0 0 200 200" aria-hidden="true">
               <defs>
                 <path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" />
@@ -85,7 +90,7 @@ export function Verification({ profils = [] }: { profils?: ProfilVitrine[] }) {
                 <textPath href="#circ">PROFIL VÉRIFIÉ • PROFIL VÉRIFIÉ •</textPath>
               </text>
             </svg>
-          </div>
+          </GroupePhotos>
 
           <div className="circle-body">
             <h2>Chaque profil est vérifié, un par un</h2>
@@ -115,30 +120,28 @@ export function Communication({ profils = [] }: { profils?: ProfilVitrine[] }) {
       <div className="wrap duo-grid">
         <div className="ycard">
           <div className="ycard-visual">
-            <div className="shots">
+            <GroupePhotos className="shots">
               <div className="shot s-side">
-                <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#F5A65B,#C97B3F)" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={portrait(profils, 4, "/profiles/p2.avif")} alt="" />
+                <span className="ph" />
+                <Photo src={portrait(profils, 4, "/profiles/p2.avif")} alt="" sizes="120px" />
                 <span className="idv">✓ Vérifiée</span>
               </div>
               <div className="shot s-main">
-                <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#E9805E,#B85538)" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <span className="ph" />
+                <Photo
                   src={portrait(profils, 5, "/profiles/p1.avif")}
                   alt={`Conversation avec ${legende(profils, 5, "Amina, 28")}`}
+                  sizes="220px"
                 />
                 <span className="shot-name">{legende(profils, 5, "Amina, 28")}</span>
                 <span className="idv">✓ Vérifiée</span>
               </div>
               <div className="shot s-side">
-                <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#8FB57C,#5C8049)" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={portrait(profils, 6, "/profiles/p4.avif")} alt="" />
+                <span className="ph" />
+                <Photo src={portrait(profils, 6, "/profiles/p4.avif")} alt="" sizes="120px" />
                 <span className="idv">✓ Vérifiée</span>
               </div>
-            </div>
+            </GroupePhotos>
           </div>
           <h3>Messages &amp; lettres</h3>
           <p>
@@ -162,22 +165,25 @@ export function Communication({ profils = [] }: { profils?: ProfilVitrine[] }) {
             <span className="chip" style={{ top: "54%", left: "9%" }}>
               <span className="cdot" style={{ background: "#10B981" }} /> HD sécurisé
             </span>
-            <div className="shots">
+            <GroupePhotos className="shots">
               <div className="shot s-side" style={{ width: "clamp(120px,12vw,190px)", aspectRatio: "10/13", borderRadius: 22 }}>
-                <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#8FD3BC,#4FA98A)" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={portrait(profils, 7, "/profiles/p6.avif")} alt="Membre en appel vidéo" />
+                <span className="ph" />
+                <Photo
+                  src={portrait(profils, 7, "/profiles/p6.avif")}
+                  alt="Membre en appel vidéo"
+                  sizes="190px"
+                />
               </div>
               <div className="shot s-main">
-                <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#F2788C,#B8324B)" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <span className="ph" />
+                <Photo
                   src={portrait(profils, 8, "/profiles/p3.avif")}
                   alt={`Appel vidéo avec ${legende(profils, 8, "Mei, 25")}`}
+                  sizes="220px"
                 />
                 <span className="shot-name">{legende(profils, 8, "Mei, 25")}</span>
               </div>
-            </div>
+            </GroupePhotos>
             <span className="flower" aria-hidden="true">
               <svg width="64" height="64" viewBox="0 0 64 64" fill="#fff">
                 <circle cx="32" cy="14" r="10" />
@@ -223,11 +229,14 @@ export function Testimonial() {
             Lire d&apos;autres histoires
           </a>
         </div>
-        <div className="testi-photo">
-          <div className="ph" style={{ background: "linear-gradient(160deg,#999,#555)" }} />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/profiles/te.avif" alt="Un couple réuni, portrait en noir et blanc" />
-        </div>
+        <GroupePhotos className="testi-photo">
+          <span className="ph" />
+          <Photo
+            src="/profiles/te.avif"
+            alt="Un couple réuni, portrait en noir et blanc"
+            sizes="(max-width:900px) 100vw, 45vw"
+          />
+        </GroupePhotos>
       </div>
     </section>
   );

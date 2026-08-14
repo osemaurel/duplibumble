@@ -1,4 +1,4 @@
-import { photosSignees } from "./photos";
+import { photosPubliques } from "./photos";
 import { profiles as demonstration } from "./profiles";
 import { createClient } from "./supabase/server";
 
@@ -33,7 +33,7 @@ export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
   const publiees = femmes ?? [];
 
   if (publiees.length) {
-    const photos = await photosSignees(
+    const photos = await photosPubliques(
       supabase,
       publiees.map((f) => f.id),
     );

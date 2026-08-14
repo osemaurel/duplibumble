@@ -371,6 +371,7 @@
 /* ============================== Avatars ============================ */
 
 .bo-avatar {
+  position: relative;
   display: grid;
   place-items: center;
   width: 42px;
@@ -1144,6 +1145,7 @@
 }
 
 .mb-photo-principale {
+  position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: var(--r-lg);
@@ -1161,12 +1163,16 @@
   gap: 0.7rem;
   margin-top: 0.9rem;
 }
-.mb-vignettes img {
+/* Chaque vignette a besoin d'un cadre positionné : l'image le remplit. */
+.mb-vignettes .vignette {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: var(--r-sm);
+  background: var(--line-soft);
 }
+.mb-vignettes img { object-fit: cover; }
 
 .mb-accroche {
   margin-top: 1rem;

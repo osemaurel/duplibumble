@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { getSessionProfile } from "@/lib/auth";
-import { photosSignees } from "@/lib/photos";
+import Photo from "@/components/site/photo";
+import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 import "../backoffice.css";
@@ -47,7 +48,7 @@ export default async function Profils({
     return f.age !== null && f.age >= min && f.age <= max;
   });
 
-  const photos = await photosSignees(
+  const photos = await photosPubliques(
     supabase,
     femmes.map((f) => f.id),
   );
@@ -146,8 +147,11 @@ export default async function Profils({
                 <Link key={femme.id} href={`/profils/${femme.id}`} className="mb-profil">
                   <div className="photo">
                     {principale ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={principale.url} alt={`${femme.display_name}, ${femme.age}`} />
+                      <Photo
+                        src={principale.url}
+                        alt={`${femme.display_name}, ${femme.age}`}
+                        sizes="(max-width:640px) 47vw, (max-width:1100px) 30vw, 300px"
+                      />
                     ) : (
                       <span className="sans-photo">Photo à venir</span>
                     )}

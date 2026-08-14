@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/auth";
+import { lireDossier } from "@/lib/import-dossier";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { LadyStatus, PhotoStatus } from "@/lib/supabase/types";
@@ -384,4 +385,112 @@ export async function enregistrerAgent(
   revalidatePath("/admin/agents");
 
   return { ok: true, message: "Agent enregistré." };
+}
+
+/**
+ * Importe un classeur de collecte.
+ *
+ * Rejoue sans dommage : une fiche dont le code existe déjà est mise à jour,
+ * pas dupliquée. On peut donc corriger le classeur et réimporter sans avoir à
+ * nettoyer la base entre deux essais.
+ *
+ * Les fiches arrivent en brouillon. Rien n'est publié par un import — la
+ * publication reste un geste délibéré, fiche par fiche.
+ */
+export async function importerDossier(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireAdmin();
+
+  const fichier = formData.get("classeur");
+  if (!(fichier instanceof File) || fichier.size === 0) {
+    return { ok: false, message: "Aucun fichier reçu." };
+  }
+
+  let lecture;
+  try {
+    lecture = await lireDossier(await fichier.arrayBuffer());
+  } catch (erreur) {
+    return {
+      ok: false,
+      message: erreur instanceof Error ? erreur.message : "Classeur illisible.",
+    };
+  }
+
+  if (!lecture.fiches.length) {
+    return { ok: false, message: "Aucune fiche trouvée dans le classeur." };
+  }
+
+  const supabase = await createClient();
+
+  const { data: agents } = await supabase.from("agents").select("id, code");
+  const agentParCode = new Map((agents ?? []).map((a) => [a.code, a.id]));
+
+  const inconnus = lecture.agents.filter((code) => !agentParCode.has(code));
+
+  let crees = 0;
+  let majs = 0;
+  const echecs: string[] = [];
+
+  for (const fiche of lecture.fiches) {
+    const agentId = fiche.codeAgent ? agentParCode.get(fiche.codeAgent) ?? null : null;
+
+    const { data: existante } = await supabase
+      .from("ladies")
+      .select("id")
+      .eq("code", fiche.code)
+      .maybeSingle();
+
+    let ladyId = existante?.id ?? null;
+
+    if (ladyId) {
+      const { error } = await supabase
+        .from("ladies")
+        .update({ ...fiche.publique, agent_id: agentId, status: undefined } as never)
+        .eq("id", ladyId);
+      if (error) {
+        echecs.push(`${fiche.code} : ${error.message}`);
+        continue;
+      }
+      majs += 1;
+    } else {
+      const { data: creee, error } = await supabase
+        .from("ladies")
+        .insert({ ...fiche.publique, agent_id: agentId } as never)
+        .select("id")
+        .single();
+      if (error || !creee) {
+        echecs.push(`${fiche.code} : ${error?.message ?? "création refusée"}`);
+        continue;
+      }
+      ladyId = creee.id;
+      crees += 1;
+    }
+
+    // Le dossier interne exige un nom légal : sans lui, on laisse la fiche
+    // publique en place plutôt que de tout refuser.
+    if (ladyId && fiche.privee.legal_name && fiche.privee.birth_date) {
+      const { error } = await supabase
+        .from("lady_private")
+        .upsert({ lady_id: ladyId, ...fiche.privee } as never, { onConflict: "lady_id" });
+      if (error) echecs.push(`${fiche.code} (dossier interne) : ${error.message}`);
+    }
+  }
+
+  revalidatePath("/admin/femmes");
+  revalidatePath("/admin");
+
+  const parties = [
+    `${crees} fiche${crees > 1 ? "s" : ""} créée${crees > 1 ? "s" : ""}`,
+    majs ? `${majs} mise${majs > 1 ? "s" : ""} à jour` : null,
+    inconnus.length ? `agents introuvables : ${inconnus.join(", ")}` : null,
+    lecture.avertissements.length ? lecture.avertissements.join(" ") : null,
+    echecs.length ? `échecs — ${echecs.slice(0, 3).join(" ; ")}` : null,
+  ].filter(Boolean);
+
+  return {
+    ok: echecs.length === 0,
+    message: parties.join(". ") + ". Les fiches sont en brouillon.",
+  };
 }

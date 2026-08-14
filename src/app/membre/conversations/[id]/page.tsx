@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Echange from "@/components/backoffice/echange";
 import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
@@ -16,20 +17,10 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   const session = await requireMember();
   const supabase = await createClient();
 
-  const { data: conversation } = await supabase
-    .from("conversations")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (!conversation) notFound();
-
-  const [{ data: femme }, { data: messages }, { data: solde }] = await Promise.all([
-    supabase
-      .from("ladies")
-      .select("id, display_name, age, display_city, display_country")
-      .eq("id", conversation.lady_id)
-      .maybeSingle(),
+  // Ces trois requêtes ne dépendent que de l'adresse et de la session : les
+  // enchaîner faisait attendre trois allers-retours là où un seul suffit.
+  const [{ data: conversation }, { data: messages }, { data: solde }] = await Promise.all([
+    supabase.from("conversations").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("messages")
       .select("*")
@@ -42,14 +33,25 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
       .maybeSingle(),
   ]);
 
+  if (!conversation) notFound();
+
+  // Le second tour a besoin de savoir de quelle femme il s'agit. Ouvrir le fil
+  // vaut lecture : la remise à zéro part avec, sans tour supplémentaire.
+  const [{ data: femme }, photos] = await Promise.all([
+    supabase
+      .from("ladies")
+      .select("id, display_name, age, display_city, display_country")
+      .eq("id", conversation.lady_id)
+      .maybeSingle(),
+    photosPubliques(supabase, [conversation.lady_id]),
+    conversation.member_unread > 0
+      ? supabase.from("conversations").update({ member_unread: 0 }).eq("id", id)
+      : Promise.resolve(),
+  ]);
+
   if (!femme) notFound();
 
-  // Ouvrir le fil vaut lecture.
-  if (conversation.member_unread > 0) {
-    await supabase.from("conversations").update({ member_unread: 0 }).eq("id", id);
-  }
-
-  const photo = (await photosPubliques(supabase, [femme.id])).get(femme.id)?.[0];
+  const photo = photos.get(femme.id)?.[0];
 
   return (
     <div style={{ maxWidth: "52rem", marginInline: "auto" }}>
@@ -79,25 +81,27 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <FilMessages
-          conversationId={conversation.id}
-          monCote="member"
-          vide="Écrivez le premier message. Présentez-vous simplement, cela fonctionne mieux qu'un compliment."
-          initiaux={(messages ?? []).map((m) => ({
-            id: m.id,
-            body: m.body,
-            created_at: m.created_at,
-            mienne: m.sender === "member",
-            attachment_path: m.attachment_path,
-          }))}
-        />
+        <Echange>
+          <FilMessages
+            conversationId={conversation.id}
+            monCote="member"
+            vide="Écrivez le premier message. Présentez-vous simplement, cela fonctionne mieux qu'un compliment."
+            initiaux={(messages ?? []).map((m) => ({
+              id: m.id,
+              body: m.body,
+              created_at: m.created_at,
+              mienne: m.sender === "member",
+              attachment_path: m.attachment_path,
+            }))}
+          />
 
-        <FormulaireMessage
-          conversationId={conversation.id}
-          prenom={femme.display_name}
-          cout={COUT_MESSAGE}
-          solde={solde?.balance ?? 0}
-        />
+          <FormulaireMessage
+            conversationId={conversation.id}
+            prenom={femme.display_name}
+            cout={COUT_MESSAGE}
+            solde={solde?.balance ?? 0}
+          />
+        </Echange>
       </div>
     </div>
   );

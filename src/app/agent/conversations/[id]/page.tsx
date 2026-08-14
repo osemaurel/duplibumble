@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import Echange from "@/components/backoffice/echange";
 import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
@@ -97,29 +98,31 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <FilMessages
-          conversationId={conversation.id}
-          monCote="lady"
-          vide="Aucun message. Vous pouvez ouvrir la conversation."
-          initiaux={(messages ?? []).map((m) => {
-            const auteur = m.authored_by_agent_id
-              ? agentParId.get(m.authored_by_agent_id)
-              : null;
-            const ecritParUnAutre = Boolean(auteur && auteur.id !== agent.id);
-            return {
-              id: m.id,
-              body: m.body,
-              created_at: m.created_at,
-              mienne: m.sender === "lady",
-              attachment_path: m.attachment_path,
-              signature:
-                m.sender === "lady" && auteur ? (ecritParUnAutre ? auteur.code : "vous") : null,
-              signatureAutre: ecritParUnAutre,
-            };
-          })}
-        />
+        <Echange>
+          <FilMessages
+            conversationId={conversation.id}
+            monCote="lady"
+            vide="Aucun message. Vous pouvez ouvrir la conversation."
+            initiaux={(messages ?? []).map((m) => {
+              const auteur = m.authored_by_agent_id
+                ? agentParId.get(m.authored_by_agent_id)
+                : null;
+              const ecritParUnAutre = Boolean(auteur && auteur.id !== agent.id);
+              return {
+                id: m.id,
+                body: m.body,
+                created_at: m.created_at,
+                mienne: m.sender === "lady",
+                attachment_path: m.attachment_path,
+                signature:
+                  m.sender === "lady" && auteur ? (ecritParUnAutre ? auteur.code : "vous") : null,
+                signatureAutre: ecritParUnAutre,
+              };
+            })}
+          />
 
-        <FormulaireReponse conversationId={conversation.id} prenom={femme.display_name} />
+          <FormulaireReponse conversationId={conversation.id} prenom={femme.display_name} />
+        </Echange>
       </div>
     </div>
   );

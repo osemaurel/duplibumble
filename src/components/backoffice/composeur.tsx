@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,13 +23,17 @@ export default function Composeur({
   conversationId,
   placeholder,
   desactive = false,
-  enCours = false,
+  brouillon = "",
 }: {
   conversationId: string;
   placeholder: string;
   desactive?: boolean;
-  enCours?: boolean;
+  /** Texte réinjecté après un envoi refusé : on ne perd pas ce qui a été tapé. */
+  brouillon?: string;
 }) {
+  // `useFormStatus` lit l'état du formulaire parent : plus besoin de le faire
+  // redescendre en propriété, et il reste juste même si l'envoi part d'ailleurs.
+  const { pending: enCours } = useFormStatus();
   const champ = useRef<HTMLTextAreaElement>(null);
   const fichier = useRef<HTMLInputElement>(null);
 
@@ -105,6 +110,9 @@ export default function Composeur({
   return (
     <div className="bo-composeur">
       <input type="hidden" name="attachment_path" value={chemin} />
+      {/* L'aperçu local voyage avec le formulaire : il permet d'afficher la
+          photo dans le fil sans attendre qu'une URL signée revienne. */}
+      <input type="hidden" name="apercu_local" value={apercu ?? ""} />
 
       {erreur && <p className="bo-message erreur">{erreur}</p>}
 
@@ -151,6 +159,7 @@ export default function Composeur({
           ref={champ}
           name="corps"
           rows={1}
+          defaultValue={brouillon}
           disabled={desactive}
           placeholder={placeholder}
           onInput={ajusterHauteur}

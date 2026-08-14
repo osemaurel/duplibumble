@@ -1522,3 +1522,81 @@
   object-fit: cover;
 }
 .bo-bulle-photo span { font-size: 0.78rem; color: var(--ink-3); padding: 1.5rem 0.75rem; }
+
+/* ========================= Silhouettes de chargement =================
+   Affichées à l'instant du clic, remplacées dès que le contenu arrive.
+   Elles reprennent la forme de ce qui va venir : le remplacement ne doit
+   pas faire sauter la page. */
+
+.bo-sq {
+  display: block;
+  border-radius: var(--r-sm);
+  background: var(--line-soft);
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 80%
+  );
+  background-size: 220% 100%;
+  animation: bo-sq-onde 1.4s ease-in-out infinite;
+  flex: none;
+}
+@keyframes bo-sq-onde {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
+}
+
+.bo-sq.rond { width: 42px; height: 42px; border-radius: 999px; }
+.bo-sq.photo { width: 100%; aspect-ratio: 3 / 4; border-radius: 0; }
+
+.bo-sq-titre {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.6rem;
+}
+
+.bo-sq-ligne {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.bo-sq-ligne:last-child { border-bottom: none; }
+
+.bo-sq-corps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.bo-sq-carte {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+.bo-sq-carte .bo-sq-corps { padding: 1.1rem 1.2rem 1.3rem; }
+
+.bo-sq-fil {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.4rem 1.2rem;
+  min-height: 40vh;
+}
+.bo-sq.bulle { height: 2.6rem; border-radius: 18px; align-self: flex-start; }
+.bo-sq.bulle.mienne { align-self: flex-end; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bo-sq { animation: none; }
+}
+
+/* Bulle déposée avant confirmation du serveur : présente mais visiblement
+   provisoire. Elle ne doit pas se faire passer pour un message envoyé. */
+.bo-bulle.en-vol { opacity: 0.62; }
+.bo-bulle.en-vol .meta { font-style: italic; }

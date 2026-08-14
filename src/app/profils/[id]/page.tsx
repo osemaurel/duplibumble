@@ -7,7 +7,6 @@ import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
 import { ouvrirConversation } from "../../membre/actions";
-import "../../backoffice.css";
 
 export const dynamic = "force-dynamic";
 
@@ -53,28 +52,7 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
   const estMembre = session?.profile.role === "member";
 
   return (
-    <div className="bo">
-      <header className="mb-barre">
-        <Link href="/" className="mb-mark">
-          Palab
-        </Link>
-        <nav className="mb-nav">
-          <Link href="/profils">Profils</Link>
-          {session ? (
-            <Link href="/membre" className="bo-btn petit">
-              Mon espace
-            </Link>
-          ) : (
-            <>
-              <Link href="/connexion">Se connecter</Link>
-              <Link href="/inscription" className="bo-btn petit">
-                Créer un compte
-              </Link>
-            </>
-          )}
-        </nav>
-      </header>
-
+    <>
       <main className="bo-main" style={{ maxWidth: 1200, marginInline: "auto" }}>
         <Link href="/profils" className="bo-retour">
           ← Tous les profils
@@ -214,6 +192,6 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

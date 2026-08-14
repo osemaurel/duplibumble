@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
+import { useEchange } from "./echange";
+
 export type MessageAffiche = {
   id: string;
   body: string;
@@ -16,6 +18,10 @@ export type MessageAffiche = {
   signatureAutre?: boolean;
   /** Chemin de la pièce jointe dans le stockage, le cas échéant. */
   attachment_path?: string | null;
+  /** Vrai tant que le serveur n'a pas confirmé l'envoi. */
+  enVol?: boolean;
+  /** Aperçu local d'une photo qui part : évite d'attendre une URL signée. */
+  apercuLocal?: string | null;
 };
 
 function heure(date: string) {
@@ -66,8 +72,18 @@ export default function FilMessages({
   const [urls, setUrls] = useState<Record<string, string>>({});
   const bas = useRef<HTMLDivElement>(null);
 
+  const echange = useEchange();
+
   const connus = new Set(initiaux.map((m) => m.id));
-  const messages = [...initiaux, ...recus.filter((m) => !connus.has(m.id))].sort((a, b) =>
+  const reels = [...initiaux, ...recus.filter((m) => !connus.has(m.id))];
+
+  // Un message en vol s'efface dès que son vrai jumeau apparaît, sans attendre
+  // que l'action se termine : l'abonnement le livre souvent en premier, et deux
+  // bulles identiques se verraient.
+  const arrives = new Set(reels.filter((m) => m.mienne).map((m) => m.body));
+  const enVol = (echange?.enAttente ?? []).filter((m) => !arrives.has(m.body));
+
+  const messages = [...reels, ...enVol].sort((a, b) =>
     a.created_at.localeCompare(b.created_at),
   );
 
@@ -117,6 +133,7 @@ export default function FilMessages({
   }, [conversationId, monCote]);
 
   const cheminsAsigner = messages
+    .filter((m) => !m.enVol)
     .map((m) => m.attachment_path)
     .filter((c): c is string => Boolean(c) && !urls[c as string])
     .join("|");
@@ -176,12 +193,15 @@ export default function FilMessages({
               {nouveauJour && <div className="bo-jour">{jourDuMessage}</div>}
 
               <div className={`bo-bulle-rangee ${message.mienne ? "mienne" : "sienne"}`}>
-                <div className="bo-bulle">
-                  {message.attachment_path && (
+                <div className={`bo-bulle${message.enVol ? " en-vol" : ""}`}>
+                  {(message.attachment_path || message.apercuLocal) && (
                     <div className="bo-bulle-photo">
-                      {urls[message.attachment_path] ? (
+                      {message.apercuLocal ?? (message.attachment_path && urls[message.attachment_path]) ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={urls[message.attachment_path]} alt="Photo envoyée" />
+                        <img
+                          src={message.apercuLocal ?? urls[message.attachment_path as string]}
+                          alt="Photo envoyée"
+                        />
                       ) : (
                         <span>Chargement de la photo…</span>
                       )}
@@ -189,7 +209,7 @@ export default function FilMessages({
                   )}
                   {message.body && <div className="texte">{message.body}</div>}
                   <p className="meta">
-                    {heure(message.created_at)}
+                    {message.enVol ? "Envoi…" : heure(message.created_at)}
                     {message.signature && (
                       <span className={message.signatureAutre ? "autre-auteur" : undefined}>
                         {" · rédigé par "}

@@ -5,7 +5,7 @@ import Photo from "@/components/site/photo";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
-import "../backoffice.css";
+
 
 export const metadata = {
   title: "Profils vérifiés | Palab",
@@ -58,30 +58,7 @@ export default async function Profils({
   ].sort() as string[];
 
   return (
-    <div className="bo">
-      <header className="mb-barre">
-        <Link href="/" className="mb-mark">
-          Palab
-        </Link>
-        <nav className="mb-nav">
-          <Link href="/profils" aria-current="page">
-            Profils
-          </Link>
-          {session ? (
-            <Link href="/membre" className="bo-btn petit">
-              Mon espace
-            </Link>
-          ) : (
-            <>
-              <Link href="/connexion">Se connecter</Link>
-              <Link href="/inscription" className="bo-btn petit">
-                Créer un compte
-              </Link>
-            </>
-          )}
-        </nav>
-      </header>
-
+    <>
       <main className="bo-main" style={{ maxWidth: 1400, marginInline: "auto" }}>
         <div className="bo-entete">
           <div>
@@ -177,6 +154,6 @@ export default async function Profils({
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }

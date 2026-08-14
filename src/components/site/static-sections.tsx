@@ -1,10 +1,32 @@
+import type { ProfilVitrine } from "@/lib/vitrine";
+
 /**
- * Sections éditoriales de la landing. Purement statiques : aucun état,
- * donc rendues côté serveur. Les textes seront à terme éditables depuis
- * l'interface admin.
+ * Sections éditoriales de la landing. Rendues côté serveur : aucun état.
+ * Les textes seront à terme éditables depuis l'interface admin.
+ *
+ * Les portraits proviennent des fiches réellement publiées, passées en
+ * propriété. Quand la vitrine retombe sur les profils de démonstration, ces
+ * sections suivent : elles montrent alors les mêmes visages que le reste de
+ * la page, plutôt qu'un jeu d'images sans rapport.
  */
 
-export function Mission() {
+/** Photo du profil demandé, ou repli sur une image générique. */
+function portrait(profils: ProfilVitrine[], rang: number, repli: string) {
+  return profils.length ? profils[rang % profils.length].photo : repli;
+}
+
+/**
+ * Nom et âge du même profil. Les vignettes légendées doivent nommer la
+ * personne qu'elles montrent : une photo réelle sous un prénom inventé serait
+ * exactement le genre de détail qui décrédibilise la page.
+ */
+function legende(profils: ProfilVitrine[], rang: number, repli: string) {
+  if (!profils.length) return repli;
+  const p = profils[rang % profils.length];
+  return `${p.nom}${p.age ? `, ${p.age}` : ""}`;
+}
+
+export function Mission({ profils = [] }: { profils?: ProfilVitrine[] }) {
   return (
     <section className="mission">
       <div className="wrap mission-grid">
@@ -22,9 +44,9 @@ export function Mission() {
 
         <div className="collage">
           {[
-            { cls: "cc1", photo: "/profiles/sk.avif", pill: "Profil vérifié", alt: "Membre de Palab en extérieur", ph: "linear-gradient(160deg,#F2788C,#B8324B)" },
-            { cls: "cc2", photo: "/profiles/ru.avif", pill: "Chat vidéo", alt: "Membre de Palab", ph: "linear-gradient(160deg,#A8C6E8,#5E8AC0)" },
-            { cls: "cc3", photo: "/profiles/dg.avif", pill: "Traduction", alt: "Membre de Palab", ph: "linear-gradient(160deg,#EAD9C6,#C9A87F)" },
+            { cls: "cc1", photo: portrait(profils, 0, "/profiles/sk.avif"), pill: "Profil vérifié", alt: "Membre de Palab", ph: "linear-gradient(160deg,#F2788C,#B8324B)" },
+            { cls: "cc2", photo: portrait(profils, 1, "/profiles/ru.avif"), pill: "Chat vidéo", alt: "Membre de Palab", ph: "linear-gradient(160deg,#A8C6E8,#5E8AC0)" },
+            { cls: "cc3", photo: portrait(profils, 2, "/profiles/dg.avif"), pill: "Traduction", alt: "Membre de Palab", ph: "linear-gradient(160deg,#EAD9C6,#C9A87F)" },
           ].map((c) => (
             <div className={`ccard ${c.cls}`} key={c.cls}>
               <div className="ph" style={{ position: "absolute", inset: 0, background: c.ph }} />
@@ -39,7 +61,7 @@ export function Mission() {
   );
 }
 
-export function Verification() {
+export function Verification({ profils = [] }: { profils?: ProfilVitrine[] }) {
   return (
     <section className="circle-sec" id="securite">
       <div className="wrap">
@@ -47,7 +69,7 @@ export function Verification() {
           <div className="circle-photo">
             <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#B98A5E,#7C5638)" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/profiles/ci.avif" alt="Deux membres de Palab en visioconférence" />
+            <img src={portrait(profils, 3, "/profiles/ci.avif")} alt="Membre de Palab vérifiée" />
             <svg className="stamp" viewBox="0 0 200 200" aria-hidden="true">
               <defs>
                 <path id="circ" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" />
@@ -87,7 +109,7 @@ export function Verification() {
   );
 }
 
-export function Communication() {
+export function Communication({ profils = [] }: { profils?: ProfilVitrine[] }) {
   return (
     <section className="duo" id="communication">
       <div className="wrap duo-grid">
@@ -97,20 +119,23 @@ export function Communication() {
               <div className="shot s-side">
                 <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#F5A65B,#C97B3F)" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/profiles/p2.avif" alt="" />
+                <img src={portrait(profils, 4, "/profiles/p2.avif")} alt="" />
                 <span className="idv">✓ Vérifiée</span>
               </div>
               <div className="shot s-main">
                 <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#E9805E,#B85538)" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/profiles/p1.avif" alt="Conversation avec Amina, 28 ans" />
-                <span className="shot-name">Amina, 28</span>
+                <img
+                  src={portrait(profils, 5, "/profiles/p1.avif")}
+                  alt={`Conversation avec ${legende(profils, 5, "Amina, 28")}`}
+                />
+                <span className="shot-name">{legende(profils, 5, "Amina, 28")}</span>
                 <span className="idv">✓ Vérifiée</span>
               </div>
               <div className="shot s-side">
                 <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#8FB57C,#5C8049)" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/profiles/p4.avif" alt="" />
+                <img src={portrait(profils, 6, "/profiles/p4.avif")} alt="" />
                 <span className="idv">✓ Vérifiée</span>
               </div>
             </div>
@@ -141,13 +166,16 @@ export function Communication() {
               <div className="shot s-side" style={{ width: "clamp(120px,12vw,190px)", aspectRatio: "10/13", borderRadius: 22 }}>
                 <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#8FD3BC,#4FA98A)" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/profiles/p6.avif" alt="Membre en appel vidéo" />
+                <img src={portrait(profils, 7, "/profiles/p6.avif")} alt="Membre en appel vidéo" />
               </div>
               <div className="shot s-main">
                 <div className="ph" style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#F2788C,#B8324B)" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/profiles/p3.avif" alt="Appel vidéo avec Mei, 25 ans" />
-                <span className="shot-name">Mei, 25</span>
+                <img
+                  src={portrait(profils, 8, "/profiles/p3.avif")}
+                  alt={`Appel vidéo avec ${legende(profils, 8, "Mei, 25")}`}
+                />
+                <span className="shot-name">{legende(profils, 8, "Mei, 25")}</span>
               </div>
             </div>
             <span className="flower" aria-hidden="true">

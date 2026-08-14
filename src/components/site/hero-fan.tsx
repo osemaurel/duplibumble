@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { profiles } from "@/lib/profiles";
+
+import type { ProfilVitrine } from "@/lib/vitrine";
 
 /** Nombre de cartes visibles et amplitude de l'éventail selon la largeur. */
 function fanConfig(width: number) {
@@ -13,11 +14,15 @@ function fanConfig(width: number) {
 
 const ROTATE_MS = 4200;
 
-export default function HeroFan() {
+/**
+ * Les profils viennent du serveur : ce sont les fiches réellement publiées,
+ * avec leurs photos signées. Ce composant ne connaît plus aucune liste en dur.
+ */
+export default function HeroFan({ profils }: { profils: ProfilVitrine[] }) {
   const fanRef = useRef<HTMLDivElement>(null);
   const [center, setCenter] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
-  const total = profiles.length;
+  const total = profils.length;
 
   /** Place chaque carte selon sa position dans l'éventail. */
   const layout = useCallback(() => {
@@ -98,7 +103,7 @@ export default function HeroFan() {
     <section className="hero">
       <div className="hero-stage">
         <div className="fan" ref={fanRef} onMouseLeave={() => setHovered(null)}>
-          {profiles.map((p, i) => (
+          {profils.map((p, i) => (
             <figure
               key={p.id}
               className="fcard"
@@ -109,9 +114,10 @@ export default function HeroFan() {
             >
               <span className="ph" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.photo} alt={`${p.name}, ${p.age}`} />
+              <img src={p.photo} alt={`${p.nom}${p.age ? `, ${p.age}` : ""}`} />
               <figcaption>
-                {p.name}, {p.age}
+                {p.nom}
+                {p.age ? `, ${p.age}` : ""}
               </figcaption>
             </figure>
           ))}
@@ -125,7 +131,7 @@ export default function HeroFan() {
           </button>
 
           <div className="fan-dots">
-            {profiles.map((p, i) => (
+            {profils.map((p, i) => (
               <i key={p.id} className={i === center ? "on" : undefined} />
             ))}
           </div>

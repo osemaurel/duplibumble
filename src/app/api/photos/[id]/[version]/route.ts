@@ -10,6 +10,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * de sa date de mise à jour : elle se met en cache, et Next peut la
  * redimensionner avant de la servir.
  *
+ * La version est un segment de chemin, pas un paramètre de requête : Next
+ * refuse d'optimiser une URL locale qui porte une chaîne de requête, et
+ * renvoie « url parameter is not allowed » — donc une image cassée.
+ *
  * Ce que la route accepte de rendre public est volontairement étroit : une
  * photo validée, appartenant à une fiche publiée. C'est exactement ce que la
  * page d'accueil affiche déjà à tout visiteur. Une photo en attente, refusée,
@@ -30,8 +34,10 @@ function introuvable() {
 
 export async function GET(
   _requete: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string; version: string }> },
 ) {
+  // La version ne sert qu'à distinguer deux états d'une même photo dans les
+  // caches : elle n'est pas relue ici, l'identifiant suffit à retrouver la ligne.
   const { id } = await params;
   if (!UUID.test(id)) return introuvable();
 

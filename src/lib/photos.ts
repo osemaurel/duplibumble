@@ -8,10 +8,15 @@ export type PhotoAffichee = {
   caption: string | null;
 };
 
-/** Adresse stable et cachable d'une photo publique. */
+/**
+ * Adresse stable et cachable d'une photo publique.
+ *
+ * La version occupe un segment de chemin plutôt qu'un paramètre de requête :
+ * l'optimiseur d'images de Next rejette les URL locales qui en portent un.
+ */
 export function urlPhoto(id: string, misAJour?: string | null) {
-  const version = misAJour ? Date.parse(misAJour) : 0;
-  return version ? `/api/photos/${id}?v=${version}` : `/api/photos/${id}`;
+  const version = (misAJour ? Date.parse(misAJour) : 0) || 0;
+  return `/api/photos/${id}/${version}`;
 }
 
 /**

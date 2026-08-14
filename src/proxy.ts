@@ -13,7 +13,10 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Tout sauf les fichiers statiques et les images.
-    "/((?!_next/static|_next/image|favicon.ico|fonts/|profiles/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|woff2)$).*)",
+    // Tout sauf les fichiers statiques et les images. `api/photos` en fait
+    // partie : y faire tourner la vérification de session ajoutait un appel
+    // d'authentification par vignette, pour une route qui ne sert que du
+    // contenu public.
+    "/((?!_next/static|_next/image|api/photos|favicon.ico|fonts/|profiles/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|woff2)$).*)",
   ],
 };

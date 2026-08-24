@@ -494,3 +494,62 @@ export async function importerDossier(
     message: parties.join(". ") + ". Les fiches sont en brouillon.",
   };
 }
+
+/**
+ * Publie d'un coup toutes les fiches qui ne le sont pas encore.
+ *
+ * Sert surtout après un import : celui-ci dépose les fiches en brouillon, et
+ * les publier une par une n'a aucun intérêt quand le lot vient d'être relu.
+ *
+ * L'action touche aussi les fiches refusées et suspendues. Ce sont des
+ * décisions de modération, pas de simples brouillons : c'est pourquoi l'écran
+ * annonce leur nombre avant d'agir plutôt que de les emporter discrètement.
+ */
+export async function publierToutesLesFiches(
+  _prev: Resultat | null,
+  _formData: FormData,
+): Promise<Resultat> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+
+  // `select()` après l'update renvoie les lignes réellement modifiées : c'est
+  // le seul compte fiable, un décompte fait avant pourrait avoir bougé.
+  const { data: publiees, error } = await supabase
+    .from("ladies")
+    .update({ status: "published", published_at: new Date().toISOString() })
+    .neq("status", "published")
+    .select("id");
+
+  if (error) return { ok: false, message: `Publication refusée : ${error.message}` };
+
+  const total = publiees?.length ?? 0;
+  if (!total) return { ok: true, message: "Aucune fiche à publier : tout est déjà en ligne." };
+
+  // Une fiche sans photo validée s'affiche sans image. On la publie quand même
+  // — c'est ce qui a été demandé — mais l'administrateur doit le savoir.
+  const identifiants = publiees.map((f) => f.id);
+  const { data: photos } = await supabase
+    .from("lady_photos")
+    .select("lady_id")
+    .eq("status", "approved")
+    .in("lady_id", identifiants);
+
+  const avecPhoto = new Set((photos ?? []).map((p) => p.lady_id));
+  const sansPhoto = identifiants.filter((id) => !avecPhoto.has(id)).length;
+
+  revalidatePath("/admin/femmes");
+  revalidatePath("/admin");
+  revalidatePath("/profils");
+  revalidatePath("/");
+
+  const accord = total > 1 ? "s" : "";
+  return {
+    ok: true,
+    message:
+      `${total} fiche${accord} publiée${accord}.` +
+      (sansPhoto
+        ? ` ${sansPhoto} n'${sansPhoto > 1 ? "ont" : "a"} aucune photo validée et s'affichera${sansPhoto > 1 ? "ont" : ""} sans image.`
+        : ""),
+  };
+}

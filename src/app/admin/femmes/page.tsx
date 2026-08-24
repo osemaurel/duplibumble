@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { LadyStatus } from "@/lib/supabase/types";
 
 import FormulaireFemme from "./formulaire-femme";
+import PublierTout, { type Attente } from "./publier-tout";
 
 const FILTRES: { valeur: LadyStatus | "tous"; libelle: string }[] = [
   { valeur: "tous", libelle: "Toutes" },
@@ -34,11 +35,26 @@ export default async function Femmes({
 
   if (statut !== "tous") requete = requete.eq("status", statut);
 
-  const [{ data: femmes }, { data: agents }, { data: photos }] = await Promise.all([
-    requete,
-    supabase.from("agents").select("id, code, agency_name").order("code"),
-    supabase.from("lady_photos").select("lady_id, status"),
-  ]);
+  const [{ data: femmes }, { data: agents }, { data: photos }, { data: nonPubliees }] =
+    await Promise.all([
+      requete,
+      supabase.from("agents").select("id, code, agency_name").order("code"),
+      supabase.from("lady_photos").select("lady_id, status"),
+      // Indépendant du filtre affiché : le bouton de publication en lot porte
+      // sur toutes les fiches, pas sur celles que l'écran montre.
+      supabase.from("ladies").select("status").neq("status", "published"),
+    ]);
+
+  const attente = (nonPubliees ?? []).reduce<Attente>(
+    (compte, fiche) => {
+      if (fiche.status === "draft") compte.brouillon += 1;
+      else if (fiche.status === "pending_review") compte.aValider += 1;
+      else if (fiche.status === "rejected") compte.refusees += 1;
+      else if (fiche.status === "suspended") compte.suspendues += 1;
+      return compte;
+    },
+    { brouillon: 0, aValider: 0, refusees: 0, suspendues: 0 },
+  );
 
   const agentParId = new Map((agents ?? []).map((a) => [a.id, a]));
 
@@ -59,6 +75,8 @@ export default async function Femmes({
             Une fiche n&apos;est visible du public qu&apos;une fois publiée par vous.
           </p>
         </div>
+
+        <PublierTout attente={attente} />
       </div>
 
       <FormulaireFemme agents={agents ?? []} />

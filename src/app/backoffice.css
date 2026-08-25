@@ -1646,8 +1646,14 @@
   position: fixed;
   inset: 0;
   z-index: 200;
-  display: grid;
-  place-items: center;
+  /* Colonne souple plutôt que grille centrée : c'est elle qui donne au cadre
+     une hauteur définie. Une hauteur en pourcentage se calculerait contre un
+     parent de hauteur automatique, donc contre rien — le cadre tombait à zéro
+     et la photo n'avait plus de place où s'afficher. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: rgba(16, 15, 14, 0.94);
   /* Les encoches et la barre de geste ne doivent pas manger les commandes. */
   padding: calc(env(safe-area-inset-top, 0px) + 3.6rem) 1rem
@@ -1663,13 +1669,19 @@
   align-items: center;
   width: 100%;
   max-width: 900px;
+  flex: 1 1 auto;
+  /* Sans cela, un élément souple refuse de passer sous la taille de son
+     contenu : l'image déborderait au lieu de s'adapter. */
+  min-height: 0;
 }
 
-/* Hauteur explicite : l'image est en `fill`, elle ne porte donc pas le cadre. */
+/* L'image est en `fill` : elle ne porte pas le cadre, c'est le cadre qui doit
+   avoir une hauteur. Il prend ce que la colonne lui laisse, légende déduite. */
 .mb-vis-cadre {
   position: relative;
   width: 100%;
-  height: min(76vh, 900px);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .mb-vis-scene figcaption {
@@ -1723,7 +1735,16 @@
    place que la photo utilise mieux. */
 @media (max-width: 640px) {
   .mb-vis-fleche { display: none; }
-  .mb-vis-cadre { height: min(72vh, 100%); }
+}
+
+/* Téléphone couché : la hauteur est la ressource rare. On rend à la photo ce
+   que les marges prenaient, sans passer sous les commandes. */
+@media (max-height: 480px) {
+  .mb-visionneuse {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 2.5rem);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2.3rem);
+  }
+  .mb-vis-scene figcaption { font-size: 0.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

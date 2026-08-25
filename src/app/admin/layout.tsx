@@ -5,6 +5,7 @@ import {
   IconeAgents,
   IconeImport,
   IconeFemmes,
+  IconeMembres,
   IconeSignalements,
   IconeTableau,
 } from "@/components/backoffice/ui";
@@ -38,6 +39,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin", label: "Tableau de bord", icone: IconeTableau, compte: 0 },
     { href: "/admin/femmes", label: "Femmes", icone: IconeFemmes, compte: fiches.count ?? 0 },
     { href: "/admin/agents", label: "Agents", icone: IconeAgents, compte: 0 },
+    { href: "/admin/membres", label: "Membres", icone: IconeMembres, compte: 0 },
     { href: "/admin/import", label: "Import", icone: IconeImport, compte: 0 },
     {
       href: "/admin/signalements",

@@ -553,3 +553,78 @@ export async function publierToutesLesFiches(
         : ""),
   };
 }
+
+/**
+ * Ajuste à la main le solde d'un membre.
+ *
+ * Le mouvement s'écrit dans le même journal que les achats et les messages :
+ * un ajustement n'est pas une correction discrète du solde, c'est une ligne
+ * de plus, datée et motivée. Le membre la voit dans son relevé — c'est
+ * précisément ce qui rend l'opération défendable s'il la conteste.
+ *
+ * Le motif est obligatoire. Un ajustement sans raison ne se justifie plus
+ * quelques semaines après, et personne ne se souvient de qui l'a passé ni
+ * pourquoi.
+ */
+export async function ajusterCredits(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  const session = await requireAdmin();
+
+  const membreId = String(formData.get("membre_id") ?? "");
+  const sens = String(formData.get("sens") ?? "ajouter");
+  const brut = String(formData.get("montant") ?? "").trim();
+  const motif = String(formData.get("motif") ?? "").trim();
+
+  if (!membreId) return { ok: false, message: "Membre introuvable." };
+  if (!motif) return { ok: false, message: "Indiquez le motif de l'ajustement." };
+
+  // Le signe vient du sens choisi, pas d'un moins tapé dans le champ : un
+  // ajustement de -50 saisi par erreur là où on voulait +50 ne se rattrape pas.
+  const montant = Number.parseInt(brut, 10);
+  if (!Number.isFinite(montant) || montant <= 0) {
+    return { ok: false, message: "Le montant doit être un nombre entier positif." };
+  }
+
+  const variation = sens === "retirer" ? -montant : montant;
+
+  const supabase = await createClient();
+
+  const { data: membre } = await supabase
+    .from("profiles")
+    .select("id, role, display_name")
+    .eq("id", membreId)
+    .maybeSingle();
+
+  if (!membre || membre.role !== "member") {
+    return { ok: false, message: "Ce compte n'est pas un compte membre." };
+  }
+
+  const { error } = await supabase.from("credit_transactions").insert({
+    member_id: membreId,
+    amount: variation,
+    reason: "adjustment",
+    note: `${motif} — par ${session.email}`,
+  });
+
+  if (error) {
+    // La contrainte de solde positif refuse un retrait plus grand que le solde.
+    if (error.message.includes("credit_balances_balance_check")) {
+      return { ok: false, message: "Le retrait dépasse le solde disponible du membre." };
+    }
+    return { ok: false, message: `Ajustement refusé : ${error.message}` };
+  }
+
+  revalidatePath("/admin/membres");
+  revalidatePath(`/admin/membres/${membreId}`);
+
+  const nom = membre.display_name ?? "le membre";
+  return {
+    ok: true,
+    message:
+      variation > 0
+        ? `${variation} crédits ajoutés à ${nom}.`
+        : `${-variation} crédits retirés à ${nom}.`,
+  };
+}

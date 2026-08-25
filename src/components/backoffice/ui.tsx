@@ -165,6 +165,14 @@ export const IconePhoto = (
   </svg>
 );
 
+export const IconeMembres = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="7.5" r="3.8" />
+    <path d="M4.8 20.5a7.2 7.2 0 0 1 14.4 0" />
+    <path d="M3 12.5h1.6M19.4 12.5H21" />
+  </svg>
+);
+
 export const IconeImport = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 3v11" />

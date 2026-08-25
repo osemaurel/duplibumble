@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { BONUS_BIENVENUE } from "@/lib/credits";
+import { REPLI, lireBareme } from "@/lib/credits";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -59,10 +59,11 @@ export default async function Inscription({
       // Les crédits de bienvenue passent par la clé de service : le journal
       // n'est ouvert en écriture à personne, sinon un membre pourrait s'en
       // accorder lui-même.
+      const bareme = await lireBareme(supabase);
       const admin = createAdminClient();
       await admin.from("credit_transactions").insert({
         member_id: data.user.id,
-        amount: BONUS_BIENVENUE,
+        amount: bareme.bonus_bienvenue,
         reason: "bonus",
         note: "Crédits offerts à l'inscription",
       });
@@ -96,7 +97,7 @@ export default async function Inscription({
             </h1>
             <p>
               Chaque profil féminin est vérifié un par un par notre équipe. Vous recevez{" "}
-              {BONUS_BIENVENUE} crédits à l&apos;inscription : de quoi engager la conversation
+              {REPLI.bonus_bienvenue} crédits à l&apos;inscription : de quoi engager la conversation
               sans rien dépenser.
             </p>
           </div>

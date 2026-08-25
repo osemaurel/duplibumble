@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { requireMember } from "@/lib/auth";
-import { BONUS_BIENVENUE, COUT_MESSAGE } from "@/lib/credits";
+import { lireBareme, lirePaliers } from "@/lib/credits";
+
+import Paliers from "./paliers";
 import { createClient } from "@/lib/supabase/server";
 
 import { seDeconnecter } from "../actions";
@@ -9,6 +11,7 @@ import { seDeconnecter } from "../actions";
 const MOTIF: Record<string, string> = {
   purchase: "Rechargement",
   message: "Message envoyé",
+  photo: "Photo envoyée",
   video_minute: "Minute de vidéo",
   gift: "Cadeau",
   refund: "Remboursement",
@@ -20,7 +23,7 @@ export default async function Compte() {
   const session = await requireMember();
   const supabase = await createClient();
 
-  const [{ data: solde }, { data: mouvements }] = await Promise.all([
+  const [{ data: solde }, { data: mouvements }, bareme, paliers] = await Promise.all([
     supabase
       .from("credit_balances")
       .select("balance")
@@ -31,6 +34,8 @@ export default async function Compte() {
       .select("*")
       .order("created_at", { ascending: false })
       .limit(50),
+    lireBareme(supabase),
+    lirePaliers(supabase),
   ]);
 
   return (
@@ -60,14 +65,31 @@ export default async function Compte() {
           >
             {solde?.balance ?? 0}
           </p>
-          <p className="bo-aide" style={{ marginTop: "0.6rem" }}>
-            {COUT_MESSAGE} crédit{COUT_MESSAGE > 1 ? "s" : ""} par message envoyé.
-            {BONUS_BIENVENUE} vous ont été offerts à l&apos;inscription.
+          <ul className="mb-bareme">
+            <li>
+              <span>Message envoyé</span>
+              <b>
+                {bareme.message} crédit{bareme.message > 1 ? "s" : ""}
+              </b>
+            </li>
+            <li>
+              <span>Photo envoyée</span>
+              <b>{bareme.photo} crédits</b>
+            </li>
+            <li>
+              <span>Message reçu</span>
+              <b className="offert">gratuit</b>
+            </li>
+          </ul>
+
+          <p className="bo-aide" style={{ marginTop: "0.9rem" }}>
+            Un message resté sans réponse pendant {bareme.jours_remboursement} jours vous est
+            remboursé automatiquement.
           </p>
 
-          <button type="button" className="bo-btn" disabled style={{ marginTop: "1.3rem" }}>
-            Recharger — bientôt disponible
-          </button>
+          <a href="#recharger" className="bo-btn" style={{ marginTop: "1.3rem" }}>
+            Recharger mon compte
+          </a>
         </section>
 
         <section className="bo-carte bo-carte-p">
@@ -95,6 +117,8 @@ export default async function Compte() {
           </div>
         </section>
       </div>
+
+      <Paliers paliers={paliers} />
 
       <div className="bo-carte" style={{ marginTop: "1.6rem" }}>
         <div className="bo-carte-titre">

@@ -4,8 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireMember } from "@/lib/auth";
-import { COUT_MESSAGE } from "@/lib/credits";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 type Resultat = { ok: true; message: string } | { ok: false; message: string };
@@ -57,18 +55,22 @@ export async function ouvrirConversation(formData: FormData) {
 }
 
 /**
- * Envoie un message et débite le compte.
+ * Envoie un message et débite le compte, en une seule opération.
  *
- * Le débit passe par la clé de service : le journal des crédits n'est ouvert
- * en écriture à personne, sans quoi un membre pourrait s'en créditer. Le solde
- * est vérifié avant l'envoi, et le débit référence le message qui l'a
- * provoqué — chaque ligne du relevé reste ainsi justifiable.
+ * Tout se passe dans `envoyer_message_membre`, côté base. L'ancienne version
+ * faisait deux appels — insérer le message, puis écrire le débit — et laissait
+ * passer le message quand le débit échouait. Il échouait systématiquement : la
+ * contrainte de solde positif rejetait la ligne proposée avant que le report
+ * n'ait lieu. Quinze messages sont ainsi partis sans être facturés.
+ *
+ * Le coût n'est pas transmis : la fonction le lit dans la table des tarifs.
+ * Le lui passer reviendrait à laisser l'appelant fixer son propre prix.
  */
 export async function envoyerMessage(
   _prev: Resultat | null,
   formData: FormData,
 ): Promise<Resultat> {
-  const session = await requireMember();
+  await requireMember();
 
   const conversationId = String(formData.get("conversation_id") ?? "");
   const corps = String(formData.get("corps") ?? "").trim();
@@ -79,59 +81,35 @@ export async function envoyerMessage(
 
   const supabase = await createClient();
 
-  const { data: solde } = await supabase
-    .from("credit_balances")
-    .select("balance")
-    .eq("member_id", session.userId)
-    .maybeSingle();
-
-  if ((solde?.balance ?? 0) < COUT_MESSAGE) {
-    return {
-      ok: false,
-      message: `Crédits insuffisants : il en faut ${COUT_MESSAGE} pour envoyer un message.`,
-    };
-  }
-
-  const { data: message, error } = await supabase
-    .from("messages")
-    .insert({
-      conversation_id: conversationId,
-      sender: "member",
-      sender_profile_id: session.userId,
-      body: corps,
-      attachment_path: pieceJointe,
-    })
-    .select("id")
-    .single();
-
-  if (error || !message) {
-    return { ok: false, message: `Envoi refusé : ${error?.message ?? "erreur inconnue"}` };
-  }
-
-  const admin = createAdminClient();
-  const { error: erreurDebit } = await admin.from("credit_transactions").insert({
-    member_id: session.userId,
-    amount: -COUT_MESSAGE,
-    reason: "message",
-    message_id: message.id,
+  const { error } = await supabase.rpc("envoyer_message_membre", {
+    p_conversation_id: conversationId,
+    p_body: corps,
+    p_attachment_path: pieceJointe,
   });
 
-  if (erreurDebit) {
-    // Le message est parti mais n'a pas été facturé. On le laisse : retirer un
-    // message déjà visible par l'agent serait pire qu'un crédit non débité.
-    // La ligne manquante se voit dans le relevé, elle est rattrapable.
-    console.error("Débit non enregistré", { messageId: message.id, erreur: erreurDebit.message });
+  if (error) {
+    return { ok: false, message: messageDErreur(error.message) };
   }
 
-  await supabase
-    .from("conversations")
-    .update({ member_unread: 0 })
-    .eq("id", conversationId);
+  // Lire ce qu'on vient d'écrire : la conversation n'a plus rien de non lu.
+  await supabase.from("conversations").update({ member_unread: 0 }).eq("id", conversationId);
 
   revalidatePath(`/membre/conversations/${conversationId}`);
   revalidatePath("/membre");
+  revalidatePath("/membre/compte");
 
   return { ok: true, message: "Message envoyé." };
+}
+
+/** Traduit les signaux de la fonction en phrases lisibles par un membre. */
+function messageDErreur(brut: string): string {
+  if (brut.includes("CREDITS_INSUFFISANTS")) {
+    return "Crédits insuffisants. Rechargez votre compte pour continuer à écrire.";
+  }
+  if (brut.includes("CONVERSATION_INTROUVABLE")) return "Conversation introuvable.";
+  if (brut.includes("MESSAGE_VIDE")) return "Le message est vide.";
+  if (brut.includes("AUTHENTIFICATION_REQUISE")) return "Votre session a expiré. Reconnectez-vous.";
+  return `Envoi refusé : ${brut}`;
 }
 
 export async function seDeconnecter() {

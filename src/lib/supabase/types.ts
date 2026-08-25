@@ -20,9 +20,29 @@ export type LadyStatus = "draft" | "pending_review" | "published" | "rejected" |
 export type PhotoStatus = "pending" | "approved" | "rejected";
 export type MaritalStatus = "celibataire" | "divorcee" | "veuve" | "separee";
 export type MessageSender = "member" | "lady";
+export type Tarif = {
+  code: string;
+  montant: number;
+  libelle: string;
+  updated_at: string;
+};
+
+export type PalierCredits = {
+  code: string;
+  libelle: string;
+  credits: number;
+  /** En centimes : jamais de nombre à virgule flottante pour un prix. */
+  prix_cents: number;
+  devise: string;
+  ordre: number;
+  mis_en_avant: boolean;
+  actif: boolean;
+};
+
 export type CreditReason =
   | "purchase"
   | "message"
+  | "photo"
   | "video_minute"
   | "gift"
   | "refund"
@@ -225,6 +245,8 @@ export type Database = {
       credit_balances: Table<CreditBalance>;
       credit_transactions: Table<CreditTransaction>;
       reports: Table<Report>;
+      tarifs: Table<Tarif>;
+      paliers_credits: Table<PalierCredits>;
     };
     Views: Record<never, never>;
     Functions: {
@@ -233,6 +255,11 @@ export type Database = {
       agent_owns_lady: { Args: { p_lady_id: string }; Returns: boolean };
       can_access_conversation: { Args: { p_conversation_id: string }; Returns: boolean };
       safe_uuid: { Args: { p_text: string }; Returns: string };
+      envoyer_message_membre: {
+        Args: { p_conversation_id: string; p_body: string; p_attachment_path?: string | null };
+        Returns: string;
+      };
+      rembourser_messages_sans_reponse: { Args: Record<never, never>; Returns: number };
     };
     Enums: {
       user_role: UserRole;

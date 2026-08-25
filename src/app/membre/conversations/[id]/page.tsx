@@ -6,7 +6,7 @@ import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
-import { COUT_MESSAGE } from "@/lib/credits";
+import { lireBareme } from "@/lib/credits";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,7 +19,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
 
   // Ces trois requêtes ne dépendent que de l'adresse et de la session : les
   // enchaîner faisait attendre trois allers-retours là où un seul suffit.
-  const [{ data: conversation }, { data: messages }, { data: solde }] = await Promise.all([
+  const [{ data: conversation }, { data: messages }, { data: solde }, bareme] = await Promise.all([
     supabase.from("conversations").select("*").eq("id", id).maybeSingle(),
     supabase
       .from("messages")
@@ -31,6 +31,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
       .select("balance")
       .eq("member_id", session.userId)
       .maybeSingle(),
+    lireBareme(supabase),
   ]);
 
   if (!conversation) notFound();
@@ -98,7 +99,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           <FormulaireMessage
             conversationId={conversation.id}
             prenom={femme.display_name}
-            cout={COUT_MESSAGE}
+            cout={bareme.message}
             solde={solde?.balance ?? 0}
           />
         </Echange>

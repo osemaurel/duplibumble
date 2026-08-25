@@ -1600,3 +1600,133 @@
    provisoire. Elle ne doit pas se faire passer pour un message envoyé. */
 .bo-bulle.en-vol { opacity: 0.62; }
 .bo-bulle.en-vol .meta { font-style: italic; }
+
+/* ====================== Visionneuse de photos ========================
+   Les vignettes d'une fiche font une centaine de pixels : on y devine la
+   photo sans la voir. Elles ouvrent donc un plein écran, où la photo est
+   montrée entière — la recadrer ici couperait ce qu'on vient regarder. */
+
+.mb-photo-ouvrir {
+  width: 100%;
+  padding: 0;
+  border: none;
+  cursor: zoom-in;
+  font: inherit;
+  color: inherit;
+}
+
+.mb-loupe {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(20, 19, 17, 0.62);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.mb-loupe svg { width: 15px; height: 15px; }
+
+.mb-vignettes .vignette {
+  padding: 0;
+  border: none;
+  cursor: zoom-in;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.mb-vignettes .vignette:hover { transform: translateY(-2px); box-shadow: var(--ombre); }
+.mb-vignettes .vignette:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.mb-visionneuse {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 15, 14, 0.94);
+  /* Les encoches et la barre de geste ne doivent pas manger les commandes. */
+  padding: calc(env(safe-area-inset-top, 0px) + 3.6rem) 1rem
+           calc(env(safe-area-inset-bottom, 0px) + 3.4rem);
+  animation: mb-vis-entree 0.18s ease-out;
+}
+@keyframes mb-vis-entree { from { opacity: 0; } to { opacity: 1; } }
+
+.mb-vis-scene {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Hauteur explicite : l'image est en `fill`, elle ne porte donc pas le cadre. */
+.mb-vis-cadre {
+  position: relative;
+  width: 100%;
+  height: min(76vh, 900px);
+}
+
+.mb-vis-scene figcaption {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.88rem;
+  text-align: center;
+  max-width: 40rem;
+}
+
+.mb-vis-fermer,
+.mb-vis-fleche {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.mb-vis-fermer:hover,
+.mb-vis-fleche:hover { background: rgba(255, 255, 255, 0.28); }
+.mb-vis-fermer:active,
+.mb-vis-fleche:active { transform: scale(0.93); }
+.mb-vis-fermer svg, .mb-vis-fleche svg { width: 20px; height: 20px; }
+
+.mb-vis-fermer {
+  top: calc(env(safe-area-inset-top, 0px) + 0.9rem);
+  right: 0.9rem;
+}
+.mb-vis-fleche { top: 50%; transform: translateY(-50%); }
+.mb-vis-fleche.gauche { left: 0.9rem; }
+.mb-vis-fleche.droite { right: 0.9rem; }
+.mb-vis-fleche:active { transform: translateY(-50%) scale(0.93); }
+
+.mb-vis-compte {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sur téléphone, le balayage remplace les flèches : elles prendraient une
+   place que la photo utilise mieux. */
+@media (max-width: 640px) {
+  .mb-vis-fleche { display: none; }
+  .mb-vis-cadre { height: min(72vh, 100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mb-visionneuse { animation: none; }
+  .mb-vignettes .vignette { transition: none; }
+}

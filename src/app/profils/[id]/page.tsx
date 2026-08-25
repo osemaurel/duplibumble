@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getSessionProfile } from "@/lib/auth";
-import Photo from "@/components/site/photo";
+import GalerieProfil from "@/components/site/galerie-profil";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
@@ -60,28 +60,10 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
 
         <div className="mb-profil-detail">
           <div>
-            <div className="mb-photo-principale">
-              {photos[0] ? (
-                <Photo
-                  src={photos[0].url}
-                  alt={`${femme.display_name}, ${femme.age}`}
-                  sizes="(max-width:900px) 92vw, 460px"
-                  prioritaire
-                />
-              ) : (
-                <span className="sans-photo">Photo à venir</span>
-              )}
-            </div>
-
-            {photos.length > 1 && (
-              <div className="mb-vignettes">
-                {photos.slice(1).map((photo) => (
-                  <span className="vignette" key={photo.url}>
-                    <Photo src={photo.url} alt="" sizes="120px" />
-                  </span>
-                ))}
-              </div>
-            )}
+            <GalerieProfil
+              nom={`${femme.display_name}${femme.age ? `, ${femme.age}` : ""}`}
+              photos={photos.map((photo) => ({ url: photo.url, caption: photo.caption }))}
+            />
           </div>
 
           <div>

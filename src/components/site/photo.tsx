@@ -19,6 +19,7 @@ export default function Photo({
   sizes,
   prioritaire = false,
   className,
+  ajustement = "cover",
 }: {
   src: string;
   alt: string;
@@ -26,6 +27,12 @@ export default function Photo({
   /** Vrai pour les images visibles d'emblée : elles sont chargées sans attendre. */
   prioritaire?: boolean;
   className?: string;
+  /**
+   * `cover` recadre pour remplir le cadre — c'est ce que veulent les vignettes.
+   * `contain` montre la photo entière : indispensable en plein écran, où
+   * recadrer reviendrait à couper ce qu'on est venu regarder.
+   */
+  ajustement?: "cover" | "contain";
 }) {
   return (
     <Image
@@ -37,7 +44,7 @@ export default function Photo({
       priority={prioritaire}
       loading={prioritaire ? "eager" : "lazy"}
       className={className}
-      style={{ objectFit: "cover" }}
+      style={{ objectFit: ajustement }}
     />
   );
 }

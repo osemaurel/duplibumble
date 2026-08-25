@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { profiles as demonstration } from "@/lib/profiles";
+import { parNouveaute } from "@/lib/classement";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
@@ -30,11 +31,11 @@ const FILTRES = [
 export default async function Gallery() {
   const supabase = await createClient();
 
-  const { data: publiees } = await supabase
-    .from("ladies")
-    .select("id, display_name, age, display_city, display_country, headline")
-    .order("last_seen_at", { ascending: false, nullsFirst: false })
-    .limit(12);
+  const { data: publiees } = await parNouveaute(
+    supabase
+      .from("ladies")
+      .select("id, display_name, age, display_city, display_country, headline"),
+  ).limit(12);
 
   const reelles = publiees ?? [];
   const photos = await photosPubliques(

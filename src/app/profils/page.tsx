@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { getSessionProfile } from "@/lib/auth";
 import Photo from "@/components/site/photo";
+import { parNouveaute } from "@/lib/classement";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
@@ -26,10 +27,11 @@ export default async function Profils({
 
   // Le RLS ne laisse sortir que les fiches publiées : le filtre de statut est
   // dans la base, pas dans cette requête.
-  let requete = supabase
-    .from("ladies")
-    .select("id, code, display_name, age, display_city, display_country, headline, seeking")
-    .order("last_seen_at", { ascending: false, nullsFirst: false });
+  let requete = parNouveaute(
+    supabase
+      .from("ladies")
+      .select("id, code, display_name, age, display_city, display_country, headline, seeking"),
+  );
 
   if (pays) requete = requete.eq("display_country", pays);
 

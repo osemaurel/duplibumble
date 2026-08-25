@@ -1,3 +1,4 @@
+import { parNouveaute } from "./classement";
 import { photosPubliques } from "./photos";
 import { profiles as demonstration } from "./profiles";
 import { createClient } from "./supabase/server";
@@ -23,12 +24,13 @@ export type ProfilVitrine = {
 export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
   const supabase = await createClient();
 
+  // On en demande plus que nécessaire : les fiches sans photo validée sont
+  // écartées juste après, et s'arrêter à `limite` d'emblée laisserait un
+  // éventail incomplet dès qu'un lot arrive avec ses photos encore à modérer.
   // Le RLS ne laisse sortir que les fiches publiées : inutile de filtrer ici.
-  const { data: femmes } = await supabase
-    .from("ladies")
-    .select("id, display_name, age, display_city, display_country")
-    .order("last_seen_at", { ascending: false, nullsFirst: false })
-    .limit(limite);
+  const { data: femmes } = await parNouveaute(
+    supabase.from("ladies").select("id, display_name, age, display_city, display_country"),
+  ).limit(limite * 3);
 
   const publiees = femmes ?? [];
 
@@ -56,7 +58,7 @@ export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
 
     // Une fiche publiée sans photo validée n'a rien à faire en vitrine : elle
     // afficherait un cadre vide au milieu du carrousel.
-    if (avecPhoto.length) return avecPhoto;
+    if (avecPhoto.length) return avecPhoto.slice(0, limite);
   }
 
   return demonstration.slice(0, limite).map((p) => ({

@@ -1,6 +1,7 @@
 import { EventName } from "@paddle/paddle-node-sdk";
 
 import { clientPaddle } from "@/lib/paddle";
+import { adresseAppelante, adresseDePaddle } from "@/lib/paddle-ips";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -29,6 +30,11 @@ export async function POST(requete: Request) {
     // 500 plutôt que 200 : Paddle réessaiera une fois la configuration en place.
     return reponse("Paiement non configuré", 500);
   }
+
+  // Première barrière : l'origine. Elle ne remplace pas la signature, elle
+  // écarte le bruit avant qu'on ne dépense la vérification cryptographique.
+  const verdict = await adresseDePaddle(adresseAppelante(requete));
+  if (verdict === "refusee") return reponse("Origine non autorisée", 403);
 
   const signature = requete.headers.get("paddle-signature");
   if (!signature) return reponse("Signature absente", 400);

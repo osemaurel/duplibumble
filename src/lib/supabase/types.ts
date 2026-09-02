@@ -37,6 +37,8 @@ export type PalierCredits = {
   ordre: number;
   mis_en_avant: boolean;
   actif: boolean;
+  /** Prix correspondant chez Paddle. Nul tant que le palier n'y est pas créé. */
+  paddle_price_id: string | null;
 };
 
 export type CreditReason =
@@ -260,6 +262,18 @@ export type Database = {
         Returns: string;
       };
       rembourser_messages_sans_reponse: { Args: Record<never, never>; Returns: number };
+      enregistrer_achat_credits: {
+        Args: {
+          p_membre: string;
+          p_fournisseur: string;
+          p_reference: string;
+          p_price_id: string;
+          p_montant_cents: number;
+          p_devise?: string;
+        };
+        /** Crédits accordés, ou zéro si la transaction avait déjà été traitée. */
+        Returns: number;
+      };
     };
     Enums: {
       user_role: UserRole;

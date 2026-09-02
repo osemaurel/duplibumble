@@ -29,6 +29,16 @@ export async function GET() {
     ),
   };
 
+  // Le paiement se diagnostique de la même façon : des booléens, jamais une
+  // valeur de clé. Sans ces quatre-là, les paliers restent affichés mais aucun
+  // bouton n'ouvre le tunnel.
+  const paiement = {
+    cleApi: Boolean(process.env.PADDLE_API_KEY),
+    secretNotifications: Boolean(process.env.PADDLE_WEBHOOK_SECRET),
+    jetonNavigateur: Boolean(process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN),
+    environnement: process.env.PADDLE_ENV === "production" ? "production" : "bac à sable",
+  };
+
   let base: { joignable: boolean; detail: string } = {
     joignable: false,
     detail: "non testée",
@@ -60,7 +70,7 @@ export async function GET() {
     base.joignable;
 
   return NextResponse.json(
-    { pret, configuration, base },
+    { pret, configuration, base, paiement },
     { status: pret ? 200 : 503 },
   );
 }

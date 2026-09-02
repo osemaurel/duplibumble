@@ -118,7 +118,7 @@ export default async function Compte() {
         </section>
       </div>
 
-      <Paliers paliers={paliers} />
+      <Paliers paliers={paliers} membreId={session.userId} email={session.email ?? ""} />
 
       <div className="bo-carte" style={{ marginTop: "1.6rem" }}>
         <div className="bo-carte-titre">

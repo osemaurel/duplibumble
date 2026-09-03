@@ -18,6 +18,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
         </Link>
         <nav className="mb-nav">
           <Link href="/profils">Profils</Link>
+          <Link href="/tarifs">Tarifs</Link>
           <Link href="/contact">Contact</Link>
         </nav>
       </header>
@@ -26,6 +27,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
 
       <footer className="lg-pied">
         <div className="lg-liens">
+          <Link href="/tarifs">Tarifs</Link>
           <Link href="/conditions">Conditions générales</Link>
           <Link href="/confidentialite">Confidentialité</Link>
           <Link href="/remboursement">Remboursement</Link>

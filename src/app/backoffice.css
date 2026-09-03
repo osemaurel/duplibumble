@@ -1908,3 +1908,73 @@
 @media (max-width: 640px) {
   .lg-defs dt { min-width: 100%; }
 }
+
+/* ====================== Page tarifs (publique) ========================
+   Reprend la présentation des cartes de recharge du compte membre, mais
+   sans les boutons d'achat : cette page n'ouvre pas de paiement, elle
+   informe — un visiteur sans compte doit pouvoir la lire. */
+
+.lg-tarifs-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+  margin: 1.2rem 0 1.6rem;
+}
+
+.lg-tarif-carte {
+  position: relative;
+  padding: 1.1rem 1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  text-align: center;
+}
+
+.lg-tarif-ruban {
+  position: absolute;
+  top: -0.65rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lg-tarif-nom {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.lg-tarif-credits {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.lg-tarif-credits span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+.lg-tarif-prix {
+  margin-top: 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 650;
+  color: var(--brand);
+  font-variant-numeric: tabular-nums;
+}
+
+.lg-tarif-unitaire { font-size: 0.78rem; color: var(--ink-3); }
+.lg-tarif-unitaire b { color: var(--vert); }

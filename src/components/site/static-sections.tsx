@@ -285,7 +285,7 @@ export function Footer() {
               <ul>
                 {c.links.map((l) => (
                   <li key={l}>
-                    <a href="#">{l}</a>
+                    <a href={l === "Tarifs & crédits" ? "/tarifs" : "#"}>{l}</a>
                   </li>
                 ))}
                 {c.title === "Aide & sécurité" && (

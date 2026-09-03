@@ -21,7 +21,10 @@ export const SOCIETE = {
   emailContact: "À COMPLÉTER : adresse e-mail de contact",
   emailPrivacy: "À COMPLÉTER : adresse e-mail pour les données personnelles",
   hebergeur: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
-  siteUrl: "https://palab-sigma.vercel.app",
+  // Lu depuis l'environnement pour ne jamais avoir à retoucher le code le
+  // jour où le domaine change — palab.love une fois branché, ou l'adresse
+  // Vercel tant qu'il ne l'est pas.
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://palab-sigma.vercel.app",
 } as const;
 
 /** Vrai tant qu'au moins une mention obligatoire n'a pas été renseignée. */

@@ -26,11 +26,12 @@ export const SOCIETE = {
   adresse: "RNIE2, Îlot 637, Parcelle T, Gbodjo, Abomey-Calavi",
   pays: "Bénin",
   directeurPublication: "Digitips Consulting",
-  // Reprise de l'adresse déclarée sur l'extrait RCCM. Une adresse dédiée au
-  // domaine (contact@palab.love) serait plus soignée une fois le domaine
-  // opérationnel ; à changer ici le jour venu.
-  emailContact: "osecapoch@gmail.com",
-  emailPrivacy: "osecapoch@gmail.com",
+  // Adresse du domaine, maintenant qu'il est branché. Suppose qu'elle
+  // redirige réellement quelque part (boîte Vercel, alias chez le
+  // registraire…) — une adresse affichée qui rebondit serait pire que
+  // l'ancienne, qui au moins arrivait.
+  emailContact: "contact@palab.love",
+  emailPrivacy: "contact@palab.love",
   hebergeur: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
   // Lu depuis l'environnement pour ne jamais avoir à retoucher le code le
   // jour où le domaine change — palab.love une fois branché, ou l'adresse

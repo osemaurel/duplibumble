@@ -254,8 +254,18 @@ export function Footer() {
     },
     {
       title: "Aide & sécurité",
-      links: ["Vérification des profils", "Lutte anti-arnaque", "Conseils de rencontre", "Nous contacter"],
+      links: ["Vérification des profils", "Lutte anti-arnaque", "Conseils de rencontre"],
     },
+  ];
+
+  // Les pages qui existent réellement. Un lien mort vers une mention légale
+  // fait échouer une vérification de paiement aussi sûrement qu'une page
+  // absente — et se remarque moins.
+  const legales = [
+    { libelle: "Conditions générales", href: "/conditions" },
+    { libelle: "Confidentialité", href: "/confidentialite" },
+    { libelle: "Remboursement", href: "/remboursement" },
+    { libelle: "Nous contacter", href: "/contact" },
   ];
 
   return (
@@ -278,6 +288,11 @@ export function Footer() {
                     <a href="#">{l}</a>
                   </li>
                 ))}
+                {c.title === "Aide & sécurité" && (
+                  <li>
+                    <a href="/contact">Nous contacter</a>
+                  </li>
+                )}
               </ul>
             </div>
           ))}
@@ -285,9 +300,9 @@ export function Footer() {
 
         <div className="fbottom">
           <div className="flegal">
-            {["Confidentialité", "Conditions", "Cookies", "Remboursement"].map((l) => (
-              <a href="#" key={l}>
-                {l}
+            {legales.map((l) => (
+              <a href={l.href} key={l.href}>
+                {l.libelle}
               </a>
             ))}
           </div>

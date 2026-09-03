@@ -69,3 +69,4 @@ export function remise(palier: PalierCredits, paliers: PalierCredits[]) {
   const unitaire = palier.prix_cents / palier.credits;
   return Math.round((1 - unitaire / reference) * 100);
 }
+

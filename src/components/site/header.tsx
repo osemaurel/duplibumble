@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const LINKS = [
@@ -47,9 +48,9 @@ export default function Header() {
             </svg>
           </button>
 
-          <a className="login" href="#">
+          <Link className="login" href="/connexion">
             Se connecter
-          </a>
+          </Link>
 
           <button
             className="burger"

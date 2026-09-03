@@ -30,6 +30,7 @@ export default function Paliers({
   const [paddle, setPaddle] = useState<Paddle>();
   const [enAttente, setEnAttente] = useState<string | null>(null);
   const [paye, setPaye] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
 
   const jeton = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
 
@@ -46,13 +47,27 @@ export default function Paliers({
       eventCallback: (evenement) => {
         if (evenement.name === CheckoutEventNames.CHECKOUT_COMPLETED) {
           setPaye(true);
+          setErreur(null);
           setEnAttente(null);
-        } else if (
-          evenement.name === CheckoutEventNames.CHECKOUT_CLOSED ||
-          evenement.name === CheckoutEventNames.CHECKOUT_ERROR
-        ) {
-          setEnAttente(null);
+          return;
         }
+
+        if (
+          evenement.name === CheckoutEventNames.CHECKOUT_ERROR ||
+          evenement.name === CheckoutEventNames.CHECKOUT_PAYMENT_ERROR
+        ) {
+          // Le tunnel de Paddle n'affiche qu'un « Something went wrong »
+          // générique, alors qu'il nous transmet ici le code et le détail.
+          // Sans les montrer, il ne reste rien pour savoir quoi corriger.
+          setErreur(
+            [evenement.code, evenement.detail].filter(Boolean).join(" — ") ||
+              "Paddle a refusé l'ouverture du paiement sans en donner la raison.",
+          );
+          setEnAttente(null);
+          return;
+        }
+
+        if (evenement.name === CheckoutEventNames.CHECKOUT_CLOSED) setEnAttente(null);
       },
     }).then((instance) => {
       if (instance) setPaddle(instance);
@@ -64,6 +79,7 @@ export default function Paliers({
   function acheter(palier: PalierCredits) {
     if (!paddle || !palier.paddle_price_id) return;
     setEnAttente(palier.code);
+    setErreur(null);
 
     paddle.Checkout.open({
       items: [{ priceId: palier.paddle_price_id, quantity: 1 }],
@@ -81,6 +97,12 @@ export default function Paliers({
       <p className="bo-aide" style={{ marginTop: "0.4rem" }}>
         Les crédits n&apos;expirent pas. Plus le palier est grand, moins le crédit coûte cher.
       </p>
+
+      {erreur && (
+        <p className="bo-message erreur" style={{ marginTop: "1rem" }}>
+          <b>Paiement indisponible.</b> {erreur}
+        </p>
+      )}
 
       {paye && (
         <p className="bo-message succes" style={{ marginTop: "1rem" }}>

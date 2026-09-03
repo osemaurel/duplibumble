@@ -56,12 +56,22 @@ export default function Paliers({
           evenement.name === CheckoutEventNames.CHECKOUT_ERROR ||
           evenement.name === CheckoutEventNames.CHECKOUT_PAYMENT_ERROR
         ) {
-          // Le tunnel de Paddle n'affiche qu'un « Something went wrong »
-          // générique, alors qu'il nous transmet ici le code et le détail.
-          // Sans les montrer, il ne reste rien pour savoir quoi corriger.
+          // « front-end_error » est le code que Paddle.js renvoie quand son
+          // propre appel réseau échoue, sans dire pourquoi. Dans l'immense
+          // majorité des cas rapportés, c'est soit un jeton et un
+          // environnement qui ne correspondent pas (un jeton de production
+          // utilisé en bac à sable, ou l'inverse), soit un bloqueur de
+          // publicité qui coupe les domaines de Paddle. Le dire vaut mieux
+          // que relayer un code que personne ne peut agir dessus tel quel.
+          const indice =
+            evenement.code === "front-end_error"
+              ? " Vérifiez que le jeton NEXT_PUBLIC_PADDLE_CLIENT_TOKEN correspond au même " +
+                "compte (bac à sable ou production) que les prix rattachés aux paliers, et " +
+                "réessayez sans bloqueur de publicité."
+              : "";
           setErreur(
-            [evenement.code, evenement.detail].filter(Boolean).join(" — ") ||
-              "Paddle a refusé l'ouverture du paiement sans en donner la raison.",
+            ([evenement.code, evenement.detail].filter(Boolean).join(" — ") ||
+              "Paddle a refusé l'ouverture du paiement sans en donner la raison.") + indice,
           );
           setEnAttente(null);
           return;

@@ -10,16 +10,27 @@
  * inventée, qui serait à la fois fausse et invérifiable.
  */
 export const SOCIETE = {
-  nom: "À COMPLÉTER : raison sociale",
-  formeJuridique: "À COMPLÉTER : forme juridique (SAS, SARL, auto-entrepreneur…)",
-  capital: "À COMPLÉTER : capital social, le cas échéant",
-  immatriculation: "À COMPLÉTER : SIRET ou numéro d'immatriculation",
-  tva: "À COMPLÉTER : numéro de TVA intracommunautaire",
-  adresse: "À COMPLÉTER : adresse du siège social",
-  pays: "À COMPLÉTER : pays",
-  directeurPublication: "À COMPLÉTER : nom du directeur de la publication",
-  emailContact: "À COMPLÉTER : adresse e-mail de contact",
-  emailPrivacy: "À COMPLÉTER : adresse e-mail pour les données personnelles",
+  // Nom commercial de l'entreprise individuelle immatriculée au RCCM de
+  // Cotonou (RB/ABC/22 A 82590). Le nom patronymique de l'exploitant n'est
+  // volontairement pas repris sur les pages publiques ; voir la remarque dans
+  // la conversation qui a fixé cette valeur sur le statut de « directeur de la
+  // publication », que le droit français exigerait nommément mais que le droit
+  // béninois ne semble pas imposer de la même façon — point resté vérifié à
+  // vue, pas tranché par un juriste.
+  nom: "Digitips Consulting",
+  formeJuridique: "entreprise individuelle de droit béninois",
+  capital: "sans capital social",
+  immatriculation: "RCCM Cotonou n° RB/ABC/22 A 82590",
+  // Le Bénin n'est pas dans l'Union européenne : pas de TVA intracommunautaire.
+  tva: "sans objet — entreprise établie hors Union européenne (Bénin)",
+  adresse: "RNIE2, Îlot 637, Parcelle T, Gbodjo, Abomey-Calavi",
+  pays: "Bénin",
+  directeurPublication: "Digitips Consulting",
+  // Reprise de l'adresse déclarée sur l'extrait RCCM. Une adresse dédiée au
+  // domaine (contact@palab.love) serait plus soignée une fois le domaine
+  // opérationnel ; à changer ici le jour venu.
+  emailContact: "osecapoch@gmail.com",
+  emailPrivacy: "osecapoch@gmail.com",
   hebergeur: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
   // Lu depuis l'environnement pour ne jamais avoir à retoucher le code le
   // jour où le domaine change — palab.love une fois branché, ou l'adresse

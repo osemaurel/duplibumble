@@ -122,10 +122,11 @@ export default async function Conditions() {
 
       <h2>7. Droit de rétractation</h2>
       <p>
-        Les crédits constituent un contenu numérique fourni immédiatement. Conformément à
-        l&apos;article L221-28 du code de la consommation, le membre qui commence à consommer
-        ses crédits avant l&apos;expiration du délai de quatorze jours renonce expressément à
-        son droit de rétractation pour les crédits consommés.
+        Les crédits constituent un contenu numérique fourni immédiatement. Le membre qui
+        commence à consommer ses crédits avant l&apos;expiration du délai de quatorze jours
+        renonce expressément à son droit de rétractation pour les crédits consommés,
+        conformément aux règles applicables à la fourniture de contenu numérique aux
+        consommateurs de l&apos;Union européenne.
       </p>
       <p>
         Les crédits non consommés demeurent remboursables pendant quatorze jours à compter de
@@ -188,10 +189,11 @@ export default async function Conditions() {
 
       <h2>13. Droit applicable et litiges</h2>
       <p>
-        Les présentes conditions sont soumises au droit {SOCIETE.pays}. En cas de litige, le
-        membre peut recourir à la plateforme européenne de règlement en ligne des litiges. À
-        défaut d&apos;accord amiable, les tribunaux compétents sont ceux du siège de
-        l&apos;éditeur, sous réserve des règles protectrices du consommateur.
+        Les présentes conditions sont soumises au droit applicable au siège social de
+        l&apos;éditeur ({SOCIETE.pays}). En cas de litige, le membre peut recourir à la
+        plateforme européenne de règlement en ligne des litiges. À défaut d&apos;accord amiable,
+        les tribunaux compétents sont ceux du siège de l&apos;éditeur, sous réserve des règles
+        protectrices du consommateur applicables à son lieu de résidence.
       </p>
     </article>
   );

@@ -628,3 +628,90 @@ export async function ajusterCredits(
         : `${-variation} crédits retirés à ${nom}.`,
   };
 }
+
+/**
+ * Rattache les paliers aux prix créés dans Paddle.
+ *
+ * Saisi ici plutôt qu'en base à la main : c'est une opération de configuration
+ * courante — un changement de tarif chez Paddle crée un nouveau prix, jamais
+ * une modification de l'ancien — et elle ne doit dépendre de personne.
+ */
+export async function enregistrerPrixPaddle(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireAdmin();
+
+  const supabase = await createClient();
+  const { data: paliers } = await supabase.from("paliers_credits").select("code, libelle");
+
+  if (!paliers?.length) return { ok: false, message: "Aucun palier à rattacher." };
+
+  const rattaches: string[] = [];
+  const vides: string[] = [];
+
+  for (const palier of paliers) {
+    const saisi = String(formData.get(`prix_${palier.code}`) ?? "").trim();
+
+    if (!saisi) {
+      vides.push(palier.libelle);
+      // Champ laissé vide : on détache plutôt que de garder un ancien prix,
+      // sinon on ne peut jamais retirer un palier de la vente.
+      const { error } = await supabase
+        .from("paliers_credits")
+        .update({ paddle_price_id: null })
+        .eq("code", palier.code);
+      if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+      continue;
+    }
+
+    // La confusion est facile et silencieuse : un identifiant de produit est
+    // accepté par la base mais ne fait rien ouvrir. Autant le dire ici.
+    if (saisi.startsWith("pro_")) {
+      return {
+        ok: false,
+        message:
+          `« ${palier.libelle} » : ${saisi} est un identifiant de produit. ` +
+          "Il faut celui du prix, qui commence par « pri_ » — ouvrez le produit " +
+          "dans Paddle, la ligne de prix en dessous porte le bon identifiant.",
+      };
+    }
+
+    if (!saisi.startsWith("pri_")) {
+      return {
+        ok: false,
+        message: `« ${palier.libelle} » : un identifiant de prix commence par « pri_ ».`,
+      };
+    }
+
+    const { error } = await supabase
+      .from("paliers_credits")
+      .update({ paddle_price_id: saisi })
+      .eq("code", palier.code);
+
+    if (error) {
+      // L'index unique interdit qu'un même prix serve deux paliers : sans lui,
+      // un achat serait rattaché au mauvais nombre de crédits.
+      if (error.message.includes("paliers_credits_paddle_price_id_idx")) {
+        return {
+          ok: false,
+          message: `Le prix ${saisi} est déjà rattaché à un autre palier.`,
+        };
+      }
+      return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+    }
+
+    rattaches.push(palier.libelle);
+  }
+
+  revalidatePath("/admin/paliers");
+  revalidatePath("/membre/compte");
+  revalidatePath("/conditions");
+
+  return {
+    ok: true,
+    message:
+      `${rattaches.length} palier${rattaches.length > 1 ? "s" : ""} en vente.` +
+      (vides.length ? ` Non rattaché${vides.length > 1 ? "s" : ""} : ${vides.join(", ")}.` : ""),
+  };
+}

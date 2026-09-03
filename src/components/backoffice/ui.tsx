@@ -173,6 +173,14 @@ export const IconeMembres = (
   </svg>
 );
 
+export const IconePaliers = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="14" width="5" height="7" rx="1.4" />
+    <rect x="9.5" y="9" width="5" height="12" rx="1.4" />
+    <rect x="16" y="4" width="5" height="17" rx="1.4" />
+  </svg>
+);
+
 export const IconeImport = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 3v11" />

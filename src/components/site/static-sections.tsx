@@ -104,7 +104,7 @@ export function Verification({ profils = [] }: { profils?: ProfilVitrine[] }) {
               surveille la plateforme en continu et notre support vous répond 7&nbsp;j/7, de votre
               premier message à votre première rencontre.
             </p>
-            <a className="btn-dark" href="#">
+            <a className="btn-dark" href="/securite">
               Notre charte de sécurité
             </a>
           </div>
@@ -225,9 +225,11 @@ export function Testimonial() {
             je prépare mon voyage pour la rencontrer
           </blockquote>
           <cite>Marc, 41 ans — membre depuis 2025</cite>
-          <a className="btn-dark" href="#">
-            Lire d&apos;autres histoires
-          </a>
+          {/* Pas de bouton « Lire d'autres histoires » : ce témoignage est
+              lui-même un profil de démonstration (voir le bandeau du pied de
+              page). En inventer d'autres pour remplir une page reviendrait à
+              fabriquer de faux avis clients — à remettre en place le jour où
+              de vrais témoignages existent, pas avant. */}
         </div>
         <GroupePhotos className="testi-photo">
           <span className="ph" />
@@ -243,18 +245,37 @@ export function Testimonial() {
 }
 
 export function Footer() {
-  const columns = [
+  // Une destination par intitulé quand elle existe réellement. "Cadeaux
+  // virtuels" et "Conseils de rencontre" restent sans lien : la fonctionnalité
+  // et le contenu correspondants n'existent pas encore, et un lien qui ne mène
+  // nulle part de précis serait pire qu'une absence de lien.
+  const columns: { title: string; links: { libelle: string; href?: string }[] }[] = [
     {
       title: "La plateforme",
-      links: ["Femmes en ligne", "Messages & lettres", "Chat vidéo", "Cadeaux virtuels", "Tarifs & crédits"],
+      links: [
+        { libelle: "Femmes en ligne", href: "/profils" },
+        { libelle: "Messages & lettres", href: "#communication" },
+        { libelle: "Chat vidéo", href: "#communication" },
+        { libelle: "Cadeaux virtuels" },
+        { libelle: "Tarifs & crédits", href: "/tarifs" },
+      ],
     },
     {
       title: "Vous êtes une femme ?",
-      links: ["Déposer ma candidature", "Comment être vérifiée", "Charte des membres", "Questions fréquentes"],
+      links: [
+        { libelle: "Déposer ma candidature", href: "/contact" },
+        { libelle: "Comment être vérifiée", href: "/securite" },
+        { libelle: "Charte des membres", href: "/conditions" },
+        { libelle: "Questions fréquentes", href: "/contact" },
+      ],
     },
     {
       title: "Aide & sécurité",
-      links: ["Vérification des profils", "Lutte anti-arnaque", "Conseils de rencontre"],
+      links: [
+        { libelle: "Vérification des profils", href: "/securite" },
+        { libelle: "Lutte anti-arnaque", href: "/securite" },
+        { libelle: "Conseils de rencontre" },
+      ],
     },
   ];
 
@@ -284,8 +305,8 @@ export function Footer() {
               <h4>{c.title}</h4>
               <ul>
                 {c.links.map((l) => (
-                  <li key={l}>
-                    <a href={l === "Tarifs & crédits" ? "/tarifs" : "#"}>{l}</a>
+                  <li key={l.libelle}>
+                    {l.href ? <a href={l.href}>{l.libelle}</a> : <span className="lien-a-venir">{l.libelle}</span>}
                   </li>
                 ))}
                 {c.title === "Aide & sécurité" && (

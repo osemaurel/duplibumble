@@ -8,7 +8,7 @@ const LINKS = [
   { href: "#fonctionnement", label: "Comment ça marche" },
   { href: "#communication", label: "Communication" },
   { href: "#securite", label: "Sécurité" },
-  { href: "#", label: "Aide" },
+  { href: "/contact", label: "Aide" },
 ];
 
 export default function Header() {
@@ -25,9 +25,9 @@ export default function Header() {
   return (
     <header className={scrolled ? "site-header scrolled" : "site-header"}>
       <div className="wrap nav">
-        <a className="wordmark" href="#" aria-label="Palab — accueil">
+        <Link className="wordmark" href="/" aria-label="Palab — accueil">
           Palab
-        </a>
+        </Link>
 
         <nav className="nav-pill" aria-label="Navigation principale">
           {LINKS.map((l) => (

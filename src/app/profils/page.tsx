@@ -30,7 +30,7 @@ export default async function Profils({
   let requete = parNouveaute(
     supabase
       .from("ladies")
-      .select("id, code, display_name, age, display_city, display_country, headline, seeking"),
+      .select("id, code, display_name, age, display_country, headline, seeking"),
   );
 
   if (pays) requete = requete.eq("display_country", pays);
@@ -141,9 +141,6 @@ export default async function Profils({
                     <p className="nom">
                       {femme.display_name}
                       {femme.age ? `, ${femme.age}` : ""}
-                    </p>
-                    <p className="lieu">
-                      {[femme.display_city, femme.display_country].filter(Boolean).join(", ")}
                     </p>
                     {femme.headline && <p className="accroche">{femme.headline}</p>}
                     <span className="bo-btn petit" style={{ marginTop: "0.9rem" }}>

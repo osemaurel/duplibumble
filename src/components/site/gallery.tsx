@@ -34,7 +34,7 @@ export default async function Gallery() {
   const { data: publiees } = await parNouveaute(
     supabase
       .from("ladies")
-      .select("id, display_name, age, display_city, display_country, headline"),
+      .select("id, display_name, age, display_country, headline"),
   ).limit(12);
 
   const reelles = publiees ?? [];
@@ -53,7 +53,6 @@ export default async function Gallery() {
         href: `/profils/${f.id}`,
         nom: f.display_name,
         age: f.age,
-        lieu: [f.display_city, f.display_country].filter(Boolean).join(", "),
         photo: photos.get(f.id)?.[0]?.url ?? null,
       }))
     : demonstration.map((p) => ({
@@ -61,7 +60,6 @@ export default async function Gallery() {
         href: "/inscription",
         nom: p.name,
         age: p.age as number | null,
-        lieu: p.location,
         photo: p.photo,
       }));
 
@@ -121,7 +119,6 @@ export default async function Gallery() {
                   {carte.nom}
                   {carte.age ? `, ${carte.age}` : ""}
                 </h3>
-                <span className="loc">{carte.lieu}</span>
                 <div className="pcard-acts">
                   <Link className="p-msg" href={carte.href}>
                     <span className="lbl-l">Envoyer un message</span>

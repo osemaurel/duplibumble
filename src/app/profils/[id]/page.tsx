@@ -42,10 +42,6 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
     ["Yeux", femme.eyes],
     ["Cheveux", femme.hair],
     ["Recherche", femme.seeking],
-    [
-      "Âge recherché",
-      femme.seeking_age_min ? `${femme.seeking_age_min} – ${femme.seeking_age_max} ans` : null,
-    ],
     ["Prête à déménager", femme.willing_to_relocate],
   ];
 
@@ -73,9 +69,6 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
               {femme.display_name}
               {femme.age ? `, ${femme.age}` : ""}
             </h1>
-            <p className="bo-sous-titre">
-              {[femme.display_city, femme.display_country].filter(Boolean).join(", ")}
-            </p>
 
             {femme.headline && <p className="mb-accroche">« {femme.headline} »</p>}
 

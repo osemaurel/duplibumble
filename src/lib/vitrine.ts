@@ -15,7 +15,6 @@ export type ProfilVitrine = {
   href: string;
   nom: string;
   age: number | null;
-  lieu: string;
   photo: string;
   /** Faux pour les profils de démonstration. */
   reel: boolean;
@@ -29,7 +28,7 @@ export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
   // éventail incomplet dès qu'un lot arrive avec ses photos encore à modérer.
   // Le RLS ne laisse sortir que les fiches publiées : inutile de filtrer ici.
   const { data: femmes } = await parNouveaute(
-    supabase.from("ladies").select("id, display_name, age, display_city, display_country"),
+    supabase.from("ladies").select("id, display_name, age"),
   ).limit(limite * 3);
 
   const publiees = femmes ?? [];
@@ -49,7 +48,6 @@ export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
           href: `/profils/${femme.id}`,
           nom: femme.display_name,
           age: femme.age,
-          lieu: [femme.display_city, femme.display_country].filter(Boolean).join(", "),
           photo: principale.url,
           reel: true,
         };
@@ -66,7 +64,6 @@ export async function profilsVitrine(limite = 12): Promise<ProfilVitrine[]> {
     href: "/inscription",
     nom: p.name,
     age: p.age,
-    lieu: p.location,
     photo: p.photo,
     reel: false,
   }));

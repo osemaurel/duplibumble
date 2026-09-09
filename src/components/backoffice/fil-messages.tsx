@@ -78,7 +78,7 @@ export default function FilMessages({
   // et ferait diverger les deux à la moindre course.
   const [recus, setRecus] = useState<MessageAffiche[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
-  const bas = useRef<HTMLDivElement>(null);
+  const flux = useRef<HTMLDivElement>(null);
 
   const echange = useEchange();
 
@@ -173,14 +173,22 @@ export default function FilMessages({
   }, [cheminsAsigner]);
 
   // Se coller au dernier message : c'est celui qu'on vient lire.
+  //
+  // En déplaçant le défilement du conteneur, et non par `scrollIntoView` :
+  // celui-ci fait défiler tous les ancêtres capables de défiler, la page
+  // comprise. Sur téléphone, ouvrir une conversation emportait donc le
+  // document entier vers le bas, et l'en-tête — photo et prénom de
+  // l'interlocutrice — se retrouvait hors de l'écran, qu'il fallait aller
+  // rechercher à la main.
   useEffect(() => {
-    bas.current?.scrollIntoView({ block: "end" });
+    const conteneur = flux.current;
+    if (conteneur) conteneur.scrollTop = conteneur.scrollHeight;
   }, [messages.length]);
 
   let dernierJour = "";
 
   return (
-    <div className="bo-conv-flux">
+    <div className="bo-conv-flux" ref={flux}>
       {!messages.length ? (
         <p
           style={{
@@ -249,7 +257,6 @@ export default function FilMessages({
           );
         })
       )}
-      <div ref={bas} />
     </div>
   );
 }

@@ -1276,6 +1276,11 @@
 
   .mb-contenu { padding-bottom: 6.5rem; }
 
+  /* Les pages de profils apportent leur propre <main> : la place de la barre
+     du bas se réserve donc sur le cadre, sinon la fin de la liste se cache
+     derrière elle. */
+  .mb-avec-onglets .bo-main { padding-bottom: 6.5rem; }
+
   .mb-onglets {
     position: fixed;
     left: 0;

@@ -30,15 +30,11 @@ export default async function MesMessages() {
 
   const [{ data: femmes }, { data: derniers }, photos] = await Promise.all([
     ladyIds.length
-      ? // Ni ville ni pays : la localisation d'une femme n'est plus montrée au
-        // membre, nulle part. On cesse donc aussi de la faire descendre.
-        supabase.from("ladies").select("id, display_name, age").in("id", ladyIds)
+      ? // Ni localisation ni âge : la messagerie s'en tient au prénom. On cesse
+        // donc aussi de faire descendre ce qu'on n'affiche plus.
+        supabase.from("ladies").select("id, display_name").in("id", ladyIds)
       : Promise.resolve({
-          data: [] as {
-            id: string;
-            display_name: string;
-            age: number | null;
-          }[],
+          data: [] as { id: string; display_name: string }[],
         }),
     supabase
       .from("messages")
@@ -101,10 +97,7 @@ export default async function MesMessages() {
 
                     <span className="corps">
                       <span className="ligne1">
-                        <span className="qui">
-                          {femme?.display_name ?? "—"}
-                          {femme?.age ? `, ${femme.age}` : ""}
-                        </span>
+                        <span className="qui">{femme?.display_name ?? "—"}</span>
                       </span>
                       <span className="apercu">
                         {dernier

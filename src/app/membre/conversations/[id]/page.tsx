@@ -43,9 +43,9 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   const [{ data: femme }, photos] = await Promise.all([
     supabase
       .from("ladies")
-      // Ni ville ni pays : la localisation d'une femme n'est plus montrée au
-      // membre, nulle part. On cesse donc aussi de la faire descendre.
-      .select("id, display_name, age")
+      // Ni localisation ni âge : la messagerie s'en tient au prénom. On cesse
+      // donc aussi de faire descendre ce qu'on n'affiche plus.
+      .select("id, display_name")
       .eq("id", conversation.lady_id)
       .maybeSingle(),
     photosPubliques(supabase, [conversation.lady_id]),
@@ -71,13 +71,15 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           <Link href="/membre" className="bo-conv-retour" aria-label="Revenir aux messages">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 19 8 12l7-7" /></svg>
           </Link>
-          <Avatar nom={femme.display_name} url={photo?.url} />
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <p className="bo-h2">
-              {femme.display_name}
-              {femme.age ? `, ${femme.age}` : ""}
-            </p>
-          </div>
+          {/* Photo et prénom mènent à la fiche. Sur téléphone, le bouton
+              explicite est masqué faute de place, et l'accès s'y faisait donc
+              par rien du tout : depuis une conversation, sa fiche était
+              devenue inatteignable. */}
+          <Link href={`/profils/${femme.id}`} className="bo-conv-qui">
+            <Avatar nom={femme.display_name} url={photo?.url} />
+            <p className="bo-h2">{femme.display_name}</p>
+          </Link>
+
           <Link href={`/profils/${femme.id}`} className="bo-btn fantome petit">
             Voir son profil
           </Link>

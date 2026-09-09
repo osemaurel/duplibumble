@@ -643,6 +643,27 @@
   border-bottom: 1px solid var(--line-soft);
   background: var(--surface);
 }
+/* Photo et prénom mènent à la fiche. Rien ne doit changer à l'œil : ni
+   soulignement ni couleur de lien — c'est la zone de toucher qui compte, pas
+   son apparence. */
+.bo-conv-qui {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--r-sm);
+}
+.bo-conv-qui .bo-h2 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bo-conv-qui:active { opacity: 0.65; }
+
 .bo-conv-flux {
   flex: 1;
   overflow-y: auto;
@@ -1398,9 +1419,11 @@
   .bo-conv-retour:active { background: var(--line-soft); }
   .bo-conv-retour svg { width: 22px; height: 22px; }
 
-  /* Le bouton de profil prend trop de place à côté du nom sur un
-     téléphone : le nom reste, l'accès à la fiche se fait en touchant
-     l'en-tête. */
+  /* Le bouton de profil prend trop de place à côté du nom sur un téléphone :
+     le nom reste, et l'accès à la fiche se fait en touchant la photo ou le
+     prénom (`.bo-conv-qui`). Cette phrase décrivait déjà l'intention avant que
+     le lien n'existe : le bouton était masqué, et rien ne le remplaçait — sa
+     fiche était donc inatteignable depuis une conversation. */
   .bo-conv.plein .bo-conv-entete .bo-btn { display: none; }
 }
 

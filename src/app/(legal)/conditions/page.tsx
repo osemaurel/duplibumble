@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import AvisBrouillon from "@/components/site/avis-brouillon";
 import { SOCIETE } from "@/lib/societe";
 import { prixLisible } from "@/lib/credits";
@@ -131,7 +133,7 @@ export default async function Conditions() {
       <p>
         Les crédits non consommés demeurent remboursables pendant quatorze jours à compter de
         l&apos;achat. Les modalités figurent dans la{" "}
-        <a href="/remboursement">politique de remboursement</a>.
+        <Link href="/remboursement">politique de remboursement</Link>.
       </p>
 
       <h2>8. Règles de conduite</h2>
@@ -177,7 +179,7 @@ export default async function Conditions() {
       <h2>11. Données personnelles</h2>
       <p>
         Le traitement des données est décrit dans la{" "}
-        <a href="/confidentialite">politique de confidentialité</a>.
+        <Link href="/confidentialite">politique de confidentialité</Link>.
       </p>
 
       <h2>12. Modification des conditions</h2>

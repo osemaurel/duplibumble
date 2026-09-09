@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import AvisBrouillon from "@/components/site/avis-brouillon";
 import { SOCIETE } from "@/lib/societe";
 
@@ -21,14 +23,14 @@ export default function Contact() {
       <p>
         Pour une demande de remboursement, précisez la date de l&apos;achat concerné et écrivez
         depuis l&apos;adresse e-mail de votre compte. Les modalités figurent dans la{" "}
-        <a href="/remboursement">politique de remboursement</a>.
+        <Link href="/remboursement">politique de remboursement</Link>.
       </p>
 
       <h2>Données personnelles</h2>
       <p>
         Pour exercer vos droits d&apos;accès, de rectification ou d&apos;effacement :{" "}
         <b>{SOCIETE.emailPrivacy}</b>. Voir la{" "}
-        <a href="/confidentialite">politique de confidentialité</a>.
+        <Link href="/confidentialite">politique de confidentialité</Link>.
       </p>
 
       <h2>Signaler un contenu ou un comportement</h2>

@@ -120,9 +120,9 @@ export default async function BoiteDeReception({
             Filtrer
           </button>
           {(filtreFemme || filtreNonLu) && (
-            <a href="/agent" className="bo-btn fantome petit">
+            <Link href="/agent" className="bo-btn fantome petit">
               Réinitialiser
-            </a>
+            </Link>
           )}
         </form>
       ) : null}

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/lib/supabase/types";
@@ -6,11 +7,24 @@ import type { Profile, UserRole } from "@/lib/supabase/types";
 /**
  * Session courante enrichie du profil applicatif, ou null.
  *
- * Le rôle est relu dans la table à chaque appel plutôt que pris dans le jeton :
- * une rétrogradation prend ainsi effet immédiatement, sans attendre qu'une
- * session expire.
+ * Le rôle est relu dans la table plutôt que pris dans le jeton : une
+ * rétrogradation prend ainsi effet dès la requête suivante, sans attendre
+ * qu'une session expire.
+ *
+ * `cache` de React mémoïse le résultat pour la durée d'une seule requête. Ce
+ * n'est pas une optimisation de confort : dans l'App Router, le layout et la
+ * page d'un même espace sont deux composants distincts qui appellent tous deux
+ * `requireAgent`. Sans mémoïsation, chaque affichage refaisait deux fois la
+ * chaîne complète — un appel réseau au serveur d'authentification, puis une
+ * lecture de `profiles`, puis une lecture de `agents` — alors que la réponse
+ * est identique. La base et le serveur d'auth étant à Paris et l'application
+ * servie depuis Washington, chacun de ces allers-retours coûtait près de
+ * quatre-vingts millisecondes.
+ *
+ * La mémoïsation ne franchit pas la frontière d'une requête : deux visiteurs,
+ * ou deux navigations du même visiteur, ne partagent jamais rien.
  */
-export async function getSessionProfile(): Promise<{
+export const getSessionProfile = cache(async function getSessionProfile(): Promise<{
   userId: string;
   email: string | null;
   profile: Profile;
@@ -31,7 +45,7 @@ export async function getSessionProfile(): Promise<{
   if (!profile) return null;
 
   return { userId: user.id, email: user.email ?? null, profile };
-}
+});
 
 /** L'espace d'accueil correspondant à un rôle. */
 export function espaceDuRole(role: UserRole) {
@@ -61,21 +75,39 @@ export const requireAdmin = (chemin = "/admin") => requireRole("admin", chemin);
 export const requireMember = (chemin = "/membre") => requireRole("member", chemin);
 
 /**
+ * Fiche agence rattachée à un compte, mémoïsée le temps d'une requête.
+ *
+ * Mémoïser `requireAgent` lui-même n'aurait pas marché : son paramètre a une
+ * valeur par défaut, et `requireAgent()` puis `requireAgent("/agent")` sont
+ * deux clés différentes pour React — le layout et la page seraient retombés
+ * sur deux lectures distinctes. La clé est donc l'identifiant du compte, que
+ * les deux appels partagent forcément.
+ */
+const ficheAgent = cache(async (profileId: string) => {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("agents")
+    .select("*")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+
+  return data;
+});
+
+/**
  * Exige un agent, et renvoie sa fiche agence en plus de la session.
  *
  * Un compte au rôle `agent` sans fiche agence ne peut rien faire : toutes les
  * politiques passent par `agent_id`. On préfère donc le renvoyer à l'accueil
  * plutôt que de le laisser devant des écrans vides et incompréhensibles.
+ *
+ * La redirection reste hors de la fonction mémoïsée : `redirect` lève une
+ * exception, et on ne met pas une exception en cache.
  */
 export async function requireAgent(chemin = "/agent") {
   const session = await requireRole("agent", chemin);
-  const supabase = await createClient();
-
-  const { data: agent } = await supabase
-    .from("agents")
-    .select("*")
-    .eq("profile_id", session.userId)
-    .maybeSingle();
+  const agent = await ficheAgent(session.userId);
 
   if (!agent) redirect("/");
 

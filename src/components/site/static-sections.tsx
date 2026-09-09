@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { ProfilVitrine } from "@/lib/vitrine";
 
 import GroupePhotos from "./groupe-photos";
@@ -311,7 +313,7 @@ export function Footer() {
                 ))}
                 {c.title === "Aide & sécurité" && (
                   <li>
-                    <a href="/contact">Nous contacter</a>
+                    <Link href="/contact">Nous contacter</Link>
                   </li>
                 )}
               </ul>

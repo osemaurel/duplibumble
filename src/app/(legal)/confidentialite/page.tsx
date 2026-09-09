@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import AvisBrouillon from "@/components/site/avis-brouillon";
 import { SOCIETE } from "@/lib/societe";
 
@@ -66,7 +68,7 @@ export default function Confidentialite() {
       <p>
         Les messages que vous adressez à un profil féminin peuvent être lus, et les réponses
         rédigées, par un agent mandaté par la personne représentée, dans les conditions décrites
-        à l&apos;article 4 des <a href="/conditions">conditions générales</a>. Cet agent est tenu
+        à l&apos;article 4 des <Link href="/conditions">conditions générales</Link>. Cet agent est tenu
         à une obligation de confidentialité contractuelle.
       </p>
       <p>

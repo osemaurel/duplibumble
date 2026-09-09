@@ -20,6 +20,7 @@ export default function Photo({
   prioritaire = false,
   className,
   ajustement = "cover",
+  optimiser = true,
 }: {
   src: string;
   alt: string;
@@ -27,6 +28,21 @@ export default function Photo({
   /** Vrai pour les images visibles d'emblée : elles sont chargées sans attendre. */
   prioritaire?: boolean;
   className?: string;
+  /**
+   * À mettre à faux pour une image dont l'accès dépend de qui regarde.
+   *
+   * L'optimiseur de Next ne se contente pas de transformer l'image : il la
+   * retélécharge lui-même, depuis le serveur, sans les cookies du visiteur.
+   * Une adresse qui vérifie une session lui répond donc « introuvable », et
+   * l'image reste vide — c'est ce qui arrivait à une photo privée tout juste
+   * débloquée.
+   *
+   * Et quand bien même elle passerait : le résultat optimisé est mis en cache
+   * par adresse, dans un cache commun à tous les visiteurs. La photo payée par
+   * l'un serait alors servie à tous les autres. Contourner la vérification
+   * aurait donc été pire que l'image cassée.
+   */
+  optimiser?: boolean;
   /**
    * `cover` recadre pour remplir le cadre — c'est ce que veulent les vignettes.
    * `contain` montre la photo entière : indispensable en plein écran, où
@@ -41,6 +57,7 @@ export default function Photo({
       fill
       sizes={sizes}
       quality={72}
+      unoptimized={!optimiser}
       priority={prioritaire}
       loading={prioritaire ? "eager" : "lazy"}
       className={className}

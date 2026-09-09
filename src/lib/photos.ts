@@ -14,14 +14,32 @@ export type PhotoAffichee = {
 };
 
 /**
+ * Génération du floutage. À incrémenter dès que `flouter` change de recette.
+ *
+ * Une photo privée garde la même adresse tant que la ligne ne bouge pas, et
+ * cette adresse est mise en cache pour des heures, chez les visiteurs comme
+ * dans les relais. Corriger le flou sans changer l'adresse ne servirait donc à
+ * rien : les caches continueraient à servir l'ancien. Ce numéro fait partie de
+ * l'adresse, il suffit de le changer pour que tout le monde reparte du serveur.
+ *
+ * La génération 1 floutait à peine — deux `resize` sur une même chaîne sharp ne
+ * s'enchaînent pas, la réduction était donc ignorée et les visages restaient
+ * lisibles.
+ */
+const GENERATION_FLOU = 2;
+
+/**
  * Adresse stable et cachable d'une photo publique.
  *
  * La version occupe un segment de chemin plutôt qu'un paramètre de requête :
- * l'optimiseur d'images de Next rejette les URL locales qui en portent un.
+ * l'optimiseur d'images de Next rejette les URL locales qui en portent un. Ce
+ * segment n'est jamais relu côté serveur — l'identifiant suffit à retrouver la
+ * ligne — il ne sert qu'à distinguer deux états d'une même photo dans les
+ * caches.
  */
-export function urlPhoto(id: string, misAJour?: string | null) {
+export function urlPhoto(id: string, misAJour?: string | null, prive = false) {
   const version = (misAJour ? Date.parse(misAJour) : 0) || 0;
-  return `/api/photos/${id}/${version}`;
+  return `/api/photos/${id}/${prive ? `${version}f${GENERATION_FLOU}` : version}`;
 }
 
 /**
@@ -54,7 +72,7 @@ export async function photosPubliques(
     const liste = parFemme.get(photo.lady_id) ?? [];
     liste.push({
       id: photo.id,
-      url: urlPhoto(photo.id, photo.updated_at),
+      url: urlPhoto(photo.id, photo.updated_at, photo.is_private),
       position: photo.position,
       caption: photo.caption,
       prive: photo.is_private,

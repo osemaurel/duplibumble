@@ -30,13 +30,14 @@ export default async function MesMessages() {
 
   const [{ data: femmes }, { data: derniers }, photos] = await Promise.all([
     ladyIds.length
-      ? supabase.from("ladies").select("id, display_name, age, display_country").in("id", ladyIds)
+      ? // Ni ville ni pays : la localisation d'une femme n'est plus montrée au
+        // membre, nulle part. On cesse donc aussi de la faire descendre.
+        supabase.from("ladies").select("id, display_name, age").in("id", ladyIds)
       : Promise.resolve({
           data: [] as {
             id: string;
             display_name: string;
             age: number | null;
-            display_country: string | null;
           }[],
         }),
     supabase
@@ -104,9 +105,6 @@ export default async function MesMessages() {
                           {femme?.display_name ?? "—"}
                           {femme?.age ? `, ${femme.age}` : ""}
                         </span>
-                        {femme?.display_country && (
-                          <span className="vers">{femme.display_country}</span>
-                        )}
                       </span>
                       <span className="apercu">
                         {dernier

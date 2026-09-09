@@ -43,7 +43,9 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   const [{ data: femme }, photos] = await Promise.all([
     supabase
       .from("ladies")
-      .select("id, display_name, age, display_city, display_country")
+      // Ni ville ni pays : la localisation d'une femme n'est plus montrée au
+      // membre, nulle part. On cesse donc aussi de la faire descendre.
+      .select("id, display_name, age")
       .eq("id", conversation.lady_id)
       .maybeSingle(),
     photosPubliques(supabase, [conversation.lady_id]),
@@ -74,9 +76,6 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
             <p className="bo-h2">
               {femme.display_name}
               {femme.age ? `, ${femme.age}` : ""}
-            </p>
-            <p style={{ marginTop: "0.15rem", fontSize: "0.78rem", color: "var(--ink-3)" }}>
-              {[femme.display_city, femme.display_country].filter(Boolean).join(", ")}
             </p>
           </div>
           <Link href={`/profils/${femme.id}`} className="bo-btn fantome petit">

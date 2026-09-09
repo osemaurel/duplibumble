@@ -154,28 +154,34 @@ export async function soumettreFiche(formData: FormData) {
 }
 
 /**
- * Rend une photo privée ou publique, et fixe son prix de déblocage.
+ * Fixe le prix de déblocage d'une photo privée.
  *
- * Réservé aux photos déjà validées : marquer privée une photo qui ne l'est
- * pas encore n'a pas de sens, et de toute façon le RLS n'ouvre cette table
- * qu'aux photos du portefeuille de l'agent — impossible de toucher à celle
- * d'un confrère.
+ * L'agent ne choisit plus quelles photos sont privées : les deux premières
+ * d'une fiche sont visibles, les suivantes ne le sont pas, et c'est la base
+ * qui l'applique — le déclencheur `lady_photos_confidentialite`. Ce qui lui
+ * reste, et qui a du sens, c'est l'ordre des photos et le prix de celles qui
+ * sont derrière.
+ *
+ * Seule `unlock_cost` est écrite ici, jamais `is_private` : le déclencheur ne
+ * se réveille que sur un changement de fiche ou de position, une écriture de
+ * prix ne le rappelle donc pas.
  */
-export async function definirVisibilitePhoto(formData: FormData) {
+export async function definirPrixPhoto(formData: FormData) {
   await requireAgent();
 
   const photoId = String(formData.get("photo_id") ?? "");
   const ladyId = String(formData.get("lady_id") ?? "");
   if (!photoId) return;
 
-  const prive = formData.get("is_private") === "on";
   const coutSaisi = Number(String(formData.get("unlock_cost") ?? "").trim());
-  const cout = Number.isFinite(coutSaisi) && coutSaisi > 0 ? Math.round(coutSaisi) : 15;
+  if (!Number.isFinite(coutSaisi) || coutSaisi < 1) return;
 
+  // Le RLS n'ouvre cette table qu'aux photos du portefeuille de l'agent :
+  // impossible de toucher au tarif d'un confrère.
   const supabase = await createClient();
   await supabase
     .from("lady_photos")
-    .update({ is_private: prive, unlock_cost: prive ? cout : null })
+    .update({ unlock_cost: Math.round(coutSaisi) })
     .eq("id", photoId);
 
   revalidatePath(`/agent/femmes/${ladyId}`);

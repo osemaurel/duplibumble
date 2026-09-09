@@ -77,6 +77,10 @@ export default async function Compte() {
               <b>{bareme.photo} crédits</b>
             </li>
             <li>
+              <span>Photo privée débloquée</span>
+              <b>{bareme.photo_privee} crédits</b>
+            </li>
+            <li>
               <span>Message reçu</span>
               <b className="offert">gratuit</b>
             </li>

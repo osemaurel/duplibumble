@@ -6,7 +6,7 @@ import { Avatar, IconePhoto, PastilleStatut } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
-import { definirVisibilitePhoto, soumettreFiche, supprimerPhoto } from "../../actions";
+import { definirPrixPhoto, soumettreFiche, supprimerPhoto } from "../../actions";
 import FormulaireFiche from "./formulaire-fiche";
 
 export default async function FicheFemmeAgent({
@@ -167,8 +167,10 @@ export default async function FicheFemmeAgent({
         <h2 className="bo-h2">Photos · {photos?.length ?? 0}</h2>
         <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
           Chaque photo est validée une par une par l&apos;administration avant d&apos;apparaître
-          publiquement. Une fois validée, vous pouvez la rendre privée : elle apparaît alors
-          floutée jusqu&apos;à ce qu&apos;un membre la débloque avec ses crédits.
+          publiquement. Les deux premières sont ensuite visibles de tous ; les suivantes
+          s&apos;affichent floutées, jusqu&apos;à ce qu&apos;un membre les débloque avec ses
+          crédits. C&apos;est donc l&apos;ordre des photos qui décide de ce qui est montré —
+          placez en tête les deux qui donnent le plus envie d&apos;écrire.
         </p>
 
         <div style={{ marginTop: "1.3rem" }}>
@@ -226,60 +228,56 @@ export default async function FicheFemmeAgent({
                       </p>
                     )}
 
-                    {photo.status === "approved" && (
-                      <form
-                        action={definirVisibilitePhoto}
-                        className="verrou-photo"
-                        style={{
-                          marginTop: "0.7rem",
-                          paddingTop: "0.7rem",
-                          borderTop: "1px solid var(--line)",
-                          display: "flex",
-                          flexWrap: "wrap",
-                          alignItems: "center",
-                          gap: "0.6rem",
-                        }}
-                      >
-                        <input type="hidden" name="photo_id" value={photo.id} />
-                        <input type="hidden" name="lady_id" value={femme.id} />
-                        <label
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.4rem",
-                            fontSize: "0.82rem",
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            name="is_private"
-                            defaultChecked={photo.is_private}
-                          />
-                          Privée
-                        </label>
-                        <label
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.4rem",
-                            fontSize: "0.82rem",
-                          }}
-                        >
-                          Prix
-                          <input
-                            type="number"
-                            name="unlock_cost"
-                            min={1}
-                            defaultValue={photo.unlock_cost ?? 15}
-                            style={{ width: "4.2rem" }}
-                          />
-                          crédits
-                        </label>
-                        <button type="submit" className="bo-btn fantome petit">
-                          Enregistrer
-                        </button>
-                      </form>
-                    )}
+                    {/* La confidentialité ne se choisit plus photo par photo :
+                        la base la décide au rang. On l'affiche donc, et l'agent
+                        n'agit que sur ce qui lui revient — l'ordre, et le prix
+                        de ce qui est derrière. */}
+                    <div
+                      className="verrou-photo"
+                      style={{
+                        marginTop: "0.7rem",
+                        paddingTop: "0.7rem",
+                        borderTop: "1px solid var(--line)",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        fontSize: "0.82rem",
+                      }}
+                    >
+                      {photo.is_private ? (
+                        <>
+                          <span style={{ fontWeight: 600 }}>🔒 Privée</span>
+                          <form
+                            action={definirPrixPhoto}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.4rem",
+                            }}
+                          >
+                            <input type="hidden" name="photo_id" value={photo.id} />
+                            <input type="hidden" name="lady_id" value={femme.id} />
+                            <input
+                              type="number"
+                              name="unlock_cost"
+                              min={1}
+                              defaultValue={photo.unlock_cost ?? 15}
+                              style={{ width: "4.2rem" }}
+                              aria-label="Prix du déblocage en crédits"
+                            />
+                            crédits
+                            <button type="submit" className="bo-btn fantome petit">
+                              Enregistrer
+                            </button>
+                          </form>
+                        </>
+                      ) : (
+                        <span style={{ color: "var(--vert)", fontWeight: 600 }}>
+                          Visible de tous
+                        </span>
+                      )}
+                    </div>
 
                     <div className="actions">
                       <form action={supprimerPhoto}>

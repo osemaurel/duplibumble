@@ -39,10 +39,16 @@ export default async function Tarifs() {
         </li>
         <li>Envoyer une photo : {bareme.photo} crédits</li>
         <li>Minute d&apos;appel vidéo : {bareme.video_minute} crédits</li>
+        <li>Débloquer une photo privée : {bareme.photo_privee} crédits</li>
         <li>
           <b>Lire les messages reçus : gratuit, toujours.</b>
         </li>
       </ul>
+      <p>
+        Les {bareme.photos_publiques} premières photos de chaque profil sont visibles sans
+        rien dépenser. Les suivantes s&apos;affichent floutées : les débloquer coûte des
+        crédits, une fois pour toutes — une photo déjà débloquée le reste.
+      </p>
       <p>
         {bareme.bonus_bienvenue} crédits sont offerts à l&apos;inscription, de quoi engager la
         conversation sans rien dépenser. Un message resté sans réponse pendant{" "}

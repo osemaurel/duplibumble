@@ -11,7 +11,18 @@ import {
 } from "@/components/site/static-sections";
 import { profilsVitrine } from "@/lib/vitrine";
 
-export const dynamic = "force-dynamic";
+/**
+ * Rendue à l'avance et servie depuis le cache, refaite au plus une fois par
+ * minute. Elle était jusqu'ici reconstruite à chaque visite, ce qui coûtait un
+ * rendu serveur complet — et un démarrage à froid pour le premier visiteur,
+ * mesuré à plus de deux secondes et demie — pour une page identique pour tout
+ * le monde.
+ *
+ * La minute n'est pas un délai d'attente : publier une fiche rafraîchit cette
+ * page immédiatement, `publierFiche` s'en charge. Elle ne sert que de filet
+ * pour ce qui change sans passer par là.
+ */
+export const revalidate = 60;
 
 export default async function Home() {
   // Un seul appel pour toute la page : les photos sont signées une fois et

@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { profiles as demonstration } from "@/lib/profiles";
 import { parNouveaute } from "@/lib/classement";
-import { photosPubliques } from "@/lib/photos";
-import { createClient } from "@/lib/supabase/server";
+import { photosPubliques, type PhotoAffichee } from "@/lib/photos";
+import { createPublicClient } from "@/lib/supabase/public";
 
 import GroupePhotos from "./groupe-photos";
 import Photo from "./photo";
@@ -28,20 +28,39 @@ const FILTRES = [
  * bandeau du pied de page indique déjà que ces personnes sont fictives. Le
  * basculement se fait tout seul dès la première publication.
  */
+/**
+ * Fiches publiées et leurs photos, ou rien si la base ne répond pas.
+ *
+ * Comme pour la vitrine : la page d'accueil étant rendue à la construction du
+ * site, une base injoignable à cet instant ferait échouer le déploiement. Le
+ * repli de démonstration existe déjà en aval, il suffit de l'atteindre.
+ */
+async function fichesPubliees() {
+  try {
+    // Sans cookies : la galerie ne montre que des fiches publiées, et la page
+    // d'accueil qui la contient est rendue à l'avance.
+    const supabase = createPublicClient();
+
+    const { data: publiees } = await parNouveaute(
+      supabase
+        .from("ladies")
+        .select("id, display_name, age, display_country, headline"),
+    ).limit(12);
+
+    const reelles = publiees ?? [];
+    const photos = await photosPubliques(
+      supabase,
+      reelles.map((f) => f.id),
+    );
+
+    return { reelles, photos };
+  } catch {
+    return { reelles: [], photos: new Map<string, PhotoAffichee[]>() };
+  }
+}
+
 export default async function Gallery() {
-  const supabase = await createClient();
-
-  const { data: publiees } = await parNouveaute(
-    supabase
-      .from("ladies")
-      .select("id, display_name, age, display_country, headline"),
-  ).limit(12);
-
-  const reelles = publiees ?? [];
-  const photos = await photosPubliques(
-    supabase,
-    reelles.map((f) => f.id),
-  );
+  const { reelles, photos } = await fichesPubliees();
 
   const paysDisponibles = [
     ...new Set(reelles.map((f) => f.display_country).filter(Boolean)),

@@ -8,6 +8,9 @@ export const metadata = {
   description: "Barème des crédits Palab et paliers de recharge, prix toutes taxes comprises.",
 };
 
+/** Les prix viennent de la base et bougent rarement : refaits chaque heure. */
+export const revalidate = 3600;
+
 /**
  * Page tarifaire publique, accessible sans compte.
  *

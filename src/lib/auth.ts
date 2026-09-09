@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { clesDeSignature } from "@/lib/supabase/jwks";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile, UserRole } from "@/lib/supabase/types";
 
@@ -23,6 +24,19 @@ import type { Profile, UserRole } from "@/lib/supabase/types";
  *
  * La mémoïsation ne franchit pas la frontière d'une requête : deux visiteurs,
  * ou deux navigations du même visiteur, ne partagent jamais rien.
+ *
+ * L'identité vient de `getClaims`, qui vérifie la signature du jeton sur place
+ * avec la clé publique du projet, plutôt que de `getUser`, qui la faisait
+ * vérifier par le serveur d'authentification à chaque affichage. La garantie
+ * est la même — un jeton falsifié ne passe pas une vérification
+ * cryptographique — mais elle ne coûte plus un aller-retour réseau.
+ *
+ * Ce que ce choix concède : un compte banni au niveau de l'authentification
+ * garderait l'accès jusqu'à l'expiration de son jeton, une heure au plus, là
+ * où `getUser` l'aurait recalé aussitôt. Le rôle et l'existence du compte,
+ * eux, restent relus dans `profiles` à chaque requête — une rétrogradation ou
+ * une suppression prend donc effet immédiatement, et c'est par là que
+ * l'application retire un accès.
  */
 export const getSessionProfile = cache(async function getSessionProfile(): Promise<{
   userId: string;
@@ -31,20 +45,25 @@ export const getSessionProfile = cache(async function getSessionProfile(): Promi
 } | null> {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { data } = await supabase.auth.getClaims(undefined, {
+    jwks: await clesDeSignature(),
+  });
+  const claims = data?.claims;
+  if (!claims?.sub) return null;
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("id", claims.sub)
     .single();
 
   if (!profile) return null;
 
-  return { userId: user.id, email: user.email ?? null, profile };
+  return {
+    userId: claims.sub,
+    email: typeof claims.email === "string" ? claims.email : null,
+    profile,
+  };
 });
 
 /** L'espace d'accueil correspondant à un rôle. */

@@ -7,7 +7,8 @@ export const metadata = {
   description: "Conditions de remboursement des crédits achetés sur Palab.",
 };
 
-export const dynamic = "force-dynamic";
+/** Document figé, mais dont le barème vient de la base : refait chaque heure. */
+export const revalidate = 3600;
 
 export default async function Remboursement() {
   const bareme = await baremeAffichable();

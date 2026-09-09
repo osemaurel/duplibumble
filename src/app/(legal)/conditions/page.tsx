@@ -10,7 +10,8 @@ export const metadata = {
   description: "Conditions générales d'utilisation et de vente de la plateforme Palab.",
 };
 
-export const dynamic = "force-dynamic";
+/** Document figé, mais dont le barème vient de la base : refait chaque heure. */
+export const revalidate = 3600;
 
 export default async function Conditions() {
   // Le barème est lu en base : les conditions ne doivent jamais annoncer un

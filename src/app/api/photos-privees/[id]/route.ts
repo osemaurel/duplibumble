@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { clesDeSignature } from "@/lib/supabase/jwks";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -27,15 +28,20 @@ export async function GET(_requete: Request, { params }: { params: Promise<{ id:
   if (!UUID.test(id)) return refuse();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return refuse();
+
+  // Signature vérifiée sur place plutôt qu'auprès du serveur
+  // d'authentification : cette route est appelée une fois par photo affichée,
+  // un aller-retour réseau par vignette s'ajouterait à chaque déblocage.
+  const { data } = await supabase.auth.getClaims(undefined, {
+    jwks: await clesDeSignature(),
+  });
+  const membre = data?.claims?.sub;
+  if (!membre) return refuse();
 
   const { data: deblocage } = await supabase
     .from("photo_unlocks")
     .select("photo_id")
-    .eq("member_id", user.id)
+    .eq("member_id", membre)
     .eq("photo_id", id)
     .maybeSingle();
 

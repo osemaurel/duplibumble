@@ -13,11 +13,15 @@ import type { PalierCredits } from "./supabase/types";
  * Séparé de `credits.ts` parce que celui-ci est importé par un composant
  * client : y placer un accès serveur tirait tout le client Supabase serveur
  * dans le bundle du navigateur, et la compilation échouait.
+ *
+ * La lecture passe par le client public, sans cookies : le barème est le même
+ * pour tout le monde, et lire un cookie ici obligerait à reconstruire ces
+ * pages à chaque visite au lieu de les servir depuis le cache.
  */
 export async function baremeAffichable(): Promise<Bareme> {
   try {
-    const { createClient } = await import("./supabase/server");
-    return await lireBareme(await createClient());
+    const { createPublicClient } = await import("./supabase/public");
+    return await lireBareme(createPublicClient());
   } catch {
     return { ...REPLI } as Bareme;
   }
@@ -25,8 +29,8 @@ export async function baremeAffichable(): Promise<Bareme> {
 
 export async function paliersAffichables(): Promise<PalierCredits[]> {
   try {
-    const { createClient } = await import("./supabase/server");
-    return await lirePaliers(await createClient());
+    const { createPublicClient } = await import("./supabase/public");
+    return await lirePaliers(createPublicClient());
   } catch {
     return [];
   }

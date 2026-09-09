@@ -191,6 +191,11 @@ export async function changerStatutFemme(formData: FormData) {
   revalidatePath("/admin/femmes");
   revalidatePath(`/admin/femmes/${ladyId}`);
   revalidatePath("/admin");
+  // La vitrine est rendue à l'avance : sans cela, une fiche publiée
+  // n'apparaîtrait qu'à la revalidation suivante.
+  revalidatePath("/");
+  revalidatePath("/profils");
+  revalidatePath(`/profils/${ladyId}`);
 }
 
 export async function attribuerFemme(formData: FormData) {
@@ -224,6 +229,11 @@ export async function changerStatutPhoto(formData: FormData) {
 
   revalidatePath(`/admin/femmes/${ladyId}`);
   revalidatePath("/admin");
+  // Une fiche sans photo validée est écartée de la vitrine : valider ou
+  // refuser une photo change donc ce que l'accueil doit montrer.
+  revalidatePath("/");
+  revalidatePath("/profils");
+  revalidatePath(`/profils/${ladyId}`);
 }
 
 export async function seDeconnecter() {

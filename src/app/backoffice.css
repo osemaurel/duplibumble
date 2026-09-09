@@ -1400,9 +1400,9 @@
 }
 
 /* ========================= Barre de saisie =========================
-   Tout sur une ligne : trombone, champ, envoi. Un cadre large surmonté
-   d'un bouton pleine largeur mange l'écran d'un téléphone sans rien
-   apporter — aucune messagerie ne procède ainsi.
+   Tout sur une ligne : trombone, cadeaux, champ, envoi. Un cadre large
+   surmonté d'un bouton pleine largeur mange l'écran d'un téléphone sans
+   rien apporter — aucune messagerie ne procède ainsi.
    ------------------------------------------------------------------ */
 
 .bo-composeur { display: grid; gap: 0.6rem; }
@@ -1451,6 +1451,14 @@
 .bo-rond:hover { color: var(--brand); border-color: var(--brand); }
 .bo-rond svg { width: 21px; height: 21px; }
 .bo-rond[data-desactive] { opacity: 0.5; pointer-events: none; }
+
+/* Cadeaux : un émoji, pas un trait SVG comme ses voisins. Sans taille propre
+   il héritait du corps de texte et paraissait deux fois plus petit que le
+   trombone posé juste à sa gauche. */
+.bo-rond.cadeau {
+  font-size: 1.25rem;
+  line-height: 1;
+}
 
 .bo-rond.envoi {
   background: var(--brand);

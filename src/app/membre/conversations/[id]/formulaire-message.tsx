@@ -34,6 +34,7 @@ export default function FormulaireMessage({
   const [resultat, setResultat] = useState<{ ok: boolean; message?: string } | null>(null);
   const [envois, setEnvois] = useState(0);
   const [brouillon, setBrouillon] = useState("");
+  const [cadeauOuvert, setCadeauOuvert] = useState(false);
 
   const soldeInsuffisant = solde < cout;
 
@@ -68,8 +69,8 @@ export default function FormulaireMessage({
   }
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}>
-      <form action={soumettre} className="bo-repondre" style={{ flex: 1, minWidth: 0 }}>
+    <>
+      <form action={soumettre} className="bo-repondre">
         <input type="hidden" name="conversation_id" value={conversationId} />
 
         {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
@@ -86,13 +87,37 @@ export default function FormulaireMessage({
           desactive={soldeInsuffisant}
           brouillon={brouillon}
           key={envois}
+          actionEnPlus={
+            categoriesCadeaux.length > 0 ? (
+              // `type="button"` : sans cela, un bouton dans un formulaire le
+              // soumet, et ouvrir le catalogue enverrait le message en cours.
+              // Il reste actif même à court de crédits — le panneau montre ce
+              // qui est à portée, et le solde est écrit dessus.
+              <button
+                type="button"
+                className="bo-rond cadeau"
+                aria-label="Envoyer un cadeau"
+                aria-haspopup="dialog"
+                aria-expanded={cadeauOuvert}
+                onClick={() => setCadeauOuvert(true)}
+              >
+                🎁
+              </button>
+            ) : null
+          }
         />
       </form>
 
-      {/* Formulaire distinct : imbriquer un second <form> dans le premier ne
-          serait pas valide, et l'envoi d'un cadeau n'a de toute façon rien à
-          voir avec celui d'un message. */}
-      <SelecteurCadeau conversationId={conversationId} categories={categoriesCadeaux} solde={solde} />
-    </div>
+      {/* Le panneau porte son propre formulaire : il reste hors de celui du
+          message, deux <form> imbriqués n'étant pas du HTML valide. Il
+          s'affiche par-dessus la page, sa place dans l'arbre ne se voit pas. */}
+      <SelecteurCadeau
+        conversationId={conversationId}
+        categories={categoriesCadeaux}
+        solde={solde}
+        ouvert={cadeauOuvert}
+        onFermer={() => setCadeauOuvert(false)}
+      />
+    </>
   );
 }

@@ -24,12 +24,19 @@ export default function Composeur({
   placeholder,
   desactive = false,
   brouillon = "",
+  actionEnPlus,
 }: {
   conversationId: string;
   placeholder: string;
   desactive?: boolean;
   /** Texte réinjecté après un envoi refusé : on ne perd pas ce qui a été tapé. */
   brouillon?: string;
+  /**
+   * Bouton supplémentaire posé après le trombone — les cadeaux, côté membre.
+   * C'est un emplacement plutôt qu'une option en dur : le composeur sert aussi
+   * à l'agent, qui n'envoie pas de cadeaux.
+   */
+  actionEnPlus?: React.ReactNode;
 }) {
   // `useFormStatus` lit l'état du formulaire parent : plus besoin de le faire
   // redescendre en propriété, et il reste juste même si l'envoi part d'ailleurs.
@@ -154,6 +161,8 @@ export default function Composeur({
             </svg>
           )}
         </label>
+
+        {actionEnPlus}
 
         <textarea
           ref={champ}

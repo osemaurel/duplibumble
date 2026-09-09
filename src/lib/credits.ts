@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type { Database, PalierCredits } from "./supabase/types";
+import type { Database, GiftCatalogItem, PalierCredits } from "./supabase/types";
 
 /**
  * Barème et paliers de recharge.
@@ -44,6 +44,36 @@ export async function lirePaliers(
     .order("ordre");
 
   return data ?? [];
+}
+
+/**
+ * Catalogue des cadeaux virtuels, groupés par catégorie dans l'ordre
+ * d'affichage. Purement symbolique : aucune expédition, aucune contrepartie
+ * réelle — un geste payant dans le fil de discussion, rien de plus.
+ */
+export async function lireCadeaux(
+  supabase: SupabaseClient<Database>,
+): Promise<{ categories: { nom: string; cadeaux: GiftCatalogItem[] }[]; parCode: Map<string, GiftCatalogItem> }> {
+  const { data } = await supabase
+    .from("gift_catalog")
+    .select("*")
+    .eq("actif", true)
+    .order("ordre");
+
+  const cadeaux = data ?? [];
+  const parCode = new Map(cadeaux.map((c) => [c.code, c]));
+
+  const categories: { nom: string; cadeaux: GiftCatalogItem[] }[] = [];
+  for (const cadeau of cadeaux) {
+    let categorie = categories.find((c) => c.nom === cadeau.category);
+    if (!categorie) {
+      categorie = { nom: cadeau.category, cadeaux: [] };
+      categories.push(categorie);
+    }
+    categorie.cadeaux.push(cadeau);
+  }
+
+  return { categories, parCode };
 }
 
 /** Prix d'un palier, formaté pour l'affichage. */

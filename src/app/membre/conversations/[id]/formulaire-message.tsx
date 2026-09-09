@@ -4,8 +4,10 @@ import { useState } from "react";
 
 import Composeur from "@/components/backoffice/composeur";
 import { useEchange } from "@/components/backoffice/echange";
+import type { GiftCatalogItem } from "@/lib/supabase/types";
 
 import { envoyerMessage } from "../../actions";
+import SelecteurCadeau from "./selecteur-cadeau";
 
 /**
  * Barre d'envoi côté membre.
@@ -20,11 +22,13 @@ export default function FormulaireMessage({
   prenom,
   cout,
   solde,
+  categoriesCadeaux,
 }: {
   conversationId: string;
   prenom: string;
   cout: number;
   solde: number;
+  categoriesCadeaux: { nom: string; cadeaux: GiftCatalogItem[] }[];
 }) {
   const echange = useEchange();
   const [resultat, setResultat] = useState<{ ok: boolean; message?: string } | null>(null);
@@ -64,24 +68,31 @@ export default function FormulaireMessage({
   }
 
   return (
-    <form action={soumettre} className="bo-repondre">
-      <input type="hidden" name="conversation_id" value={conversationId} />
+    <div style={{ display: "flex", alignItems: "flex-end", gap: "0.5rem" }}>
+      <form action={soumettre} className="bo-repondre" style={{ flex: 1, minWidth: 0 }}>
+        <input type="hidden" name="conversation_id" value={conversationId} />
 
-      {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
+        {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
 
-      {soldeInsuffisant && (
-        <p className="bo-message avertissement">
-          Vos crédits sont épuisés. Le rechargement arrive très bientôt.
-        </p>
-      )}
+        {soldeInsuffisant && (
+          <p className="bo-message avertissement">
+            Vos crédits sont épuisés. Le rechargement arrive très bientôt.
+          </p>
+        )}
 
-      <Composeur
-        conversationId={conversationId}
-        placeholder={`Écrire à ${prenom}…`}
-        desactive={soldeInsuffisant}
-        brouillon={brouillon}
-        key={envois}
-      />
-    </form>
+        <Composeur
+          conversationId={conversationId}
+          placeholder={`Écrire à ${prenom}…`}
+          desactive={soldeInsuffisant}
+          brouillon={brouillon}
+          key={envois}
+        />
+      </form>
+
+      {/* Formulaire distinct : imbriquer un second <form> dans le premier ne
+          serait pas valide, et l'envoi d'un cadeau n'a de toute façon rien à
+          voir avec celui d'un message. */}
+      <SelecteurCadeau conversationId={conversationId} categories={categoriesCadeaux} solde={solde} />
+    </div>
   );
 }

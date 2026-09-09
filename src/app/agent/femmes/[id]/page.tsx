@@ -6,7 +6,7 @@ import { Avatar, IconePhoto, PastilleStatut } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
-import { soumettreFiche, supprimerPhoto } from "../../actions";
+import { definirVisibilitePhoto, soumettreFiche, supprimerPhoto } from "../../actions";
 import FormulaireFiche from "./formulaire-fiche";
 
 export default async function FicheFemmeAgent({
@@ -40,6 +40,25 @@ export default async function FicheFemmeAgent({
   }
 
   const prochainePosition = (photos ?? []).reduce((max, p) => Math.max(max, p.position), 0) + 1;
+
+  // Indicateur d'intérêt, pas un relevé d'argent : la monétisation de l'agent
+  // reste hors sujet pour l'instant, mais savoir ce qui retient l'attention
+  // dans son portefeuille aide à décider quoi compléter en priorité.
+  const idsPhotosPrivees = (photos ?? []).filter((p) => p.is_private).map((p) => p.id);
+
+  const [{ count: deblocages }, { count: cadeauxRecus }] = await Promise.all([
+    idsPhotosPrivees.length
+      ? supabase
+          .from("photo_unlocks")
+          .select("id", { count: "exact", head: true })
+          .in("photo_id", idsPhotosPrivees)
+      : Promise.resolve({ count: 0 }),
+    supabase
+      .from("messages")
+      .select("id, conversations!inner(lady_id)", { count: "exact", head: true })
+      .eq("conversations.lady_id", id)
+      .not("gift_code", "is", null),
+  ]);
 
   const manques = [
     !femme.headline && "l'accroche",
@@ -124,11 +143,32 @@ export default async function FicheFemmeAgent({
 
       <FormulaireFiche femme={femme} />
 
+      {(idsPhotosPrivees.length > 0 || (cadeauxRecus ?? 0) > 0) && (
+        <section className="bo-carte bo-carte-p">
+          <h2 className="bo-h2">Intérêt du portefeuille</h2>
+          <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
+            Un repère, pas un relevé d&apos;argent — la rémunération de l&apos;agent n&apos;est
+            pas encore mise en place.
+          </p>
+          <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
+            <div>
+              <dt>Photos privées débloquées</dt>
+              <dd>{deblocages ?? 0}</dd>
+            </div>
+            <div>
+              <dt>Cadeaux reçus</dt>
+              <dd>{cadeauxRecus ?? 0}</dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
       <section className="bo-carte bo-carte-p">
         <h2 className="bo-h2">Photos · {photos?.length ?? 0}</h2>
         <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
           Chaque photo est validée une par une par l&apos;administration avant d&apos;apparaître
-          publiquement.
+          publiquement. Une fois validée, vous pouvez la rendre privée : elle apparaît alors
+          floutée jusqu&apos;à ce qu&apos;un membre la débloque avec ses crédits.
         </p>
 
         <div style={{ marginTop: "1.3rem" }}>
@@ -184,6 +224,61 @@ export default async function FicheFemmeAgent({
                       >
                         {photo.rejection_note}
                       </p>
+                    )}
+
+                    {photo.status === "approved" && (
+                      <form
+                        action={definirVisibilitePhoto}
+                        className="verrou-photo"
+                        style={{
+                          marginTop: "0.7rem",
+                          paddingTop: "0.7rem",
+                          borderTop: "1px solid var(--line)",
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: "0.6rem",
+                        }}
+                      >
+                        <input type="hidden" name="photo_id" value={photo.id} />
+                        <input type="hidden" name="lady_id" value={femme.id} />
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.4rem",
+                            fontSize: "0.82rem",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            name="is_private"
+                            defaultChecked={photo.is_private}
+                          />
+                          Privée
+                        </label>
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.4rem",
+                            fontSize: "0.82rem",
+                          }}
+                        >
+                          Prix
+                          <input
+                            type="number"
+                            name="unlock_cost"
+                            min={1}
+                            defaultValue={photo.unlock_cost ?? 15}
+                            style={{ width: "4.2rem" }}
+                          />
+                          crédits
+                        </label>
+                        <button type="submit" className="bo-btn fantome petit">
+                          Enregistrer
+                        </button>
+                      </form>
                     )}
 
                     <div className="actions">

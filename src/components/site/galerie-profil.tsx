@@ -1,10 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 
 import Photo from "./photo";
 
-export type PhotoProfil = { url: string; caption: string | null };
+export type PhotoProfil = {
+  id: string;
+  url: string;
+  caption: string | null;
+  /** Vrai si la photo n'est visible qu'après déblocage par des crédits. */
+  prive: boolean;
+  /** Vrai si le visiteur courant a déjà payé pour la voir. */
+  debloquee: boolean;
+  /** Coût du déblocage en crédits, uniquement quand `prive` et non `debloquee`. */
+  coutDeblocage: number | null;
+};
+
+type ResultatDeblocage = { ok: true; message: string } | { ok: false; message: string };
 
 /** Déplacement horizontal minimal, en pixels, pour compter comme un balayage. */
 const SEUIL_BALAYAGE = 45;
@@ -20,13 +33,25 @@ const SEUIL_BALAYAGE = 45;
  * La navigation suit les habitudes de chaque appareil : balayage du doigt sur
  * téléphone, flèches du clavier et clic sur ordinateur, Échap pour fermer
  * partout.
+ *
+ * Une photo privée non débloquée arrive déjà floutée dans `url` — c'est la
+ * route qui la sert qui en décide, jamais ce composant. Le seul rôle d'ici est
+ * de superposer un cadenas et un moyen de payer pour la voir.
  */
 export default function GalerieProfil({
   photos,
   nom,
+  peutDebloquer,
+  debloquer,
+  lienInscription,
 }: {
   photos: PhotoProfil[];
   nom: string;
+  /** Vrai pour un membre connecté : lui seul peut dépenser des crédits. */
+  peutDebloquer: boolean;
+  debloquer?: (prev: ResultatDeblocage | null, formData: FormData) => Promise<ResultatDeblocage>;
+  /** Destination proposée à qui n'est pas membre, pour créer un compte. */
+  lienInscription: string;
 }) {
   const [ouverte, setOuverte] = useState<number | null>(null);
   const depart = useRef<{ x: number; y: number } | null>(null);
@@ -82,6 +107,7 @@ export default function GalerieProfil({
   // nombre à l'intérieur du bloc, pas la variable d'état.
   const index = ouverte;
   const courante = index === null ? null : photos[index];
+  const verrouillee = (photo: PhotoProfil) => photo.prive && !photo.debloquee;
 
   return (
     <>
@@ -97,13 +123,20 @@ export default function GalerieProfil({
           sizes="(max-width:900px) 92vw, 460px"
           prioritaire
         />
-        <span className="mb-loupe" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7" />
-            <path d="m16.5 16.5 4 4M11 8v6M8 11h6" />
-          </svg>
-          {total > 1 ? `${total} photos` : "Agrandir"}
-        </span>
+        {verrouillee(photos[0]) ? (
+          <span className="mb-loupe" aria-hidden="true">
+            <IconeCadenas />
+            Photo privée
+          </span>
+        ) : (
+          <span className="mb-loupe" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m16.5 16.5 4 4M11 8v6M8 11h6" />
+            </svg>
+            {total > 1 ? `${total} photos` : "Agrandir"}
+          </span>
+        )}
       </button>
 
       {total > 1 && (
@@ -112,11 +145,20 @@ export default function GalerieProfil({
             <button
               type="button"
               className="vignette"
-              key={photo.url}
+              key={photo.id}
               onClick={() => setOuverte(rang + 1)}
-              aria-label={`Voir la photo ${rang + 2} de ${nom} en grand`}
+              aria-label={
+                verrouillee(photo)
+                  ? `Photo privée ${rang + 2} de ${nom}`
+                  : `Voir la photo ${rang + 2} de ${nom} en grand`
+              }
             >
               <Photo src={photo.url} alt="" sizes="120px" />
+              {verrouillee(photo) && (
+                <span className="mb-vignette-cadenas" aria-hidden="true">
+                  <IconeCadenas />
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -167,6 +209,14 @@ export default function GalerieProfil({
                 ajustement="contain"
                 prioritaire
               />
+              {verrouillee(courante) && (
+                <DeverrouillageOverlay
+                  photo={courante}
+                  peutDebloquer={peutDebloquer}
+                  debloquer={debloquer}
+                  lienInscription={lienInscription}
+                />
+              )}
             </div>
             {courante.caption && <figcaption>{courante.caption}</figcaption>}
           </figure>
@@ -209,5 +259,60 @@ export default function GalerieProfil({
         </div>
       )}
     </>
+  );
+}
+
+function IconeCadenas() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="9" rx="1.5" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+/**
+ * Superposition proposant de payer pour voir la photo courante.
+ *
+ * Un clic anonyme ne peut rien débloquer : `debloquer` n'est fourni qu'à un
+ * membre connecté, et sans lui l'overlay ne propose qu'un lien d'inscription.
+ */
+function DeverrouillageOverlay({
+  photo,
+  peutDebloquer,
+  debloquer,
+  lienInscription,
+}: {
+  photo: PhotoProfil;
+  peutDebloquer: boolean;
+  debloquer?: (prev: ResultatDeblocage | null, formData: FormData) => Promise<ResultatDeblocage>;
+  lienInscription: string;
+}) {
+  const [resultat, soumettre, enCours] = useActionState<ResultatDeblocage | null, FormData>(
+    async (prev, formData) => (debloquer ? debloquer(prev, formData) : prev),
+    null,
+  );
+
+  return (
+    <div className="mb-photo-verrou" onClick={(e) => e.stopPropagation()}>
+      <IconeCadenas />
+      <p className="mb-photo-verrou-titre">Photo privée</p>
+
+      {peutDebloquer && debloquer ? (
+        <form action={soumettre}>
+          <input type="hidden" name="photo_id" value={photo.id} />
+          <button type="submit" className="bo-btn" disabled={enCours}>
+            {enCours ? "Déblocage…" : `Débloquer pour ${photo.coutDeblocage} crédits`}
+          </button>
+          {resultat && !resultat.ok && (
+            <p className="mb-photo-verrou-erreur">{resultat.message}</p>
+          )}
+        </form>
+      ) : (
+        <Link href={lienInscription} className="bo-btn">
+          Créer un compte pour débloquer
+        </Link>
+      )}
+    </div>
   );
 }

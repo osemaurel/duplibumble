@@ -1731,6 +1731,51 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Cadenas d'une vignette privée non débloquée : juste un repère, le paiement
+   se propose une fois la photo ouverte en grand, pas depuis la grille. */
+.mb-vignette-cadenas {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(20, 19, 17, 0.68);
+  color: #fff;
+}
+.mb-vignette-cadenas svg { width: 13px; height: 13px; }
+
+/* Superposition proposant de débloquer la photo privée affichée en grand. */
+.mb-photo-verrou {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(16, 15, 14, 0.72);
+  backdrop-filter: blur(3px);
+  color: #fff;
+  border-radius: inherit;
+}
+.mb-photo-verrou svg { width: 28px; height: 28px; }
+.mb-photo-verrou-titre {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.mb-photo-verrou-erreur {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: #ffd7d7;
+}
+
 /* Sur téléphone, le balayage remplace les flèches : elles prendraient une
    place que la photo utilise mieux. */
 @media (max-width: 640px) {
@@ -1978,3 +2023,131 @@
 
 .lg-tarif-unitaire { font-size: 0.78rem; color: var(--ink-3); }
 .lg-tarif-unitaire b { color: var(--vert); }
+
+/* ============================= Cadeaux virtuels ========================
+   Un geste payant dans le fil de discussion, distinct d'un message : bulle à
+   part, et un panneau à catégories pour le choisir. */
+
+.bo-bulle-cadeau {
+  background: linear-gradient(160deg, #fff2e8, #ffe3ee);
+  border: 1px solid rgba(224, 49, 75, 0.18);
+}
+.bo-cadeau {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem 0.6rem;
+  text-align: center;
+}
+.bo-cadeau-emoji { font-size: 2.2rem; line-height: 1; }
+.bo-cadeau-libelle { font-size: 0.85rem; font-weight: 600; color: var(--ink-2); }
+
+.bo-cadeaux-fond {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(16, 15, 14, 0.5);
+  padding: 0;
+}
+@media (min-width: 640px) {
+  .bo-cadeaux-fond { align-items: center; padding: 1.5rem; }
+}
+
+.bo-cadeaux-panneau {
+  width: 100%;
+  max-width: 620px;
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  .bo-cadeaux-panneau { border-radius: var(--r-lg); }
+}
+
+.bo-cadeaux-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--line);
+}
+.bo-cadeaux-entete h3 { font-size: 1.05rem; font-weight: 650; }
+.bo-cadeaux-entete button {
+  border: none;
+  background: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.bo-cadeaux-corps {
+  overflow-y: auto;
+  padding: 0.6rem 1.2rem 1.4rem;
+}
+
+.bo-cadeaux-categorie { margin-top: 1.1rem; }
+.bo-cadeaux-categorie h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 0.6rem;
+}
+
+.bo-cadeaux-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 0.6rem;
+}
+
+.bo-cadeau-carte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.7rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.bo-cadeau-carte:hover { border-color: var(--brand); transform: translateY(-1px); }
+.bo-cadeau-carte:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.bo-cadeau-carte .emoji { font-size: 1.7rem; line-height: 1; }
+.bo-cadeau-carte .libelle {
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink-2);
+}
+.bo-cadeau-carte .cout {
+  font-size: 0.7rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.bo-liste-simple { list-style: none; }
+
+.bo-modeles-reponse {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 0.78rem;
+  color: var(--ink-2);
+}

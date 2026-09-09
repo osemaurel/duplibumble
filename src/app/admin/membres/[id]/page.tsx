@@ -11,6 +11,7 @@ const MOTIF: Record<string, string> = {
   purchase: "Rechargement",
   message: "Message envoyé",
   photo: "Photo envoyée",
+  photo_unlock: "Photo privée débloquée",
   video_minute: "Minute de vidéo",
   gift: "Cadeau",
   refund: "Remboursement",

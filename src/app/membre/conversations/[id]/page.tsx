@@ -6,7 +6,7 @@ import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
-import { lireBareme } from "@/lib/credits";
+import { lireBareme, lireCadeaux } from "@/lib/credits";
 import { photosPubliques } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,20 +19,22 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
 
   // Ces trois requêtes ne dépendent que de l'adresse et de la session : les
   // enchaîner faisait attendre trois allers-retours là où un seul suffit.
-  const [{ data: conversation }, { data: messages }, { data: solde }, bareme] = await Promise.all([
-    supabase.from("conversations").select("*").eq("id", id).maybeSingle(),
-    supabase
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", id)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("credit_balances")
-      .select("balance")
-      .eq("member_id", session.userId)
-      .maybeSingle(),
-    lireBareme(supabase),
-  ]);
+  const [{ data: conversation }, { data: messages }, { data: solde }, bareme, cadeaux] =
+    await Promise.all([
+      supabase.from("conversations").select("*").eq("id", id).maybeSingle(),
+      supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("credit_balances")
+        .select("balance")
+        .eq("member_id", session.userId)
+        .maybeSingle(),
+      lireBareme(supabase),
+      lireCadeaux(supabase),
+    ]);
 
   if (!conversation) notFound();
 
@@ -93,7 +95,11 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
               created_at: m.created_at,
               mienne: m.sender === "member",
               attachment_path: m.attachment_path,
+              gift_code: m.gift_code,
             }))}
+            cadeaux={Object.fromEntries(
+              [...cadeaux.parCode].map(([code, c]) => [code, { libelle: c.libelle, emoji: c.emoji }]),
+            )}
           />
 
           <FormulaireMessage
@@ -101,6 +107,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
             prenom={femme.display_name}
             cout={bareme.message}
             solde={solde?.balance ?? 0}
+            categoriesCadeaux={cadeaux.categories}
           />
         </Echange>
       </div>

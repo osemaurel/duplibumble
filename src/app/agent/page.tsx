@@ -16,9 +16,14 @@ function ilYA(date: string | null) {
   return new Date(date).toLocaleDateString("fr-FR");
 }
 
-export default async function BoiteDeReception() {
+export default async function BoiteDeReception({
+  searchParams,
+}: {
+  searchParams: Promise<{ femme?: string; non_lu?: string }>;
+}) {
   await requireAgent();
   const supabase = await createClient();
+  const { femme: filtreFemme, non_lu: filtreNonLu } = await searchParams;
 
   // Le RLS restreint déjà aux conversations du portefeuille : rien d'autre ne
   // peut remonter, même en cas d'oubli de filtre.
@@ -63,6 +68,19 @@ export default async function BoiteDeReception() {
 
   const enAttente = (conversations ?? []).filter((c) => c.agent_unread > 0).length;
 
+  // Filtres de la boîte de réception : par femme, et non-lus seulement. En
+  // GET plutôt qu'en JavaScript côté client — l'état tient dans l'adresse,
+  // partageable et compatible avec le bouton retour du navigateur.
+  const femmesDuPortefeuille = [...femmeParId.values()].sort((a, b) =>
+    a.display_name.localeCompare(b.display_name),
+  );
+
+  const conversationsFiltrees = (conversations ?? []).filter((c) => {
+    if (filtreFemme && c.lady_id !== filtreFemme) return false;
+    if (filtreNonLu === "1" && c.agent_unread === 0) return false;
+    return true;
+  });
+
   return (
     <div>
       <div className="bo-entete">
@@ -79,7 +97,37 @@ export default async function BoiteDeReception() {
         )}
       </div>
 
-      <div className="bo-carte">
+      {conversations?.length ? (
+        <form
+          method="get"
+          style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.7rem" }}
+        >
+          <select name="femme" defaultValue={filtreFemme ?? ""}>
+            <option value="">Toutes les femmes</option>
+            {femmesDuPortefeuille.map((femme) => (
+              <option key={femme.id} value={femme.id}>
+                {femme.display_name}
+              </option>
+            ))}
+          </select>
+
+          <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.85rem" }}>
+            <input type="checkbox" name="non_lu" value="1" defaultChecked={filtreNonLu === "1"} />
+            Non lus seulement
+          </label>
+
+          <button type="submit" className="bo-btn fantome petit">
+            Filtrer
+          </button>
+          {(filtreFemme || filtreNonLu) && (
+            <a href="/agent" className="bo-btn fantome petit">
+              Réinitialiser
+            </a>
+          )}
+        </form>
+      ) : null}
+
+      <div className="bo-carte" style={{ marginTop: conversations?.length ? "1rem" : 0 }}>
         {!conversations?.length ? (
           <EtatVide
             icone={IconeMessages}
@@ -91,9 +139,15 @@ export default async function BoiteDeReception() {
               </Link>
             }
           />
+        ) : !conversationsFiltrees.length ? (
+          <EtatVide
+            icone={IconeMessages}
+            titre="Aucune conversation ne correspond"
+            texte="Essayez un autre filtre, ou réinitialisez-le."
+          />
         ) : (
           <ul className="bo-fil">
-            {conversations.map((conversation) => {
+            {conversationsFiltrees.map((conversation) => {
               const femme = femmeParId.get(conversation.lady_id);
               const membre = membreParId.get(conversation.member_id);
               const dernier = dernierParConversation.get(conversation.id);

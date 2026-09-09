@@ -1,3 +1,4 @@
+import { flouter } from "@/lib/flou";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -19,6 +20,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * page d'accueil affiche déjà à tout visiteur. Une photo en attente, refusée,
  * ou rattachée à une fiche en brouillon renvoie 404 — y compris à quelqu'un qui
  * devinerait son identifiant.
+ *
+ * Une photo marquée privée est toujours rendue floutée ici, quel que soit le
+ * visiteur : cette adresse est mise en cache par des relais partagés, la même
+ * réponse part donc à tout le monde. La version intacte vit ailleurs — voir
+ * `/api/photos-privees/[id]`, qui ne connaît pas de cache commun et vérifie
+ * qui demande avant de répondre.
  */
 
 /** Une heure : une photo dépubliée disparaît des caches en une heure au plus. */
@@ -45,7 +52,7 @@ export async function GET(
 
   const { data: photo } = await admin
     .from("lady_photos")
-    .select("lady_id, storage_path, status, updated_at")
+    .select("lady_id, storage_path, status, updated_at, is_private")
     .eq("id", id)
     .maybeSingle();
 
@@ -65,13 +72,17 @@ export async function GET(
 
   if (error || !fichier) return introuvable();
 
-  return new Response(fichier, {
+  const corps: BodyInit = photo.is_private
+    ? new Uint8Array(await flouter(await fichier.arrayBuffer()))
+    : fichier;
+
+  return new Response(corps, {
     headers: {
-      "Content-Type": fichier.type || "image/jpeg",
+      "Content-Type": photo.is_private ? "image/jpeg" : fichier.type || "image/jpeg",
       "Cache-Control": CACHE,
       // Change quand la photo change : un remplacement invalide le cache sans
       // attendre l'expiration.
-      ETag: `"${id}-${Date.parse(photo.updated_at) || 0}"`,
+      ETag: `"${id}-${Date.parse(photo.updated_at) || 0}${photo.is_private ? "-flou" : ""}"`,
       "Content-Security-Policy": "default-src 'none'; sandbox",
       "X-Content-Type-Options": "nosniff",
     },

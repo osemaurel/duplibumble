@@ -45,6 +45,7 @@ export type CreditReason =
   | "purchase"
   | "message"
   | "photo"
+  | "photo_unlock"
   | "video_minute"
   | "gift"
   | "refund"
@@ -147,6 +148,40 @@ export type LadyPhoto = {
   caption: string | null;
   status: PhotoStatus;
   rejection_note: string | null;
+  /** Vrai si la photo n'est visible qu'après déblocage par des crédits. */
+  is_private: boolean;
+  /** Coût du déblocage en crédits. Non nul dès lors que `is_private` l'est. */
+  unlock_cost: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Preuve qu'un membre a payé pour voir une photo privée précise. */
+export type PhotoUnlock = {
+  id: string;
+  member_id: string;
+  photo_id: string;
+  transaction_id: string | null;
+  created_at: string;
+};
+
+/** Cadeau virtuel envoyable dans une conversation. Purement symbolique. */
+export type GiftCatalogItem = {
+  code: string;
+  category: string;
+  libelle: string;
+  emoji: string;
+  cost: number;
+  ordre: number;
+  actif: boolean;
+};
+
+/** Réponse pré-rédigée qu'un agent réutilise d'un membre à l'autre. */
+export type ReponseType = {
+  id: string;
+  agent_id: string;
+  libelle: string;
+  corps: string;
   created_at: string;
   updated_at: string;
 };
@@ -173,6 +208,8 @@ export type Message = {
   authored_by_agent_id: string | null;
   body: string;
   attachment_path: string | null;
+  /** Code du cadeau virtuel envoyé, le cas échéant. */
+  gift_code: string | null;
   read_at: string | null;
   created_at: string;
 };
@@ -249,6 +286,9 @@ export type Database = {
       reports: Table<Report>;
       tarifs: Table<Tarif>;
       paliers_credits: Table<PalierCredits>;
+      photo_unlocks: Table<PhotoUnlock>;
+      gift_catalog: Table<GiftCatalogItem>;
+      reponses_types: Table<ReponseType>;
     };
     Views: Record<never, never>;
     Functions: {
@@ -262,6 +302,11 @@ export type Database = {
         Returns: string;
       };
       rembourser_messages_sans_reponse: { Args: Record<never, never>; Returns: number };
+      debloquer_photo: { Args: { p_photo_id: string }; Returns: string };
+      envoyer_cadeau_membre: {
+        Args: { p_conversation_id: string; p_gift_code: string };
+        Returns: string;
+      };
       enregistrer_achat_credits: {
         Args: {
           p_membre: string;

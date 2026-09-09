@@ -3,9 +3,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase/types";
 
 export type PhotoAffichee = {
+  id: string;
   url: string;
   position: number;
   caption: string | null;
+  /** Vrai si la photo n'est visible qu'après déblocage par des crédits. */
+  prive: boolean;
+  /** Coût du déblocage en crédits, uniquement quand `prive` est vrai. */
+  coutDeblocage: number | null;
 };
 
 /**
@@ -25,6 +30,11 @@ export function urlPhoto(id: string, misAJour?: string | null) {
  * Une seule requête pour toute la page, et surtout aucun appel de signature :
  * l'ancienne version signait chaque photo l'une après l'autre, soit une
  * trentaine d'allers-retours réseau avant même le premier octet de HTML.
+ *
+ * Une photo privée garde la même URL stable que les autres : c'est la route
+ * qui la sert qui décide, à chaque requête, de rendre l'image floutée ou
+ * intacte. Rien à faire ici pour qu'une photo non déverrouillée s'affiche
+ * automatiquement floutée partout où cette fonction est utilisée.
  */
 export async function photosPubliques(
   supabase: SupabaseClient<Database>,
@@ -35,7 +45,7 @@ export async function photosPubliques(
 
   const { data: photos } = await supabase
     .from("lady_photos")
-    .select("id, lady_id, position, caption, updated_at")
+    .select("id, lady_id, position, caption, updated_at, is_private, unlock_cost")
     .in("lady_id", ladyIds)
     .eq("status", "approved")
     .order("position");
@@ -43,14 +53,28 @@ export async function photosPubliques(
   for (const photo of photos ?? []) {
     const liste = parFemme.get(photo.lady_id) ?? [];
     liste.push({
+      id: photo.id,
       url: urlPhoto(photo.id, photo.updated_at),
       position: photo.position,
       caption: photo.caption,
+      prive: photo.is_private,
+      coutDeblocage: photo.is_private ? photo.unlock_cost : null,
     });
     parFemme.set(photo.lady_id, liste);
   }
 
   return parFemme;
+}
+
+/**
+ * Adresse de la version intacte d'une photo privée, réservée à qui l'a payée.
+ *
+ * Contrairement à `urlPhoto`, cette adresse n'est pas mise en cache par un
+ * relais partagé (CDN) : la réponse dépend de qui demande, un cache commun la
+ * servirait donc soit à tort à un non-payeur, soit floutée à qui a payé.
+ */
+export function urlPhotoDebloquee(id: string) {
+  return `/api/photos-privees/${id}`;
 }
 
 /**
@@ -72,7 +96,7 @@ export async function photosSignees(
 
   let requete = supabase
     .from("lady_photos")
-    .select("lady_id, storage_path, position, caption, status")
+    .select("id, lady_id, storage_path, position, caption, status, is_private, unlock_cost")
     .in("lady_id", ladyIds)
     .order("position");
 
@@ -88,7 +112,16 @@ export async function photosSignees(
     if (!data?.signedUrl) continue;
 
     const liste = parFemme.get(photo.lady_id) ?? [];
-    liste.push({ url: data.signedUrl, position: photo.position, caption: photo.caption });
+    liste.push({
+      id: photo.id,
+      url: data.signedUrl,
+      position: photo.position,
+      caption: photo.caption,
+      // Cette route sert des URL signées à l'agent ou à l'administration : eux
+      // voient toujours l'original, le flou n'a de sens que côté public.
+      prive: photo.is_private,
+      coutDeblocage: photo.is_private ? photo.unlock_cost : null,
+    });
     parFemme.set(photo.lady_id, liste);
   }
 

@@ -112,6 +112,89 @@ function messageDErreur(brut: string): string {
   return `Envoi refusé : ${brut}`;
 }
 
+/**
+ * Débloque une photo privée. Tout se joue dans `debloquer_photo`, côté base :
+ * le débit et la preuve de déblocage réussissent ou échouent ensemble.
+ */
+export async function debloquerPhoto(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireMember();
+
+  const photoId = String(formData.get("photo_id") ?? "");
+  if (!photoId) return { ok: false, message: "Photo introuvable." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("debloquer_photo", { p_photo_id: photoId });
+
+  if (error) return { ok: false, message: messageDeblocageErreur(error.message) };
+
+  const { data: photo } = await supabase
+    .from("lady_photos")
+    .select("lady_id")
+    .eq("id", photoId)
+    .maybeSingle();
+
+  if (photo) revalidatePath(`/profils/${photo.lady_id}`);
+
+  return { ok: true, message: "Photo débloquée." };
+}
+
+function messageDeblocageErreur(brut: string): string {
+  if (brut.includes("CREDITS_INSUFFISANTS")) {
+    return "Crédits insuffisants pour débloquer cette photo.";
+  }
+  if (brut.includes("PHOTO_INTROUVABLE")) return "Photo introuvable.";
+  if (brut.includes("PHOTO_DEJA_PUBLIQUE")) return "Cette photo n'est pas privée.";
+  if (brut.includes("AUTHENTIFICATION_REQUISE")) return "Votre session a expiré. Reconnectez-vous.";
+  // Course entre deux clics rapides sur le même bouton : la photo est bien
+  // débloquée, c'est le second appel qui échoue en la retrouvant déjà payée.
+  if (brut.includes("duplicate key")) return "Photo déjà débloquée.";
+  return `Déblocage refusé : ${brut}`;
+}
+
+/**
+ * Envoie un cadeau virtuel dans une conversation. Purement symbolique : aucune
+ * expédition, aucune contrepartie réelle. Le prix est relu dans le catalogue
+ * par `envoyer_cadeau_membre`, jamais transmis par l'appelant.
+ */
+export async function envoyerCadeau(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireMember();
+
+  const conversationId = String(formData.get("conversation_id") ?? "");
+  const giftCode = String(formData.get("gift_code") ?? "");
+  if (!conversationId || !giftCode) return { ok: false, message: "Cadeau introuvable." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("envoyer_cadeau_membre", {
+    p_conversation_id: conversationId,
+    p_gift_code: giftCode,
+  });
+
+  if (error) return { ok: false, message: messageCadeauErreur(error.message) };
+
+  await supabase.from("conversations").update({ member_unread: 0 }).eq("id", conversationId);
+
+  revalidatePath(`/membre/conversations/${conversationId}`);
+  revalidatePath("/membre");
+
+  return { ok: true, message: "Cadeau envoyé." };
+}
+
+function messageCadeauErreur(brut: string): string {
+  if (brut.includes("CREDITS_INSUFFISANTS")) {
+    return "Crédits insuffisants pour envoyer ce cadeau.";
+  }
+  if (brut.includes("CONVERSATION_INTROUVABLE")) return "Conversation introuvable.";
+  if (brut.includes("CADEAU_INTROUVABLE")) return "Ce cadeau n'est plus disponible.";
+  if (brut.includes("AUTHENTIFICATION_REQUISE")) return "Votre session a expiré. Reconnectez-vous.";
+  return `Envoi refusé : ${brut}`;
+}
+
 export async function seDeconnecter() {
   const supabase = await createClient();
   await supabase.auth.signOut();

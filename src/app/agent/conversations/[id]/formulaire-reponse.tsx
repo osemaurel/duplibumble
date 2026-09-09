@@ -14,9 +14,12 @@ import { repondre } from "../../actions";
 export default function FormulaireReponse({
   conversationId,
   prenom,
+  modeles = [],
 }: {
   conversationId: string;
   prenom: string;
+  /** Réponses types de l'agent, proposées en raccourci au-dessus de la saisie. */
+  modeles?: { id: string; libelle: string; corps: string }[];
 }) {
   const echange = useEchange();
   const [resultat, setResultat] = useState<{ ok: boolean; message?: string } | null>(null);
@@ -57,6 +60,30 @@ export default function FormulaireReponse({
       <input type="hidden" name="conversation_id" value={conversationId} />
 
       {resultat && !resultat.ok && <p className="bo-message erreur">{resultat.message}</p>}
+
+      {modeles.length > 0 && (
+        <select
+          className="bo-modeles-reponse"
+          defaultValue=""
+          aria-label="Insérer une réponse type"
+          onChange={(e) => {
+            const modele = modeles.find((m) => m.id === e.target.value);
+            if (!modele) return;
+            setBrouillon(modele.corps);
+            setEnvois((n) => n + 1);
+            e.target.value = "";
+          }}
+        >
+          <option value="" disabled>
+            Insérer une réponse type…
+          </option>
+          {modeles.map((modele) => (
+            <option key={modele.id} value={modele.id}>
+              {modele.libelle}
+            </option>
+          ))}
+        </select>
+      )}
 
       <Composeur
         conversationId={conversationId}

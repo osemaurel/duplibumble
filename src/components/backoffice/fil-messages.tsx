@@ -18,11 +18,16 @@ export type MessageAffiche = {
   signatureAutre?: boolean;
   /** Chemin de la pièce jointe dans le stockage, le cas échéant. */
   attachment_path?: string | null;
+  /** Code du cadeau virtuel envoyé, le cas échéant. */
+  gift_code?: string | null;
   /** Vrai tant que le serveur n'a pas confirmé l'envoi. */
   enVol?: boolean;
   /** Aperçu local d'une photo qui part : évite d'attendre une URL signée. */
   apercuLocal?: string | null;
 };
+
+/** Ce qu'il faut pour afficher un cadeau : son libellé et son émoji. */
+export type CadeauAffiche = { libelle: string; emoji: string };
 
 function heure(date: string) {
   return new Date(date).toLocaleString("fr-FR", {
@@ -57,12 +62,15 @@ export default function FilMessages({
   initiaux,
   monCote,
   vide,
+  cadeaux = {},
 }: {
   conversationId: string;
   initiaux: MessageAffiche[];
   /** Quel expéditeur s'affiche à droite. */
   monCote: "member" | "lady";
   vide: string;
+  /** Catalogue des cadeaux, par code, pour afficher libellé et émoji. */
+  cadeaux?: Record<string, CadeauAffiche>;
 }) {
   // Deux sources : la liste rendue par le serveur, et ce qui arrive par
   // l'abonnement. On ne garde en état que la seconde, et on fusionne au rendu.
@@ -107,6 +115,7 @@ export default function FilMessages({
             created_at: string;
             sender: "member" | "lady";
             attachment_path: string | null;
+            gift_code: string | null;
           };
 
           setRecus((actuels) =>
@@ -120,6 +129,7 @@ export default function FilMessages({
                     created_at: ligne.created_at,
                     mienne: ligne.sender === monCote,
                     attachment_path: ligne.attachment_path,
+                    gift_code: ligne.gift_code,
                   },
                 ],
           );
@@ -193,21 +203,37 @@ export default function FilMessages({
               {nouveauJour && <div className="bo-jour">{jourDuMessage}</div>}
 
               <div className={`bo-bulle-rangee ${message.mienne ? "mienne" : "sienne"}`}>
-                <div className={`bo-bulle${message.enVol ? " en-vol" : ""}`}>
-                  {(message.attachment_path || message.apercuLocal) && (
-                    <div className="bo-bulle-photo">
-                      {message.apercuLocal ?? (message.attachment_path && urls[message.attachment_path]) ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={message.apercuLocal ?? urls[message.attachment_path as string]}
-                          alt="Photo envoyée"
-                        />
-                      ) : (
-                        <span>Chargement de la photo…</span>
-                      )}
+                <div
+                  className={`bo-bulle${message.enVol ? " en-vol" : ""}${message.gift_code ? " bo-bulle-cadeau" : ""}`}
+                >
+                  {message.gift_code ? (
+                    <div className="bo-cadeau">
+                      <span className="bo-cadeau-emoji">
+                        {cadeaux[message.gift_code]?.emoji ?? "🎁"}
+                      </span>
+                      <span className="bo-cadeau-libelle">
+                        {cadeaux[message.gift_code]?.libelle ?? message.body}
+                      </span>
                     </div>
+                  ) : (
+                    <>
+                      {(message.attachment_path || message.apercuLocal) && (
+                        <div className="bo-bulle-photo">
+                          {message.apercuLocal ??
+                          (message.attachment_path && urls[message.attachment_path]) ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img
+                              src={message.apercuLocal ?? urls[message.attachment_path as string]}
+                              alt="Photo envoyée"
+                            />
+                          ) : (
+                            <span>Chargement de la photo…</span>
+                          )}
+                        </div>
+                      )}
+                      {message.body && <div className="texte">{message.body}</div>}
+                    </>
                   )}
-                  {message.body && <div className="texte">{message.body}</div>}
                   <p className="meta">
                     {message.enVol ? "Envoi…" : heure(message.created_at)}
                     {message.signature && (

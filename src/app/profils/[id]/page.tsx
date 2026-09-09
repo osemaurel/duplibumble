@@ -3,10 +3,10 @@ import { notFound } from "next/navigation";
 
 import { getSessionProfile } from "@/lib/auth";
 import GalerieProfil from "@/components/site/galerie-profil";
-import { photosPubliques } from "@/lib/photos";
+import { photosPubliques, urlPhotoDebloquee } from "@/lib/photos";
 import { createClient } from "@/lib/supabase/server";
 
-import { ouvrirConversation } from "../../membre/actions";
+import { debloquerPhoto, ouvrirConversation } from "../../membre/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +27,36 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
   const { data: femme } = await supabase.from("ladies").select("*").eq("id", id).maybeSingle();
   if (!femme) notFound();
 
-  const photos = (await photosPubliques(supabase, [femme.id])).get(femme.id) ?? [];
+  const bruts = (await photosPubliques(supabase, [femme.id])).get(femme.id) ?? [];
+
+  const estMembre = session?.profile.role === "member";
+
+  // Les photos débloquées par ce visiteur précis : sans session membre,
+  // aucune ne l'est, et on ne fait pas l'appel pour rien.
+  const debloquees = new Set<string>();
+  if (estMembre && bruts.some((p) => p.prive)) {
+    const { data } = await supabase
+      .from("photo_unlocks")
+      .select("photo_id")
+      .eq("member_id", session.userId)
+      .in(
+        "photo_id",
+        bruts.filter((p) => p.prive).map((p) => p.id),
+      );
+    for (const ligne of data ?? []) debloquees.add(ligne.photo_id);
+  }
+
+  const photos = bruts.map((photo) => {
+    const debloquee = !photo.prive || debloquees.has(photo.id);
+    return {
+      id: photo.id,
+      url: photo.prive && debloquee ? urlPhotoDebloquee(photo.id) : photo.url,
+      caption: photo.caption,
+      prive: photo.prive,
+      debloquee,
+      coutDeblocage: photo.coutDeblocage,
+    };
+  });
 
   const langues = Array.isArray(femme.languages)
     ? (femme.languages as unknown[]).map((l) => String(l))
@@ -45,8 +74,6 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
     ["Prête à déménager", femme.willing_to_relocate],
   ];
 
-  const estMembre = session?.profile.role === "member";
-
   return (
     <>
       <main className="bo-main" style={{ maxWidth: 1200, marginInline: "auto" }}>
@@ -58,7 +85,10 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
           <div>
             <GalerieProfil
               nom={`${femme.display_name}${femme.age ? `, ${femme.age}` : ""}`}
-              photos={photos.map((photo) => ({ url: photo.url, caption: photo.caption }))}
+              photos={photos}
+              peutDebloquer={estMembre}
+              debloquer={estMembre ? debloquerPhoto : undefined}
+              lienInscription={`/inscription?suivant=${encodeURIComponent(`/profils/${femme.id}`)}`}
             />
           </div>
 

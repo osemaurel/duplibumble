@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import NavLien from "@/components/backoffice/nav-lien";
-import { IconeFemmes, IconeMessages } from "@/components/backoffice/ui";
+import { IconeFemmes, IconeMessages, IconeReponses } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,6 +34,9 @@ export default async function AgentLayout({ children }: { children: React.ReactN
             </NavLien>
             <NavLien href="/agent/femmes" icone={IconeFemmes}>
               Mes fiches
+            </NavLien>
+            <NavLien href="/agent/reponses" icone={IconeReponses}>
+              Réponses types
             </NavLien>
           </nav>
 

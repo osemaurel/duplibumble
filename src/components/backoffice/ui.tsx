@@ -181,6 +181,13 @@ export const IconePaliers = (
   </svg>
 );
 
+export const IconeReponses = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 5h16v10H8l-4 4V5Z" />
+    <path d="M8 9.5h8M8 12.5h5" />
+  </svg>
+);
+
 export const IconeImport = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 3v11" />

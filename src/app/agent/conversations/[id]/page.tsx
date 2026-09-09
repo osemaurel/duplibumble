@@ -6,6 +6,7 @@ import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
+import { lireCadeaux } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/server";
 
 import FormulaireReponse from "./formulaire-reponse";
@@ -26,23 +27,30 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
   // conversation qui ne le regarde pas.
   if (!conversation) notFound();
 
-  const [{ data: femme }, { data: membre }, { data: messages }] = await Promise.all([
-    supabase
-      .from("ladies")
-      .select("id, code, display_name, age")
-      .eq("id", conversation.lady_id)
-      .single(),
-    supabase
-      .from("profiles")
-      .select("id, display_name, country")
-      .eq("id", conversation.member_id)
-      .maybeSingle(),
-    supabase
-      .from("messages")
-      .select("*")
-      .eq("conversation_id", id)
-      .order("created_at", { ascending: true }),
-  ]);
+  const [{ data: femme }, { data: membre }, { data: messages }, cadeaux, { data: modeles }] =
+    await Promise.all([
+      supabase
+        .from("ladies")
+        .select("id, code, display_name, age")
+        .eq("id", conversation.lady_id)
+        .single(),
+      supabase
+        .from("profiles")
+        .select("id, display_name, country")
+        .eq("id", conversation.member_id)
+        .maybeSingle(),
+      supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", id)
+        .order("created_at", { ascending: true }),
+      lireCadeaux(supabase),
+      supabase
+        .from("reponses_types")
+        .select("id, libelle, corps")
+        .eq("agent_id", agent.id)
+        .order("created_at", { ascending: false }),
+    ]);
 
   if (!femme) notFound();
 
@@ -114,14 +122,22 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
                 created_at: m.created_at,
                 mienne: m.sender === "lady",
                 attachment_path: m.attachment_path,
+                gift_code: m.gift_code,
                 signature:
                   m.sender === "lady" && auteur ? (ecritParUnAutre ? auteur.code : "vous") : null,
                 signatureAutre: ecritParUnAutre,
               };
             })}
+            cadeaux={Object.fromEntries(
+              [...cadeaux.parCode].map(([code, c]) => [code, { libelle: c.libelle, emoji: c.emoji }]),
+            )}
           />
 
-          <FormulaireReponse conversationId={conversation.id} prenom={femme.display_name} />
+          <FormulaireReponse
+            conversationId={conversation.id}
+            prenom={femme.display_name}
+            modeles={modeles ?? []}
+          />
         </Echange>
       </div>
     </div>

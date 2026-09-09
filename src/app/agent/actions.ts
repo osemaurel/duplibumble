@@ -153,6 +153,34 @@ export async function soumettreFiche(formData: FormData) {
   revalidatePath("/agent/femmes");
 }
 
+/**
+ * Rend une photo privée ou publique, et fixe son prix de déblocage.
+ *
+ * Réservé aux photos déjà validées : marquer privée une photo qui ne l'est
+ * pas encore n'a pas de sens, et de toute façon le RLS n'ouvre cette table
+ * qu'aux photos du portefeuille de l'agent — impossible de toucher à celle
+ * d'un confrère.
+ */
+export async function definirVisibilitePhoto(formData: FormData) {
+  await requireAgent();
+
+  const photoId = String(formData.get("photo_id") ?? "");
+  const ladyId = String(formData.get("lady_id") ?? "");
+  if (!photoId) return;
+
+  const prive = formData.get("is_private") === "on";
+  const coutSaisi = Number(String(formData.get("unlock_cost") ?? "").trim());
+  const cout = Number.isFinite(coutSaisi) && coutSaisi > 0 ? Math.round(coutSaisi) : 15;
+
+  const supabase = await createClient();
+  await supabase
+    .from("lady_photos")
+    .update({ is_private: prive, unlock_cost: prive ? cout : null })
+    .eq("id", photoId);
+
+  revalidatePath(`/agent/femmes/${ladyId}`);
+}
+
 export async function supprimerPhoto(formData: FormData) {
   const { agent } = await requireAgent();
   void agent;
@@ -168,6 +196,48 @@ export async function supprimerPhoto(formData: FormData) {
   if (chemin) await supabase.storage.from("lady-photos").remove([chemin]);
 
   revalidatePath(`/agent/femmes/${ladyId}`);
+}
+
+/**
+ * Réponses types : messages pré-rédigés qu'un agent réutilise d'un membre à
+ * l'autre. Strictement personnelles — le RLS ne laisse un agent voir ni
+ * modifier que les siennes.
+ */
+export async function creerReponseType(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  const { agent } = await requireAgent();
+
+  const libelle = String(formData.get("libelle") ?? "").trim();
+  const corps = String(formData.get("corps") ?? "").trim();
+
+  if (!libelle || !corps) {
+    return { ok: false, message: "Le titre et le texte sont obligatoires." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("reponses_types")
+    .insert({ agent_id: agent.id, libelle, corps });
+
+  if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+
+  revalidatePath("/agent/reponses");
+
+  return { ok: true, message: "Réponse type enregistrée." };
+}
+
+export async function supprimerReponseType(formData: FormData) {
+  await requireAgent();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = await createClient();
+  await supabase.from("reponses_types").delete().eq("id", id);
+
+  revalidatePath("/agent/reponses");
 }
 
 export async function seDeconnecter() {

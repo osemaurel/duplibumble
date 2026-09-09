@@ -16,6 +16,9 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
+/** Fiches qu'un visiteur sans compte peut parcourir avant qu'on lui en demande un. */
+const LIMITE_SANS_COMPTE = 20;
+
 export default async function Profils({
   searchParams,
 }: {
@@ -50,9 +53,17 @@ export default async function Profils({
     return f.age !== null && f.age >= min && f.age <= max;
   });
 
+  // Un visiteur sans compte parcourt une vingtaine de fiches, puis on lui
+  // propose de s'inscrire. Assez pour juger de ce que vaut le catalogue, pas
+  // assez pour s'en passer.
+  const affichees = session ? femmes : femmes.slice(0, LIMITE_SANS_COMPTE);
+  const restantes = femmes.length - affichees.length;
+
+  // Les photos ne sont demandées que pour ce qui est réellement affiché : rien
+  // ne sert de faire descendre celles qui sont derrière le mur.
   const photos = await photosPubliques(
     supabase,
-    femmes.map((f) => f.id),
+    affichees.map((f) => f.id),
   );
 
   const paysDisponibles = [
@@ -119,7 +130,7 @@ export default async function Profils({
           </div>
         ) : (
           <div className="mb-galerie">
-            {femmes.map((femme) => {
+            {affichees.map((femme) => {
               const principale = photos.get(femme.id)?.[0];
 
               return (
@@ -151,6 +162,37 @@ export default async function Profils({
               );
             })}
           </div>
+        )}
+
+        {restantes > 0 && (
+          <section className="mb-mur">
+            {/* Des cadres vides, pas de vraies fiches floutées. Envoyer les
+                photos au navigateur pour les brouiller en CSS reviendrait à les
+                livrer quand même : le flou d'une feuille de styles se retire en
+                deux clics. Ce qui est derrière le mur ne quitte pas le serveur. */}
+            <div className="mb-mur-cadres" aria-hidden="true">
+              {Array.from({ length: 8 }, (_, rang) => (
+                <span key={rang} />
+              ))}
+            </div>
+
+            <div className="mb-mur-texte">
+              <h2 className="bo-titre" style={{ fontSize: "1.5rem" }}>
+                {restantes} autre{restantes > 1 ? "s" : ""} profil
+                {restantes > 1 ? "s" : ""} vous {restantes > 1 ? "attendent" : "attend"}
+              </h2>
+              <p className="bo-sous-titre" style={{ marginTop: "0.6rem" }}>
+                La suite du catalogue est réservée aux membres. L&apos;inscription est
+                gratuite et prend deux minutes.
+              </p>
+              <Link href="/inscription" className="bo-btn" style={{ marginTop: "1.2rem" }}>
+                Créer mon compte
+              </Link>
+              <p className="bo-aide" style={{ marginTop: "0.8rem" }}>
+                Déjà inscrit ? <Link href="/connexion">Se connecter</Link>
+              </p>
+            </div>
+          </section>
         )}
       </main>
     </>

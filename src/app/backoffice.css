@@ -2187,3 +2187,47 @@
   font-size: 0.78rem;
   color: var(--ink-2);
 }
+
+/* ========================= Mur d'inscription ==========================
+   Ce qu'un visiteur sans compte voit à la place de la suite du catalogue.
+   Les cadres sont vides : aucune fiche réelle n'est envoyée puis floutée en
+   CSS, un flou de feuille de styles se retirant en deux clics. */
+
+.mb-mur {
+  position: relative;
+  margin-top: 1.4rem;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+}
+
+.mb-mur-cadres {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.1rem;
+  /* Le dégradé fait disparaître les cadres vers le bas : la coupure paraît
+     ainsi continuer la grille au lieu de s'arrêter net. */
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 78%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent 78%);
+  pointer-events: none;
+}
+.mb-mur-cadres span {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r);
+  background: linear-gradient(150deg, var(--line-soft), var(--surface-2) 60%);
+  filter: blur(6px);
+}
+@media (max-width: 640px) {
+  .mb-mur-cadres { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+}
+
+.mb-mur-texte {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+.mb-mur-texte .bo-sous-titre { max-width: 34rem; }

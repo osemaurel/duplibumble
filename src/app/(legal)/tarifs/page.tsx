@@ -45,9 +45,10 @@ export default async function Tarifs() {
         </li>
       </ul>
       <p>
-        Les {bareme.photos_publiques} premières photos de chaque profil sont visibles sans
-        rien dépenser. Les suivantes s&apos;affichent floutées : les débloquer coûte des
-        crédits, une fois pour toutes — une photo déjà débloquée le reste.
+        La moitié des photos de chaque profil est visible sans rien dépenser — et la photo
+        en trop, sur un nombre impair, est offerte. L&apos;autre moitié s&apos;affiche
+        floutée : la débloquer coûte des crédits, une fois pour toutes. Une photo déjà
+        débloquée le reste.
       </p>
       <p>
         {bareme.bonus_bienvenue} crédits sont offerts à l&apos;inscription, de quoi engager la

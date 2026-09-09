@@ -20,9 +20,7 @@ export const REPLI = {
   bonus_bienvenue: 10,
   jours_remboursement: 7,
   /** Coût du déblocage d'une photo privée. */
-  photo_privee: 15,
-  /** Nombre de photos visibles sans crédits, en tête de chaque fiche. */
-  photos_publiques: 2,
+  photo_privee: 5,
 } as const;
 
 export type CodeTarif = keyof typeof REPLI;

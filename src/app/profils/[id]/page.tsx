@@ -125,75 +125,102 @@ export default async function Profil({ params }: { params: Promise<{ id: string 
               </p>
             </div>
 
-            {femme.bio && (
+            {/* Sans compte, la fiche s'arrête aux photos et à l'accroche.
+                Ce qu'elle a écrit d'elle-même n'est pas une vitrine : c'est la
+                matière de la rencontre, et la laisser ouverte revient à
+                l'offrir aux moissonneurs autant qu'aux visiteurs. */}
+            {!session ? (
               <section className="bo-carte bo-carte-p" style={{ marginTop: "1.6rem" }}>
-                <h2 className="bo-h2">Sa présentation</h2>
-                <p className="mb-texte">{femme.bio}</p>
+                <h2 className="bo-h2">Sa présentation est réservée aux membres</h2>
+                <p className="mb-texte">
+                  Ce qu&apos;elle raconte d&apos;elle, ce qu&apos;elle recherche et ses
+                  centres d&apos;intérêt s&apos;affichent dès la création d&apos;un compte.
+                  C&apos;est gratuit, et cela prend deux minutes.
+                </p>
+                <Link
+                  href={`/inscription?suivant=${encodeURIComponent(`/profils/${femme.id}`)}`}
+                  className="bo-btn"
+                  style={{ marginTop: "1.1rem" }}
+                >
+                  Créer mon compte
+                </Link>
+                <p className="bo-aide" style={{ marginTop: "0.8rem" }}>
+                  Déjà inscrit ? <Link href="/connexion">Se connecter</Link>
+                </p>
               </section>
-            )}
+            ) : (
+              <>
+                {femme.bio && (
+                  <section className="bo-carte bo-carte-p" style={{ marginTop: "1.6rem" }}>
+                    <h2 className="bo-h2">Sa présentation</h2>
+                    <p className="mb-texte">{femme.bio}</p>
+                  </section>
+                )}
 
-            {femme.looking_for && (
-              <section className="bo-carte bo-carte-p" style={{ marginTop: "1.1rem" }}>
-                <h2 className="bo-h2">Ce qu&apos;elle recherche</h2>
-                <p className="mb-texte">{femme.looking_for}</p>
-              </section>
-            )}
+                {femme.looking_for && (
+                  <section className="bo-carte bo-carte-p" style={{ marginTop: "1.1rem" }}>
+                    <h2 className="bo-h2">Ce qu&apos;elle recherche</h2>
+                    <p className="mb-texte">{femme.looking_for}</p>
+                  </section>
+                )}
 
-            <section className="bo-carte bo-carte-p" style={{ marginTop: "1.1rem" }}>
-              <h2 className="bo-h2">En quelques mots</h2>
-              <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
-                {details
-                  .filter(([, valeur]) => valeur)
-                  .map(([libelle, valeur]) => (
-                    <div key={libelle}>
-                      <dt>{libelle}</dt>
-                      <dd>{valeur}</dd>
+                <section className="bo-carte bo-carte-p" style={{ marginTop: "1.1rem" }}>
+                  <h2 className="bo-h2">En quelques mots</h2>
+                  <dl className="bo-defs c2" style={{ marginTop: "1.1rem" }}>
+                    {details
+                      .filter(([, valeur]) => valeur)
+                      .map(([libelle, valeur]) => (
+                        <div key={libelle}>
+                          <dt>{libelle}</dt>
+                          <dd>{valeur}</dd>
+                        </div>
+                      ))}
+                  </dl>
+
+                  {(femme.interests ?? []).length > 0 && (
+                    <div style={{ marginTop: "1.3rem" }}>
+                      <dt
+                        style={{
+                          fontSize: "0.775rem",
+                          fontWeight: 600,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          color: "var(--ink-3)",
+                        }}
+                      >
+                        Centres d&apos;intérêt
+                      </dt>
+                      <div className="mb-etiquettes">
+                        {femme.interests.map((interet) => (
+                          <span key={interet}>{interet}</span>
+                        ))}
+                      </div>
                     </div>
-                  ))}
-              </dl>
+                  )}
 
-              {(femme.interests ?? []).length > 0 && (
-                <div style={{ marginTop: "1.3rem" }}>
-                  <dt
-                    style={{
-                      fontSize: "0.775rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                      color: "var(--ink-3)",
-                    }}
-                  >
-                    Centres d&apos;intérêt
-                  </dt>
-                  <div className="mb-etiquettes">
-                    {femme.interests.map((interet) => (
-                      <span key={interet}>{interet}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {langues.length > 0 && (
-                <div style={{ marginTop: "1.1rem" }}>
-                  <dt
-                    style={{
-                      fontSize: "0.775rem",
-                      fontWeight: 600,
-                      letterSpacing: "0.05em",
-                      textTransform: "uppercase",
-                      color: "var(--ink-3)",
-                    }}
-                  >
-                    Langues
-                  </dt>
-                  <div className="mb-etiquettes">
-                    {langues.map((langue) => (
-                      <span key={langue}>{langue}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </section>
+                  {langues.length > 0 && (
+                    <div style={{ marginTop: "1.1rem" }}>
+                      <dt
+                        style={{
+                          fontSize: "0.775rem",
+                          fontWeight: 600,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          color: "var(--ink-3)",
+                        }}
+                      >
+                        Langues
+                      </dt>
+                      <div className="mb-etiquettes">
+                        {langues.map((langue) => (
+                          <span key={langue}>{langue}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
           </div>
         </div>
       </main>

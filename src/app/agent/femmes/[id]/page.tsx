@@ -167,10 +167,11 @@ export default async function FicheFemmeAgent({
         <h2 className="bo-h2">Photos · {photos?.length ?? 0}</h2>
         <p className="bo-aide" style={{ fontSize: "0.9rem" }}>
           Chaque photo est validée une par une par l&apos;administration avant d&apos;apparaître
-          publiquement. Les deux premières sont ensuite visibles de tous ; les suivantes
-          s&apos;affichent floutées, jusqu&apos;à ce qu&apos;un membre les débloque avec ses
-          crédits. C&apos;est donc l&apos;ordre des photos qui décide de ce qui est montré —
-          placez en tête les deux qui donnent le plus envie d&apos;écrire.
+          publiquement. La moitié des photos est ensuite visible de tous ; l&apos;autre
+          moitié s&apos;affiche floutée, jusqu&apos;à ce qu&apos;un membre la débloque avec
+          ses crédits. Plus il y a de photos, plus il y en a de visibles : six photos en
+          montrent trois. C&apos;est l&apos;ordre qui décide de ce qui est montré — placez en
+          tête celles qui donnent le plus envie d&apos;écrire.
         </p>
 
         <div style={{ marginTop: "1.3rem" }}>

@@ -1,4 +1,4 @@
-import { flouter } from "@/lib/flou";
+import { flouter, largeurAdmise, redimensionner } from "@/lib/images";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -40,13 +40,18 @@ function introuvable() {
 }
 
 export async function GET(
-  _requete: Request,
+  requete: Request,
   { params }: { params: Promise<{ id: string; version: string }> },
 ) {
   // La version ne sert qu'à distinguer deux états d'une même photo dans les
   // caches : elle n'est pas relue ici, l'identifiant suffit à retrouver la ligne.
   const { id } = await params;
   if (!UUID.test(id)) return introuvable();
+
+  // La largeur voulue, ramenée à une liste fermée : sans cela, n'importe qui
+  // ferait fabriquer autant de variantes qu'il existe de nombres, et chacune
+  // occuperait une entrée de cache.
+  const largeur = largeurAdmise(Number(new URL(requete.url).searchParams.get("l")));
 
   const admin = createAdminClient();
 
@@ -72,17 +77,22 @@ export async function GET(
 
   if (error || !fichier) return introuvable();
 
-  const corps: BodyInit = photo.is_private
-    ? new Uint8Array(await flouter(await fichier.arrayBuffer()))
-    : fichier;
+  // Redimensionnée ici, et non par l'optimiseur de Next : celui-ci est un
+  // service compté, et son quota épuisé a fait disparaître toutes les photos du
+  // site d'un coup. L'original pèse plusieurs mégaoctets, il ne part jamais tel
+  // quel vers un téléphone.
+  const octets = await fichier.arrayBuffer();
+  const corps = new Uint8Array(
+    photo.is_private ? await flouter(octets, largeur) : await redimensionner(octets, largeur),
+  );
 
   return new Response(corps, {
     headers: {
-      "Content-Type": photo.is_private ? "image/jpeg" : fichier.type || "image/jpeg",
+      "Content-Type": "image/webp",
       "Cache-Control": CACHE,
-      // Change quand la photo change : un remplacement invalide le cache sans
-      // attendre l'expiration.
-      ETag: `"${id}-${Date.parse(photo.updated_at) || 0}${photo.is_private ? "-flou" : ""}"`,
+      // Change quand la photo change, et avec la largeur demandée : deux
+      // tailles de la même photo ne doivent pas se confondre dans un cache.
+      ETag: `"${id}-${Date.parse(photo.updated_at) || 0}-${largeur}${photo.is_private ? "-flou" : ""}"`,
       "Content-Security-Policy": "default-src 'none'; sandbox",
       "X-Content-Type-Options": "nosniff",
     },

@@ -109,14 +109,6 @@ export default function GalerieProfil({
   const courante = index === null ? null : photos[index];
   const verrouillee = (photo: PhotoProfil) => photo.prive && !photo.debloquee;
 
-  /**
-   * Une photo privée débloquée est servie par une adresse qui vérifie qui
-   * demande. Elle doit échapper à l'optimiseur de Next, qui la retéléchargerait
-   * sans les cookies du visiteur — et la mettrait ensuite en cache pour tout le
-   * monde. Voir `Photo`.
-   */
-  const aOptimiser = (photo: PhotoProfil) => !(photo.prive && photo.debloquee);
-
   return (
     <>
       <button
@@ -129,7 +121,7 @@ export default function GalerieProfil({
           src={photos[0].url}
           alt={`${nom}`}
           sizes="(max-width:900px) 92vw, 460px"
-          optimiser={aOptimiser(photos[0])}
+          largeur={640}
           prioritaire
         />
         {verrouillee(photos[0]) ? (
@@ -162,7 +154,7 @@ export default function GalerieProfil({
                   : `Voir la photo ${rang + 2} de ${nom} en grand`
               }
             >
-              <Photo src={photo.url} alt="" sizes="120px" optimiser={aOptimiser(photo)} />
+              <Photo src={photo.url} alt="" sizes="120px" largeur={240} />
               {verrouillee(photo) && (
                 <span className="mb-vignette-cadenas" aria-hidden="true">
                   <IconeCadenas />
@@ -216,7 +208,7 @@ export default function GalerieProfil({
                 alt={`${nom} — photo ${index + 1} sur ${total}`}
                 sizes="100vw"
                 ajustement="contain"
-                optimiser={aOptimiser(courante)}
+                largeur={1280}
                 prioritaire
               />
               {verrouillee(courante) && (

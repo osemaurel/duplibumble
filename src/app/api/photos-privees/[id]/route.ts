@@ -1,3 +1,4 @@
+import { largeurAdmise, redimensionner } from "@/lib/images";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { clesDeSignature } from "@/lib/supabase/jwks";
 import { createClient } from "@/lib/supabase/server";
@@ -23,9 +24,11 @@ function refuse() {
   return new Response("Introuvable", { status: 404 });
 }
 
-export async function GET(_requete: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(requete: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!UUID.test(id)) return refuse();
+
+  const largeur = largeurAdmise(Number(new URL(requete.url).searchParams.get("l")));
 
   const supabase = await createClient();
 
@@ -63,9 +66,13 @@ export async function GET(_requete: Request, { params }: { params: Promise<{ id:
 
   if (error || !fichier) return refuse();
 
-  return new Response(fichier, {
+  // Redimensionnée comme les autres : payer pour voir une photo ne doit pas
+  // valoir téléchargement de plusieurs mégaoctets sur un téléphone.
+  const corps = new Uint8Array(await redimensionner(await fichier.arrayBuffer(), largeur));
+
+  return new Response(corps, {
     headers: {
-      "Content-Type": fichier.type || "image/jpeg",
+      "Content-Type": "image/webp",
       // Privé au visiteur : jamais partagé par un CDN, seulement par son propre
       // navigateur, et brièvement.
       "Cache-Control": "private, max-age=3600, no-transform",

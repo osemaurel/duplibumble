@@ -6,13 +6,22 @@ import Image from "next/image";
  * Toutes les images du site passent par ici, pour une raison simple : les
  * originaux déposés par les agents pèsent trois mégaoctets pièce. Servis tels
  * quels dans une vignette de deux cents pixels, ils faisaient une page
- * d'accueil à plusieurs dizaines de mégaoctets. `next/image` fabrique la taille
- * réellement affichée, en AVIF ou WebP, et la met en cache.
+ * d'accueil à plusieurs dizaines de mégaoctets.
  *
- * `sizes` n'est pas décoratif : c'est lui qui dit au navigateur quelle largeur
- * télécharger. Sans lui, il prend la plus grande, et tout le bénéfice est
- * perdu. Chaque appel doit donc décrire la place que l'image occupe vraiment.
+ * Le redimensionnement est fait par notre propre route, `/api/photos`, et non
+ * par l'optimiseur de Next. Celui-ci est un service compté par l'hébergeur :
+ * son quota épuisé, il a répondu « paiement requis » et toutes les photos du
+ * site ont disparu d'un coup, sans qu'une ligne de code ait changé. Une
+ * vitrine ne peut pas dépendre d'un compteur.
+ *
+ * `largeur` remplace donc le rôle qu'avait `sizes` : c'est elle qui décide du
+ * poids réellement téléchargé. Elle doit correspondre à la place occupée à
+ * l'écran, doublée pour les écrans fins.
  */
+
+/** Adresse servie par l'application, seule à savoir se redimensionner. */
+const INTERNE = "/api/photos";
+
 export default function Photo({
   src,
   alt,
@@ -20,44 +29,39 @@ export default function Photo({
   prioritaire = false,
   className,
   ajustement = "cover",
-  optimiser = true,
+  largeur = 640,
 }: {
   src: string;
   alt: string;
+  /** Conservé pour la mise en page ; le poids se règle par `largeur`. */
   sizes: string;
   /** Vrai pour les images visibles d'emblée : elles sont chargées sans attendre. */
   prioritaire?: boolean;
   className?: string;
-  /**
-   * À mettre à faux pour une image dont l'accès dépend de qui regarde.
-   *
-   * L'optimiseur de Next ne se contente pas de transformer l'image : il la
-   * retélécharge lui-même, depuis le serveur, sans les cookies du visiteur.
-   * Une adresse qui vérifie une session lui répond donc « introuvable », et
-   * l'image reste vide — c'est ce qui arrivait à une photo privée tout juste
-   * débloquée.
-   *
-   * Et quand bien même elle passerait : le résultat optimisé est mis en cache
-   * par adresse, dans un cache commun à tous les visiteurs. La photo payée par
-   * l'un serait alors servie à tous les autres. Contourner la vérification
-   * aurait donc été pire que l'image cassée.
-   */
-  optimiser?: boolean;
   /**
    * `cover` recadre pour remplir le cadre — c'est ce que veulent les vignettes.
    * `contain` montre la photo entière : indispensable en plein écran, où
    * recadrer reviendrait à couper ce qu'on est venu regarder.
    */
   ajustement?: "cover" | "contain";
+  /** Largeur demandée à la route, en pixels d'image. */
+  largeur?: number;
 }) {
+  // Les profils de démonstration sont des fichiers statiques : ils ne passent
+  // pas par la route et n'ont donc pas de largeur à demander.
+  const adresse = src.startsWith(INTERNE) ? `${src}?l=${largeur}` : src;
+
   return (
     <Image
-      src={src}
+      src={adresse}
       alt={alt}
       fill
       sizes={sizes}
-      quality={72}
-      unoptimized={!optimiser}
+      // L'optimiseur est court-circuité : c'est notre route qui a déjà fabriqué
+      // la bonne taille. Il l'est aussi par nécessité pour les photos privées
+      // débloquées — il les retéléchargerait sans les cookies du visiteur, et
+      // mettrait le résultat dans un cache commun à tous.
+      unoptimized
       priority={prioritaire}
       loading={prioritaire ? "eager" : "lazy"}
       className={className}

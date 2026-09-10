@@ -141,6 +141,7 @@ export default async function Profils({
                         src={principale.url}
                         alt={`${femme.display_name}, ${femme.age}`}
                         sizes="(max-width:640px) 47vw, (max-width:1100px) 30vw, 300px"
+                        largeur={480}
                       />
                     ) : (
                       <span className="sans-photo">Photo à venir</span>

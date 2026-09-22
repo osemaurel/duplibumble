@@ -58,16 +58,11 @@ function jour(date: string) {
  * droit de lire, l'abonnement n'ouvre donc rien de plus.
  */
 export default function FilMessages({
-  conversationId,
   initiaux,
-  monCote,
   vide,
   cadeaux = {},
 }: {
-  conversationId: string;
   initiaux: MessageAffiche[];
-  /** Quel expéditeur s'affiche à droite. */
-  monCote: "member" | "lady";
   vide: string;
   /** Catalogue des cadeaux, par code, pour afficher libellé et émoji. */
   cadeaux?: Record<string, CadeauAffiche>;
@@ -76,11 +71,11 @@ export default function FilMessages({
   // l'abonnement. On ne garde en état que la seconde, et on fusionne au rendu.
   // Recopier le serveur dans l'état obligerait à les resynchroniser sans cesse,
   // et ferait diverger les deux à la moindre course.
-  const [recus, setRecus] = useState<MessageAffiche[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const flux = useRef<HTMLDivElement>(null);
 
   const echange = useEchange();
+  const recus = echange?.recus ?? [];
 
   const connus = new Set(initiaux.map((m) => m.id));
   const reels = [...initiaux, ...recus.filter((m) => !connus.has(m.id))];
@@ -94,53 +89,6 @@ export default function FilMessages({
   const messages = [...reels, ...enVol].sort((a, b) =>
     a.created_at.localeCompare(b.created_at),
   );
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    const canal = supabase
-      .channel(`conversation:${conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        (charge) => {
-          const ligne = charge.new as {
-            id: string;
-            body: string;
-            created_at: string;
-            sender: "member" | "lady";
-            attachment_path: string | null;
-            gift_code: string | null;
-          };
-
-          setRecus((actuels) =>
-            actuels.some((m) => m.id === ligne.id)
-              ? actuels
-              : [
-                  ...actuels,
-                  {
-                    id: ligne.id,
-                    body: ligne.body,
-                    created_at: ligne.created_at,
-                    mienne: ligne.sender === monCote,
-                    attachment_path: ligne.attachment_path,
-                    gift_code: ligne.gift_code,
-                  },
-                ],
-          );
-        },
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(canal);
-    };
-  }, [conversationId, monCote]);
 
   const cheminsAsigner = messages
     .filter((m) => !m.enVol)
@@ -256,6 +204,14 @@ export default function FilMessages({
             </div>
           );
         })
+      )}
+
+      {echange?.autreEcrit && (
+        <div className="bo-bulle-rangee sienne">
+          <div className="bo-bulle bo-saisie" aria-label="Votre interlocuteur écrit">
+            <span /><span /><span />
+          </div>
+        </div>
       )}
     </div>
   );

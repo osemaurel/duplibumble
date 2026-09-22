@@ -85,10 +85,8 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           </Link>
         </div>
 
-        <Echange>
+        <Echange conversationId={conversation.id} monCote="member">
           <FilMessages
-            conversationId={conversation.id}
-            monCote="member"
             vide="Écrivez le premier message. Présentez-vous simplement, cela fonctionne mieux qu'un compliment."
             initiaux={(messages ?? []).map((m) => ({
               id: m.id,

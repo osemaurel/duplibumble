@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import SaisieEnCours from "@/components/backoffice/saisie-en-cours";
 import { Avatar, EtatVide, IconeMessages } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -170,6 +171,7 @@ export default async function BoiteDeReception({
                           {femme?.display_name ?? "—"}
                           {femme?.age ? `, ${femme.age}` : ""}
                         </span>
+                        <SaisieEnCours conversationId={conversation.id} monCote="lady" />
                       </span>
                       <span className="apercu">
                         {dernier

@@ -5,6 +5,8 @@ import { useFormStatus } from "react-dom";
 
 import { createClient } from "@/lib/supabase/client";
 
+import { useEchange } from "./echange";
+
 const TAILLE_MAX = 8 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/heic"];
 
@@ -41,6 +43,7 @@ export default function Composeur({
   // `useFormStatus` lit l'état du formulaire parent : plus besoin de le faire
   // redescendre en propriété, et il reste juste même si l'envoi part d'ailleurs.
   const { pending: enCours } = useFormStatus();
+  const echange = useEchange();
   const champ = useRef<HTMLTextAreaElement>(null);
   const fichier = useRef<HTMLInputElement>(null);
 
@@ -171,7 +174,12 @@ export default function Composeur({
           defaultValue={brouillon}
           disabled={desactive}
           placeholder={placeholder}
-          onInput={ajusterHauteur}
+          onInput={() => {
+            ajusterHauteur();
+            // Prévient l'autre partie qu'on écrit. Le contexte s'espace
+            // lui-même : inutile de guetter la cadence ici.
+            echange?.signalerSaisie();
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
               e.preventDefault();

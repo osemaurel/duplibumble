@@ -2269,3 +2269,50 @@
   gap: 0.2rem;
   font-size: 0.85rem;
 }
+
+/* =========================== Points de saisie =========================
+   Les trois points de toutes les messageries. Une animation, trois retards :
+   c'est le décalage qui donne l'impression d'une vague. */
+
+@keyframes bo-saisie-onde {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+.bo-saisie {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.75rem 1rem;
+}
+.bo-saisie span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  animation: bo-saisie-onde 1.3s infinite ease-in-out;
+}
+.bo-saisie span:nth-child(2) { animation-delay: 0.18s; }
+.bo-saisie span:nth-child(3) { animation-delay: 0.36s; }
+
+/* Version réduite, devant un nom dans la liste des conversations. */
+.bo-saisie-liste {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 0.45rem;
+  vertical-align: middle;
+}
+.bo-saisie-liste span {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--brand);
+  animation: bo-saisie-onde 1.3s infinite ease-in-out;
+}
+.bo-saisie-liste span:nth-child(2) { animation-delay: 0.18s; }
+.bo-saisie-liste span:nth-child(3) { animation-delay: 0.36s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bo-saisie span, .bo-saisie-liste span { animation: none; opacity: 0.7; }
+}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import SaisieEnCours from "@/components/backoffice/saisie-en-cours";
 import { Avatar, EtatVide, IconeMessages } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
 import { photosPubliques } from "@/lib/photos";
@@ -98,6 +99,7 @@ export default async function MesMessages() {
                     <span className="corps">
                       <span className="ligne1">
                         <span className="qui">{femme?.display_name ?? "—"}</span>
+                        <SaisieEnCours conversationId={conversation.id} monCote="member" />
                       </span>
                       <span className="apercu">
                         {dernier

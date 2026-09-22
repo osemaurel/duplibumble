@@ -131,10 +131,8 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
           />
         )}
 
-        <Echange>
+        <Echange conversationId={conversation.id} monCote="lady">
           <FilMessages
-            conversationId={conversation.id}
-            monCote="lady"
             vide="Aucun message. Vous pouvez ouvrir la conversation."
             initiaux={(messages ?? []).map((m) => {
               const auteur = m.authored_by_agent_id

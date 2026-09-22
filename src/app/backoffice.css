@@ -604,6 +604,12 @@
 .bo-fil .vers { font-size: 0.86rem; color: var(--ink-3); }
 .bo-fil .elle { font-weight: 600; color: var(--brand); }
 .bo-fil .apercu {
+  /* `display: block` n'est pas décoratif ici, c'est lui qui fait la troncature.
+     L'aperçu est un <span>, donc un élément en ligne — et `overflow` ne
+     s'applique pas à un élément en ligne. Les trois règles ci-dessous étaient
+     donc écrites, lues, et sans aucun effet : un message un peu long sortait
+     de la carte et poussait l'horodatage hors de l'écran. */
+  display: block;
   margin-top: 0.28rem;
   font-size: 0.885rem;
   color: var(--ink-3);

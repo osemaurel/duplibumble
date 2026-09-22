@@ -295,12 +295,22 @@ export async function enregistrerCleIA(
     cle_chiffree: chiffrer(cle),
     empreinte: cle.slice(-4),
     verifiee_le: new Date().toISOString(),
+    // Déposer sa clé, c'est adhérer. La première version demandait ensuite de
+    // cocher une case dans un second formulaire : la clé était acceptée, un
+    // message annonçait que tout allait bien, et rien ne se déclenchait jamais.
+    // Personne ne devinait qu'il manquait un geste, et rien ne le disait.
+    actif: true,
   });
 
   if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
 
   revalidatePath("/agent/assistant");
-  return { ok: true, message: "Clé enregistrée et vérifiée auprès d'OpenAI." };
+  return {
+    ok: true,
+    message:
+      "Clé vérifiée auprès d'OpenAI et enregistrée. L'assistant est actif : " +
+      "il répondra dans vos conversations. Décochez la case ci-dessous pour l'arrêter.",
+  };
 }
 
 /** Modèle, consignes et interrupteur. La clé ne passe pas par là. */

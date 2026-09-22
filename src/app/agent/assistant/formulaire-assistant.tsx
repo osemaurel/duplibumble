@@ -108,8 +108,13 @@ export default function FormulaireAssistant({
           }}
         >
           <input type="checkbox" name="actif" defaultChecked={actif} />
-          Proposer des brouillons dans mes conversations
+          Laisser l&apos;assistant répondre dans mes conversations
         </label>
+        <p className="bo-aide" style={{ marginTop: "0.4rem" }}>
+          {actif
+            ? "Actif : l'assistant répond de lui-même aux messages restés sans réponse, dans toutes vos conversations. Chaque conversation peut être exclue depuis son propre réglage."
+            : "Inactif : aucun message ne part automatiquement. Enregistrer une clé réactive l'assistant."}
+        </p>
 
         <div className="bo-champ" style={{ marginTop: "1.1rem" }}>
           <label htmlFor="modele">Modèle</label>

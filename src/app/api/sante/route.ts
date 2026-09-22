@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { chiffrementDisponible } from "@/lib/chiffrement";
+import { etatCoffre } from "@/lib/chiffrement";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -43,8 +43,10 @@ export async function GET() {
   // L'assistant des agents se diagnostique pareillement. Sans coffre, l'écran
   // de l'agent refuse l'enregistrement d'une clé — c'est voulu, mais vu de
   // l'agent cela ressemble à une panne : d'où ce témoin.
+  const coffre = etatCoffre();
   const assistant = {
-    coffre: chiffrementDisponible(),
+    coffre: coffre.ok,
+    coffreDetail: coffre.detail,
     secretTravailleur: Boolean(process.env.IA_WORKER_SECRET),
   };
 

@@ -27,16 +27,25 @@ const MARQUE = "v1";
 function cleMaitre(): Buffer {
   const brute = process.env.CLE_CHIFFREMENT;
   if (!brute) {
-    throw new Error(
-      "CLE_CHIFFREMENT absente : impossible de chiffrer un secret. " +
-        "Générez-la avec « node -e \"console.log(require('crypto').randomBytes(32).toString('base64'))\" » " +
-        "puis posez-la dans l'environnement.",
-    );
+    throw new Error("CLE_CHIFFREMENT absente : impossible de chiffrer un secret.");
   }
 
-  const cle = Buffer.from(brute, "base64");
+  // Coupée aux extrémités : un espace ou un retour à la ligne attrapé au
+  // collage est la façon la plus banale de rendre une clé pourtant juste
+  // inutilisable, et rien à l'écran ne le montre.
+  const nettoyee = brute.trim();
+
+  // L'hexadécimal est accepté aussi : certains générateurs n'offrent que
+  // cela, et une clé refusée sans raison visible coûte une heure à qui ne
+  // sait pas ce qu'est le base64.
+  const cle = /^[0-9a-f]{64}$/i.test(nettoyee)
+    ? Buffer.from(nettoyee, "hex")
+    : Buffer.from(nettoyee, "base64");
+
   if (cle.length !== 32) {
-    throw new Error("CLE_CHIFFREMENT invalide : 32 octets attendus, encodés en base64.");
+    throw new Error(
+      `CLE_CHIFFREMENT invalide : 32 octets attendus, ${cle.length} reçus.`,
+    );
   }
   return cle;
 }
@@ -48,6 +57,26 @@ export function chiffrementDisponible() {
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Pourquoi le coffre est refusé, en une phrase et sans rien révéler.
+ *
+ * « Absente » et « trop courte » appellent deux gestes opposés, et les
+ * confondre sous un même refus envoie chercher le problème là où il n'est pas.
+ * La longueur obtenue n'apprend rien à un tiers : elle est publique par
+ * construction, c'est 32.
+ */
+export function etatCoffre(): { ok: boolean; detail: string } {
+  try {
+    cleMaitre();
+    return { ok: true, detail: "en place" };
+  } catch (erreur) {
+    return {
+      ok: false,
+      detail: erreur instanceof Error ? erreur.message : "indisponible",
+    };
   }
 }
 

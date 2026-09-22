@@ -2231,3 +2231,41 @@
   padding: 1.5rem;
 }
 .mb-mur-texte .bo-sous-titre { max-width: 34rem; }
+
+/* ===================== Réglages d'IA d'une conversation ================
+   Une barre discrète entre l'en-tête et le fil : l'agent vient répondre, pas
+   régler. Seul l'état — l'IA parle ici, ou non — mérite d'être lisible sans
+   rien ouvrir. */
+
+.bo-ia-fil { border-bottom: 1px solid var(--line-soft); background: var(--surface-2); }
+
+.bo-ia-etat {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+}
+.bo-ia-etat .pastille {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: none;
+}
+.bo-ia-etat .pastille.on { background: var(--vert); }
+.bo-ia-etat .pastille.off { background: var(--ink-3); }
+.bo-ia-etat .chevron { margin-left: auto; color: var(--ink-3); }
+
+.bo-ia-reglages {
+  padding: 0 1.4rem 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}

@@ -99,17 +99,28 @@ export async function proposerReponse(options: {
   cle: string;
   modele: string;
   consignes: string | null;
+  /** Consignes propres à cette conversation, prioritaires sur les générales. */
+  consignesFil?: string | null;
   femme: Lady;
   fil: MessageFil[];
   prenomMembre: string;
 }): Promise<ResultatAssistant> {
-  const { cle, modele, consignes, femme, fil, prenomMembre } = options;
+  const { cle, modele, consignes, consignesFil, femme, fil, prenomMembre } = options;
 
   const contexte = [
     REGLES,
     consignes?.trim() ? `Consignes de l'agence :\n${consignes.trim()}` : null,
+    // Après les générales, donc plus proches de la tâche : quand les deux se
+    // contredisent, c'est celle qui vise ce fil précis qui doit l'emporter.
+    consignesFil?.trim()
+      ? `Consignes propres à cette conversation, prioritaires sur les précédentes :\n${consignesFil.trim()}`
+      : null,
     `Fiche de la femme :\n${fiche(femme)}`,
     `Le membre s'appelle ${prenomMembre}.`,
+    // Les messages déjà envoyés par l'agent figurent dans le fil comme des
+    // messages de la femme : le modèle en reprend donc le ton et les faits, et
+    // une reprise manuelle infléchit la suite sans qu'on ait à la lui décrire.
+    "Les messages qui te sont attribués ci-dessous ont pu être écrits par une personne : reprends leur ton et n'en contredis aucun.",
   ]
     .filter(Boolean)
     .join("\n\n");

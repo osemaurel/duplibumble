@@ -78,6 +78,13 @@ export default async function Conditions() {
         rattachés à la personne représentée, qui en conserve la connaissance et le bénéfice.
       </p>
       <p>
+        L&apos;agent mandaté peut s&apos;appuyer sur un outil de rédaction automatique pour
+        composer tout ou partie de ses réponses. Un message reçu depuis un profil féminin peut
+        donc avoir été rédigé de cette manière. Il demeure envoyé sous la responsabilité de
+        l&apos;agent, qui reste tenu par le contrat le liant à la personne représentée, et Palab
+        conserve la trace des messages ainsi composés.
+      </p>
+      <p>
         En créant un compte et en achetant des crédits, le membre reconnaît avoir été informé de
         ce fonctionnement et l&apos;accepter.
       </p>

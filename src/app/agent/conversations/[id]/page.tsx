@@ -11,6 +11,7 @@ import { lireCadeaux } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/server";
 
 import FormulaireReponse from "./formulaire-reponse";
+import ReglagesIA from "./reglages-ia";
 
 export default async function Conversation({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -79,6 +80,14 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
     .eq("agent_id", agent.id)
     .maybeSingle();
 
+  // Pas de ligne vaut « activé » : l'IA prend en charge un fil sans qu'on
+  // l'arme, dès lors que l'agent a activé son assistant.
+  const { data: reglagesFil } = await supabase
+    .from("conversation_ia")
+    .select("actif, consignes")
+    .eq("conversation_id", id)
+    .maybeSingle();
+
   const nomMembre = membre?.display_name ?? "Membre";
 
   return (
@@ -113,6 +122,14 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
             Voir la fiche
           </Link>
         </div>
+
+        {assistant?.actif && (
+          <ReglagesIA
+            conversationId={conversation.id}
+            actif={reglagesFil?.actif ?? true}
+            consignes={reglagesFil?.consignes ?? ""}
+          />
+        )}
 
         <Echange>
           <FilMessages

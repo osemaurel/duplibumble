@@ -192,6 +192,15 @@ export type AgentIA = {
   updated_at: string;
 };
 
+/** Réglages de l'IA pour une conversation. Pas de ligne vaut « activé ». */
+export type ConversationIA = {
+  conversation_id: string;
+  actif: boolean;
+  consignes: string | null;
+  derniere_tentative: string | null;
+  updated_at: string;
+};
+
 /** Réponse pré-rédigée qu'un agent réutilise d'un membre à l'autre. */
 export type ReponseType = {
   id: string;
@@ -308,6 +317,7 @@ export type Database = {
       gift_catalog: Table<GiftCatalogItem>;
       reponses_types: Table<ReponseType>;
       agent_ia: Table<AgentIA>;
+      conversation_ia: Table<ConversationIA>;
     };
     Views: Record<never, never>;
     Functions: {
@@ -321,6 +331,11 @@ export type Database = {
         Returns: string;
       };
       rembourser_messages_sans_reponse: { Args: Record<never, never>; Returns: number };
+      conversations_pour_ia: {
+        Args: { p_limite?: number };
+        Returns: { conversation_id: string; agent_id: string }[];
+      };
+      marquer_tentative_ia: { Args: { p_conversation_id: string }; Returns: undefined };
       debloquer_photo: { Args: { p_photo_id: string }; Returns: string };
       envoyer_cadeau_membre: {
         Args: { p_conversation_id: string; p_gift_code: string };

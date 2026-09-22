@@ -418,6 +418,39 @@ export async function proposerBrouillon(conversationId: string): Promise<Resulta
 
 type ResultatAssistantAgent = { ok: true; texte: string } | { ok: false; message: string };
 
+/**
+ * Interrupteur et consignes de l'IA pour une conversation précise.
+ *
+ * Le RLS borne déjà l'écriture aux conversations du portefeuille : inutile de
+ * revérifier ici ce que la base refuse déjà.
+ */
+export async function reglerIAConversation(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  await requireAgent();
+
+  const conversationId = String(formData.get("conversation_id") ?? "");
+  if (!conversationId) return { ok: false, message: "Conversation introuvable." };
+
+  const actif = formData.get("actif") === "on";
+  const consignes = String(formData.get("consignes") ?? "").trim() || null;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("conversation_ia")
+    .upsert({ conversation_id: conversationId, actif, consignes });
+
+  if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+
+  revalidatePath(`/agent/conversations/${conversationId}`);
+
+  return {
+    ok: true,
+    message: actif ? "L'IA répondra sur cette conversation." : "IA désactivée sur cette conversation.",
+  };
+}
+
 export async function seDeconnecter() {
   const supabase = await createClient();
   await supabase.auth.signOut();

@@ -176,6 +176,22 @@ export type GiftCatalogItem = {
   actif: boolean;
 };
 
+/**
+ * Assistant de rédaction d'un agent. `cle_chiffree` n'est jamais lisible par
+ * le client : aucune politique n'en ouvre la lecture hors administration.
+ */
+export type AgentIA = {
+  agent_id: string;
+  cle_chiffree: string | null;
+  empreinte: string | null;
+  modele: string;
+  consignes: string | null;
+  actif: boolean;
+  verifiee_le: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 /** Réponse pré-rédigée qu'un agent réutilise d'un membre à l'autre. */
 export type ReponseType = {
   id: string;
@@ -210,6 +226,8 @@ export type Message = {
   attachment_path: string | null;
   /** Code du cadeau virtuel envoyé, le cas échéant. */
   gift_code: string | null;
+  /** Vrai si le texte a été proposé par un modèle de langage. */
+  redige_par_ia: boolean;
   read_at: string | null;
   created_at: string;
 };
@@ -289,6 +307,7 @@ export type Database = {
       photo_unlocks: Table<PhotoUnlock>;
       gift_catalog: Table<GiftCatalogItem>;
       reponses_types: Table<ReponseType>;
+      agent_ia: Table<AgentIA>;
     };
     Views: Record<never, never>;
     Functions: {

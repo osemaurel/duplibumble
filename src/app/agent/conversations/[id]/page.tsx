@@ -6,6 +6,7 @@ import FilMessages from "@/components/backoffice/fil-messages";
 import ModePleinEcran from "@/components/backoffice/mode-plein-ecran";
 import { Avatar } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { lireCadeaux } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/server";
 
@@ -70,6 +71,13 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
     ? await supabase.from("agents").select("id, code").in("id", agentsIds)
     : { data: [] as { id: string; code: string }[] };
   const agentParId = new Map((agents ?? []).map((a) => [a.id, a]));
+
+  // Clé de service, limitée à cet agent : `agent_ia` ne s'ouvre pas au client.
+  const { data: assistant } = await createAdminClient()
+    .from("agent_ia")
+    .select("actif")
+    .eq("agent_id", agent.id)
+    .maybeSingle();
 
   const nomMembre = membre?.display_name ?? "Membre";
 
@@ -137,6 +145,7 @@ export default async function Conversation({ params }: { params: Promise<{ id: s
             conversationId={conversation.id}
             prenom={femme.display_name}
             modeles={modeles ?? []}
+            assistant={assistant?.actif ?? false}
           />
         </Echange>
       </div>

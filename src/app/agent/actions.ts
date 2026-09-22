@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
+import { proposerReponse, verifierCle } from "@/lib/assistant";
 import { requireAgent } from "@/lib/auth";
+import { chiffrer, chiffrementDisponible, dechiffrer } from "@/lib/chiffrement";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Lady, MaritalStatus } from "@/lib/supabase/types";
 
@@ -23,6 +26,11 @@ export async function repondre(_prev: Resultat | null, formData: FormData): Prom
   const corps = String(formData.get("corps") ?? "").trim();
   const pieceJointe = String(formData.get("attachment_path") ?? "").trim() || null;
 
+  // Posé par la barre de réponse quand le texte part tel que l'assistant l'a
+  // proposé. Retouché par l'agent, il redevient le sien : la trace consigne ce
+  // qui s'est réellement passé, pas l'outil qui a servi en chemin.
+  const redigeParIA = formData.get("redige_par_ia") === "on";
+
   if (!conversationId) return { ok: false, message: "Conversation introuvable." };
   if (!corps && !pieceJointe) return { ok: false, message: "Le message est vide." };
 
@@ -31,9 +39,12 @@ export async function repondre(_prev: Resultat | null, formData: FormData): Prom
   const { error } = await supabase.from("messages").insert({
     conversation_id: conversationId,
     sender: "lady",
+    // L'agent reste l'auteur responsable, même quand la machine a tenu la
+    // plume : c'est lui qui a relu et décidé d'envoyer.
     authored_by_agent_id: agent.id,
     body: corps,
     attachment_path: pieceJointe,
+    redige_par_ia: redigeParIA,
   });
 
   if (error) {
@@ -245,6 +256,167 @@ export async function supprimerReponseType(formData: FormData) {
 
   revalidatePath("/agent/reponses");
 }
+
+/* ------------------------------------------------------- assistant de rédaction
+ *
+ * La table `agent_ia` n'ouvre sa lecture à personne d'autre que
+ * l'administration : on y accède avec la clé de service, en se limitant
+ * explicitement à l'agent authentifié. C'est le prix à payer pour que la
+ * colonne chiffrée ne puisse pas sortir par le client.
+ */
+
+/** Enregistre la clé de l'agent, après l'avoir essayée auprès d'OpenAI. */
+export async function enregistrerCleIA(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  const { agent } = await requireAgent();
+
+  const cle = String(formData.get("cle") ?? "").trim();
+  if (!cle) return { ok: false, message: "Collez votre clé pour l'enregistrer." };
+
+  if (!chiffrementDisponible()) {
+    return {
+      ok: false,
+      message:
+        "Le coffre n'est pas configuré sur ce serveur : la clé ne peut pas être mise à l'abri, " +
+        "elle n'a donc pas été enregistrée. Signalez-le à l'administration.",
+    };
+  }
+
+  // Essayée avant d'être rangée : enregistrer une clé morte, c'est découvrir la
+  // panne le jour où un membre attend une réponse.
+  const essai = await verifierCle(cle);
+  if (!essai.ok) return { ok: false, message: essai.message };
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("agent_ia").upsert({
+    agent_id: agent.id,
+    cle_chiffree: chiffrer(cle),
+    empreinte: cle.slice(-4),
+    verifiee_le: new Date().toISOString(),
+  });
+
+  if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+
+  revalidatePath("/agent/assistant");
+  return { ok: true, message: "Clé enregistrée et vérifiée auprès d'OpenAI." };
+}
+
+/** Modèle, consignes et interrupteur. La clé ne passe pas par là. */
+export async function reglerAssistant(
+  _prev: Resultat | null,
+  formData: FormData,
+): Promise<Resultat> {
+  const { agent } = await requireAgent();
+
+  const modele = String(formData.get("modele") ?? "").trim() || "gpt-4o-mini";
+  const consignes = String(formData.get("consignes") ?? "").trim() || null;
+  const actif = formData.get("actif") === "on";
+
+  const admin = createAdminClient();
+  const { data: existant } = await admin
+    .from("agent_ia")
+    .select("cle_chiffree")
+    .eq("agent_id", agent.id)
+    .maybeSingle();
+
+  if (actif && !existant?.cle_chiffree) {
+    return { ok: false, message: "Enregistrez d'abord une clé : sans elle, rien à activer." };
+  }
+
+  const { error } = await admin
+    .from("agent_ia")
+    .upsert({ agent_id: agent.id, modele, consignes, actif });
+
+  if (error) return { ok: false, message: `Enregistrement refusé : ${error.message}` };
+
+  revalidatePath("/agent/assistant");
+  return { ok: true, message: actif ? "Assistant activé." : "Réglages enregistrés." };
+}
+
+export async function oublierCleIA() {
+  const { agent } = await requireAgent();
+  const admin = createAdminClient();
+
+  await admin
+    .from("agent_ia")
+    .update({ cle_chiffree: null, empreinte: null, verifiee_le: null, actif: false })
+    .eq("agent_id", agent.id);
+
+  revalidatePath("/agent/assistant");
+}
+
+/**
+ * Propose un brouillon de réponse pour une conversation.
+ *
+ * Un brouillon, et rien de plus : le texte revient dans la barre de saisie,
+ * l'agent le lit, le corrige et décide de l'envoyer. Rien ne part au nom d'une
+ * femme sans qu'un mandataire l'ait vu — c'est ce que son mandat promet.
+ */
+export async function proposerBrouillon(conversationId: string): Promise<ResultatAssistantAgent> {
+  const { agent } = await requireAgent();
+  if (!conversationId) return { ok: false, message: "Conversation introuvable." };
+
+  const supabase = await createClient();
+
+  // Le RLS borne déjà la conversation au portefeuille de l'agent : s'il ne la
+  // voit pas, elle n'existe pas pour lui.
+  const { data: conversation } = await supabase
+    .from("conversations")
+    .select("id, lady_id, member_id")
+    .eq("id", conversationId)
+    .maybeSingle();
+
+  if (!conversation) return { ok: false, message: "Conversation introuvable." };
+
+  const admin = createAdminClient();
+  const { data: reglages } = await admin
+    .from("agent_ia")
+    .select("cle_chiffree, modele, consignes, actif")
+    .eq("agent_id", agent.id)
+    .maybeSingle();
+
+  if (!reglages?.actif || !reglages.cle_chiffree) {
+    return { ok: false, message: "Votre assistant n'est pas activé." };
+  }
+
+  const cle = dechiffrer(reglages.cle_chiffree);
+  if (!cle) {
+    return {
+      ok: false,
+      message: "Votre clé n'a pas pu être relue. Enregistrez-la de nouveau.",
+    };
+  }
+
+  const [{ data: femme }, { data: fil }, { data: membre }] = await Promise.all([
+    supabase.from("ladies").select("*").eq("id", conversation.lady_id).maybeSingle(),
+    supabase
+      .from("messages")
+      .select("sender, body")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true })
+      .limit(40),
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", conversation.member_id)
+      .maybeSingle(),
+  ]);
+
+  if (!femme) return { ok: false, message: "Fiche introuvable." };
+
+  return proposerReponse({
+    cle,
+    modele: reglages.modele,
+    consignes: reglages.consignes,
+    femme,
+    fil: fil ?? [],
+    prenomMembre: membre?.display_name ?? "ce membre",
+  });
+}
+
+type ResultatAssistantAgent = { ok: true; texte: string } | { ok: false; message: string };
 
 export async function seDeconnecter() {
   const supabase = await createClient();

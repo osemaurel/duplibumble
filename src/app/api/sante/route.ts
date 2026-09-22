@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { chiffrementDisponible } from "@/lib/chiffrement";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -39,6 +40,14 @@ export async function GET() {
     environnement: process.env.PADDLE_ENV === "production" ? "production" : "bac à sable",
   };
 
+  // L'assistant des agents se diagnostique pareillement. Sans coffre, l'écran
+  // de l'agent refuse l'enregistrement d'une clé — c'est voulu, mais vu de
+  // l'agent cela ressemble à une panne : d'où ce témoin.
+  const assistant = {
+    coffre: chiffrementDisponible(),
+    secretTravailleur: Boolean(process.env.IA_WORKER_SECRET),
+  };
+
   let base: { joignable: boolean; detail: string } = {
     joignable: false,
     detail: "non testée",
@@ -70,7 +79,7 @@ export async function GET() {
     base.joignable;
 
   return NextResponse.json(
-    { pret, configuration, base, paiement },
+    { pret, configuration, base, paiement, assistant },
     { status: pret ? 200 : 503 },
   );
 }

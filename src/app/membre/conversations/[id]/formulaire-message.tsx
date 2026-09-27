@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Composeur from "@/components/backoffice/composeur";
 import { useEchange } from "@/components/backoffice/echange";
+import { evenementMeta } from "@/lib/pixel";
 import type { GiftCatalogItem } from "@/lib/supabase/types";
 
 import { envoyerMessage } from "../../actions";
@@ -60,6 +61,10 @@ export default function FormulaireMessage({
 
     const reponse = await envoyerMessage(null, donnees);
     setResultat(reponse);
+
+    // Un message parti est la conversion qui compte vraiment ici : c'est le
+    // moment où un visiteur devient quelqu'un qui écrit.
+    if (reponse.ok) evenementMeta("Contact", { content_category: "message" });
 
     // Refusé : on rend son texte à l'expéditeur plutôt que de le perdre.
     if (!reponse.ok) {

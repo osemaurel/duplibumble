@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { useEchange } from "@/components/backoffice/echange";
+import { evenementPerso } from "@/lib/pixel";
 import type { GiftCatalogItem } from "@/lib/supabase/types";
 
 import { envoyerCadeau } from "../../actions";
@@ -55,7 +56,20 @@ export default function SelecteurCadeau({
       }
 
       const reponse = await envoyerCadeau(prev, formData);
-      if (reponse.ok) onFermer();
+
+      if (reponse.ok) {
+        onFermer();
+        // Événement propre à Palab : un cadeau se règle en crédits déjà
+        // achetés, ce n'est donc pas une vente. Le compter comme un achat
+        // gonflerait le chiffre d'affaires vu par Meta d'un montant
+        // qu'aucune facture ne porte.
+        evenementPerso("CadeauEnvoye", {
+          content_name: cadeau?.libelle,
+          content_ids: code ? [code] : undefined,
+          credits: cadeau?.cost,
+        });
+      }
+
       return reponse;
     },
     null,

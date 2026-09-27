@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import AvisBrouillon from "@/components/site/avis-brouillon";
+import ReglagesPub from "@/components/site/reglages-pub";
 import { SOCIETE } from "@/lib/societe";
 
 export const metadata = {
@@ -12,7 +13,7 @@ export default function Confidentialite() {
   return (
     <article className="lg-texte">
       <h1>Politique de confidentialité</h1>
-      <p className="lg-date">Dernière mise à jour : 3 septembre 2026</p>
+      <p className="lg-date">Dernière mise à jour : 27 septembre 2026</p>
 
       <AvisBrouillon />
 
@@ -57,6 +58,11 @@ export default function Confidentialite() {
             <td>Sécurité des utilisateurs</td>
             <td>Intérêt légitime</td>
           </tr>
+          <tr>
+            <td>Pages consultées et actions réalisées sur le site</td>
+            <td>Mesurer l&apos;efficacité de nos publicités</td>
+            <td>Consentement (article 7)</td>
+          </tr>
         </tbody>
       </table>
       <p>
@@ -87,6 +93,10 @@ export default function Confidentialite() {
         <li>
           <b>Paddle</b> — traitement des paiements et facturation.
         </li>
+        <li>
+          <b>Meta Platforms Ireland</b> — mesure de l&apos;efficacité de nos publicités,
+          uniquement si vous y avez consenti (article 7).
+        </li>
       </ul>
       <p>
         Certains de ces prestataires sont établis hors de l&apos;Union européenne. Les transferts
@@ -114,16 +124,30 @@ export default function Confidentialite() {
         contrôle compétente.
       </p>
 
-      <h2>7. Cookies</h2>
+      <h2>7. Cookies et mesure publicitaire</h2>
       <p>
-        Palab dépose uniquement les cookies nécessaires au maintien de votre session et à la
-        sécurité du site. Ces cookies ne servent ni au profilage publicitaire ni à la mesure
-        d&apos;audience par un tiers, et ne requièrent donc pas de consentement préalable.
+        Les cookies nécessaires au maintien de votre session et à la sécurité du site sont
+        déposés sans votre accord : le site ne peut pas fonctionner sans eux, et ils ne servent
+        à rien d&apos;autre. Le tunnel de paiement de Paddle dépose également ses propres
+        cookies, décrits dans la politique de Paddle.
       </p>
       <p>
-        Le tunnel de paiement de Paddle peut déposer ses propres cookies, décrits dans la
-        politique de Paddle.
+        Nous utilisons par ailleurs le <b>pixel Meta</b>, un outil fourni par Meta Platforms
+        (Facebook, Instagram), pour savoir quelles publicités amènent réellement des inscriptions
+        et des achats. Il dépose un cookie et transmet à Meta les pages que vous consultez sur
+        Palab ainsi que certaines actions : création de compte, envoi d&apos;un message,
+        ouverture et validation d&apos;un paiement, envoi d&apos;un cadeau, déblocage d&apos;une
+        photo. Le contenu de vos messages, vos photos et votre adresse e-mail ne lui sont jamais
+        transmis.
       </p>
+      <p>
+        Cette mesure n&apos;est pas nécessaire au service : elle repose uniquement sur votre
+        consentement, demandé lors de votre première visite. Tant que vous n&apos;avez pas
+        accepté, aucun script de Meta n&apos;est chargé. Vous pouvez revenir sur votre choix à
+        tout moment, ici même :
+      </p>
+
+      <ReglagesPub />
 
       <h2>8. Sécurité</h2>
       <p>

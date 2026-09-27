@@ -458,3 +458,36 @@
 /* Intitulé de pied de page sans destination réelle : une fonctionnalité pas
    encore construite, plutôt qu'un lien mort qui se prétend cliquable. */
 .lien-a-venir { color: var(--ink-3); cursor: default; }
+
+/* ================= Consentement publicitaire =================
+   Le pixel Meta est un traceur : il ne se charge qu'après un « Accepter »
+   explicite. Le bandeau ne recouvre pas la page, ne bloque pas la lecture, et
+   ne déguise pas le refus — les deux boutons sont côte à côte, de même taille,
+   au même endroit. Un bandeau qui cache son « Refuser » ne recueille pas un
+   consentement, il l'extorque, et ne vaut rien devant la CNIL. */
+.pub-bandeau{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(1rem + env(safe-area-inset-bottom));z-index:80;
+  width:min(680px,calc(100% - 1.6rem));
+  display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.2rem;
+  padding:1rem 1.2rem;border-radius:20px;
+  background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow)}
+.pub-bandeau p{flex:1 1 16rem;font-size:.86rem;line-height:1.5;color:var(--ink-soft)}
+.pub-bandeau p a{text-decoration:underline}
+.pub-bandeau-boutons,.pub-reglages-boutons{display:flex;gap:.6rem;margin-left:auto}
+.pub-bandeau button,.pub-reglages button{font:inherit;font-size:.85rem;font-weight:600;
+  cursor:pointer;padding:.55rem 1.2rem;border-radius:999px;
+  border:1px solid var(--line);background:transparent;color:var(--ink)}
+.pub-bandeau button.pub-accord,.pub-reglages button.pub-accord{
+  background:var(--yellow);border-color:var(--yellow);color:#fff}
+.pub-reglages button:disabled{opacity:.45;cursor:default}
+
+.pub-reglages{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;
+  margin-top:1rem;padding:1rem 1.2rem;border-radius:16px;
+  border:1px solid var(--line);background:#FBFAF8}
+.pub-reglages p{flex:1 1 16rem;font-size:.9rem;color:var(--ink-soft)}
+
+@media (max-width:560px){
+  .pub-bandeau{bottom:calc(.6rem + env(safe-area-inset-bottom));padding:.9rem 1rem}
+  .pub-bandeau-boutons,.pub-reglages-boutons{width:100%;margin-left:0}
+  .pub-bandeau-boutons button,.pub-reglages-boutons button{flex:1}
+}

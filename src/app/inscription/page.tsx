@@ -13,6 +13,26 @@ export const metadata = {
     "Rejoignez Palab pour écrire aux femmes dont chaque profil est vérifié par notre équipe.",
 };
 
+/**
+ * Ramène une destination à une adresse du site.
+ *
+ * `suivant` voyage dans l'adresse et dans un champ caché : il est donc écrit
+ * par le visiteur, et rien n'empêcherait d'y glisser un autre domaine. Une
+ * inscription qui finit ailleurs que sur Palab, c'est la page de connexion
+ * d'un imitateur à un clic du mot de passe qu'on vient de choisir.
+ */
+function interne(destination: string) {
+  return destination.startsWith("/") && !destination.startsWith("//")
+    ? destination
+    : "/membre";
+}
+
+/** Marque l'arrivée d'un nouveau compte, lue par le pixel côté navigateur. */
+function avecMarqueInscription(destination: string) {
+  const separateur = destination.includes("?") ? "&" : "?";
+  return `${destination}${separateur}inscrit=1`;
+}
+
 export default async function Inscription({
   searchParams,
 }: {
@@ -26,7 +46,7 @@ export default async function Inscription({
     const email = String(formData.get("email") ?? "").trim().toLowerCase();
     const motDePasse = String(formData.get("motDePasse") ?? "");
     const prenom = String(formData.get("prenom") ?? "").trim();
-    const destination = String(formData.get("suivant") ?? "/membre");
+    const destination = interne(String(formData.get("suivant") ?? "/membre"));
 
     const echec = (message: string) =>
       redirect(
@@ -69,16 +89,20 @@ export default async function Inscription({
       });
     }
 
-    // Sans session, la confirmation par e-mail est active sur le projet.
+    // Sans session, la confirmation par e-mail est active sur le projet. Le
+    // compte existe quand même : l'inscription compte, elle attend seulement
+    // sa confirmation.
     if (!data.session) {
       redirect(
-        `/connexion?erreur=${encodeURIComponent(
-          "Compte créé. Confirmez votre adresse e-mail, puis connectez-vous.",
-        )}`,
+        avecMarqueInscription(
+          `/connexion?erreur=${encodeURIComponent(
+            "Compte créé. Confirmez votre adresse e-mail, puis connectez-vous.",
+          )}`,
+        ),
       );
     }
 
-    redirect(destination);
+    redirect(avecMarqueInscription(destination));
   }
 
   return (

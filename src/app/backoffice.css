@@ -1321,6 +1321,14 @@
     border-top: 1px solid var(--line);
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  /* Le bandeau de consentement est ancré en bas de l'écran, la barre d'onglets
+     aussi. Sur les pages qui portent la barre, le bandeau se pose au-dessus
+     plutôt que dessus. */
+  body:has(.mb-onglets) .pub-bandeau {
+    bottom: calc(4.6rem + env(safe-area-inset-bottom));
+  }
+
   .mb-onglets a {
     display: flex;
     flex-direction: column;
@@ -1362,7 +1370,10 @@
 @media (max-width: 720px) {
   body.plein-ecran .mb-barre,
   body.plein-ecran .mb-onglets,
-  body.plein-ecran .bo-side {
+  body.plein-ecran .bo-side,
+  /* Une conversation en plein écran, c'est le clavier et le fil : un bandeau
+     posé par-dessus ne se lit pas, il gêne. Il reviendra en sortant. */
+  body.plein-ecran .pub-bandeau {
     display: none;
   }
   /* Rien ne doit défiler derrière le panneau : sans ce verrou, la

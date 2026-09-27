@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 
+import { evenementPerso } from "@/lib/pixel";
+
 import Photo from "./photo";
 
 export type PhotoProfil = {
@@ -294,6 +296,17 @@ function DeverrouillageOverlay({
     async (prev, formData) => (debloquer ? debloquer(prev, formData) : prev),
     null,
   );
+
+  // Comme les cadeaux : des crédits déjà payés qui changent de poche, pas une
+  // vente. Le signal reste précieux — c'est un visiteur prêt à dépenser.
+  useEffect(() => {
+    if (resultat?.ok) {
+      evenementPerso("PhotoDebloquee", {
+        content_ids: [photo.id],
+        credits: photo.coutDeblocage,
+      });
+    }
+  }, [resultat, photo.id, photo.coutDeblocage]);
 
   return (
     <div className="mb-photo-verrou" onClick={(e) => e.stopPropagation()}>

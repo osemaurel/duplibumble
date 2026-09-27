@@ -1,9 +1,10 @@
 "use client";
 
 import { CheckoutEventNames, initializePaddle, type Paddle } from "@paddle/paddle-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { prixDuCredit, prixLisible, remise } from "@/lib/credits";
+import { evenementMeta } from "@/lib/pixel";
 import type { PalierCredits } from "@/lib/supabase/types";
 
 /**
@@ -32,6 +33,13 @@ export default function Paliers({
   const [paye, setPaye] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
+  // Le palier choisi, retenu hors du rendu : le retour de Paddle ne dit pas ce
+  // qui a été acheté sous une forme qu'on maîtrise, et la mesure a besoin du
+  // montant. Une référence plutôt qu'un état, car la relire ne doit rien
+  // réafficher.
+  const choisi = useRef<PalierCredits | null>(null);
+  const compte = useRef(false);
+
   const jeton = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
 
   useEffect(() => {
@@ -49,6 +57,23 @@ export default function Paliers({
           setPaye(true);
           setErreur(null);
           setEnAttente(null);
+
+          // Mesure publicitaire seulement : les crédits, eux, sont accordés
+          // par la notification signée reçue côté serveur. Paddle peut
+          // annoncer la fin du tunnel plus d'une fois — d'où le verrou, sinon
+          // la campagne compterait deux ventes pour un seul paiement.
+          const palier = choisi.current;
+          if (palier && !compte.current) {
+            compte.current = true;
+            evenementMeta("Purchase", {
+              value: palier.prix_cents / 100,
+              currency: palier.devise,
+              content_name: palier.libelle,
+              content_ids: [palier.code],
+              content_type: "product",
+              num_items: 1,
+            });
+          }
           return;
         }
 
@@ -90,6 +115,17 @@ export default function Paliers({
     if (!paddle || !palier.paddle_price_id) return;
     setEnAttente(palier.code);
     setErreur(null);
+    choisi.current = palier;
+    compte.current = false;
+
+    evenementMeta("InitiateCheckout", {
+      value: palier.prix_cents / 100,
+      currency: palier.devise,
+      content_name: palier.libelle,
+      content_ids: [palier.code],
+      content_type: "product",
+      num_items: 1,
+    });
 
     paddle.Checkout.open({
       items: [{ priceId: palier.paddle_price_id, quantity: 1 }],

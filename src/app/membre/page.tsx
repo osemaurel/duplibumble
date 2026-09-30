@@ -1,22 +1,13 @@
 import Link from "next/link";
 
-import SaisieEnCours from "@/components/backoffice/saisie-en-cours";
-import { Avatar, EtatVide, IconeMessages } from "@/components/backoffice/ui";
+import ListeConversations, {
+  type LigneConversation,
+} from "@/components/backoffice/liste-conversations";
+import { EtatVide, IconeMessages } from "@/components/backoffice/ui";
 import { requireMember } from "@/lib/auth";
 import { photosPubliques } from "@/lib/photos";
+import { apercuDe, ilYA } from "@/lib/temps";
 import { createClient } from "@/lib/supabase/server";
-
-function ilYA(date: string | null) {
-  if (!date) return "—";
-  const minutes = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
-  if (minutes < 1) return "à l'instant";
-  if (minutes < 60) return `il y a ${minutes} min`;
-  const heures = Math.floor(minutes / 60);
-  if (heures < 24) return `il y a ${heures} h`;
-  const jours = Math.floor(heures / 24);
-  if (jours < 7) return `il y a ${jours} j`;
-  return new Date(date).toLocaleDateString("fr-FR");
-}
 
 export default async function MesMessages() {
   await requireMember();
@@ -39,7 +30,7 @@ export default async function MesMessages() {
         }),
     supabase
       .from("messages")
-      .select("conversation_id, body, sender, created_at")
+      .select("conversation_id, body, sender, created_at, attachment_path")
       .order("created_at", { ascending: false })
       .limit(300),
     photosPubliques(supabase, ladyIds),
@@ -47,15 +38,38 @@ export default async function MesMessages() {
 
   const femmeParId = new Map((femmes ?? []).map((f) => [f.id, f]));
 
-  const dernierParConversation = new Map<string, { body: string; sender: string }>();
+  const dernierParConversation = new Map<
+    string,
+    { body: string; sender: string; attachment_path: string | null }
+  >();
   for (const message of derniers ?? []) {
     if (!dernierParConversation.has(message.conversation_id)) {
       dernierParConversation.set(message.conversation_id, {
         body: message.body,
         sender: message.sender,
+        attachment_path: message.attachment_path,
       });
     }
   }
+
+  const lignes: LigneConversation[] = (conversations ?? []).map((conversation) => {
+    const femme = femmeParId.get(conversation.lady_id);
+    const dernier = dernierParConversation.get(conversation.id);
+    const texte = dernier ? apercuDe(dernier) : "";
+
+    return {
+      id: conversation.id,
+      href: `/membre/conversations/${conversation.id}`,
+      avatarNom: femme?.display_name ?? "?",
+      avatarUrl: photos.get(conversation.lady_id)?.[0]?.url,
+      qui: femme?.display_name ?? "—",
+      dernier: dernier ? { texte, deMoi: dernier.sender === "member" } : null,
+      vide: "Conversation ouverte, à vous d'écrire",
+      dateISO: conversation.last_message_at,
+      quandInitial: ilYA(conversation.last_message_at),
+      nonLu: conversation.member_unread,
+    };
+  });
 
   return (
     <div>
@@ -81,42 +95,7 @@ export default async function MesMessages() {
             }
           />
         ) : (
-          <ul className="bo-fil">
-            {conversations.map((conversation) => {
-              const femme = femmeParId.get(conversation.lady_id);
-              const dernier = dernierParConversation.get(conversation.id);
-              const nonLu = conversation.member_unread > 0;
-              const photo = photos.get(conversation.lady_id)?.[0];
-
-              return (
-                <li key={conversation.id}>
-                  <Link
-                    href={`/membre/conversations/${conversation.id}`}
-                    className={nonLu ? "non-lu" : undefined}
-                  >
-                    <Avatar nom={femme?.display_name ?? "?"} url={photo?.url} />
-
-                    <span className="corps">
-                      <span className="ligne1">
-                        <span className="qui">{femme?.display_name ?? "—"}</span>
-                        <SaisieEnCours conversationId={conversation.id} monCote="member" />
-                      </span>
-                      <span className="apercu">
-                        {dernier
-                          ? `${dernier.sender === "member" ? "Vous : " : ""}${dernier.body}`
-                          : "Conversation ouverte, à vous d'écrire"}
-                      </span>
-                    </span>
-
-                    <span className="droite">
-                      <span className="quand">{ilYA(conversation.last_message_at)}</span>
-                      {nonLu && <span className="compte">{conversation.member_unread}</span>}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <ListeConversations lignes={lignes} monCote="member" />
         )}
       </div>
     </div>

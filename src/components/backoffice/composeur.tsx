@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { reduirePourStockage } from "@/lib/image-navigateur";
 import { createClient } from "@/lib/supabase/client";
 
 import { useEchange } from "./echange";
@@ -85,14 +86,19 @@ export default function Composeur({
     setEnvoiPhoto(true);
 
     const supabase = createClient();
-    const extension = image.name.split(".").pop()?.toLowerCase() ?? "jpg";
+
+    // Même réduction que pour les fiches : une photo de conversation n'a pas
+    // besoin d'être plus grande que ce qu'on en affiche.
+    const aEnvoyer = (await reduirePourStockage(image)) ?? image;
+
+    const extension = aEnvoyer.name.split(".").pop()?.toLowerCase() ?? "jpg";
     // Le premier segment identifie la conversation : c'est lui que la
     // politique de stockage compare aux droits de l'expéditeur.
     const destination = `${conversationId}/${Date.now()}.${extension}`;
 
     const { error } = await supabase.storage
       .from("message-attachments")
-      .upload(destination, image, { upsert: false });
+      .upload(destination, aEnvoyer, { upsert: false });
 
     setEnvoiPhoto(false);
 

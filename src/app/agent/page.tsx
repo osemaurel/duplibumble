@@ -1,21 +1,12 @@
 import Link from "next/link";
 
-import SaisieEnCours from "@/components/backoffice/saisie-en-cours";
-import { Avatar, EtatVide, IconeMessages } from "@/components/backoffice/ui";
+import ListeConversations, {
+  type LigneConversation,
+} from "@/components/backoffice/liste-conversations";
+import { EtatVide, IconeMessages } from "@/components/backoffice/ui";
 import { requireAgent } from "@/lib/auth";
+import { apercuDe, ilYA } from "@/lib/temps";
 import { createClient } from "@/lib/supabase/server";
-
-function ilYA(date: string | null) {
-  if (!date) return "—";
-  const minutes = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
-  if (minutes < 1) return "à l'instant";
-  if (minutes < 60) return `il y a ${minutes} min`;
-  const heures = Math.floor(minutes / 60);
-  if (heures < 24) return `il y a ${heures} h`;
-  const jours = Math.floor(heures / 24);
-  if (jours < 7) return `il y a ${jours} j`;
-  return new Date(date).toLocaleDateString("fr-FR");
-}
 
 export default async function BoiteDeReception({
   searchParams,
@@ -49,7 +40,7 @@ export default async function BoiteDeReception({
         }),
     supabase
       .from("messages")
-      .select("conversation_id, body, sender, created_at")
+      .select("conversation_id, body, sender, created_at, attachment_path")
       .order("created_at", { ascending: false })
       .limit(400),
   ]);
@@ -57,12 +48,16 @@ export default async function BoiteDeReception({
   const femmeParId = new Map((femmes ?? []).map((f) => [f.id, f]));
   const membreParId = new Map((membres ?? []).map((m) => [m.id, m]));
 
-  const dernierParConversation = new Map<string, { body: string; sender: string }>();
+  const dernierParConversation = new Map<
+    string,
+    { body: string; sender: string; attachment_path: string | null }
+  >();
   for (const message of derniers ?? []) {
     if (!dernierParConversation.has(message.conversation_id)) {
       dernierParConversation.set(message.conversation_id, {
         body: message.body,
         sender: message.sender,
+        attachment_path: message.attachment_path,
       });
     }
   }
@@ -80,6 +75,29 @@ export default async function BoiteDeReception({
     if (filtreFemme && c.lady_id !== filtreFemme) return false;
     if (filtreNonLu === "1" && c.agent_unread === 0) return false;
     return true;
+  });
+
+  const lignes: LigneConversation[] = conversationsFiltrees.map((conversation) => {
+    const femme = femmeParId.get(conversation.lady_id);
+    const membre = membreParId.get(conversation.member_id);
+    const dernier = dernierParConversation.get(conversation.id);
+    const nomMembre = membre?.display_name ?? "Membre";
+    const texte = dernier ? apercuDe(dernier) : "";
+
+    return {
+      id: conversation.id,
+      href: `/agent/conversations/${conversation.id}`,
+      avatarNom: nomMembre,
+      qui: nomMembre,
+      destinataire: `${femme?.display_name ?? "—"}${femme?.age ? `, ${femme.age}` : ""}`,
+      // Côté agent, « Vous » couvre aussi ce que l'assistant a écrit en son
+      // nom : c'est son mandat qui l'a fait partir, et sa responsabilité.
+      dernier: dernier ? { texte, deMoi: dernier.sender === "lady" } : null,
+      vide: "Pas encore de message",
+      dateISO: conversation.last_message_at,
+      quandInitial: ilYA(conversation.last_message_at),
+      nonLu: conversation.agent_unread,
+    };
   });
 
   return (
@@ -147,48 +165,7 @@ export default async function BoiteDeReception({
             texte="Essayez un autre filtre, ou réinitialisez-le."
           />
         ) : (
-          <ul className="bo-fil">
-            {conversationsFiltrees.map((conversation) => {
-              const femme = femmeParId.get(conversation.lady_id);
-              const membre = membreParId.get(conversation.member_id);
-              const dernier = dernierParConversation.get(conversation.id);
-              const nonLu = conversation.agent_unread > 0;
-              const nomMembre = membre?.display_name ?? "Membre";
-
-              return (
-                <li key={conversation.id}>
-                  <Link
-                    href={`/agent/conversations/${conversation.id}`}
-                    className={nonLu ? "non-lu" : undefined}
-                  >
-                    <Avatar nom={nomMembre} />
-
-                    <span className="corps">
-                      <span className="ligne1">
-                        <span className="qui">{nomMembre}</span>
-                        <span className="vers">écrit à</span>
-                        <span className="elle">
-                          {femme?.display_name ?? "—"}
-                          {femme?.age ? `, ${femme.age}` : ""}
-                        </span>
-                        <SaisieEnCours conversationId={conversation.id} monCote="lady" />
-                      </span>
-                      <span className="apercu">
-                        {dernier
-                          ? `${dernier.sender === "lady" ? "Vous : " : ""}${dernier.body}`
-                          : "Pas encore de message"}
-                      </span>
-                    </span>
-
-                    <span className="droite">
-                      <span className="quand">{ilYA(conversation.last_message_at)}</span>
-                      {nonLu && <span className="compte">{conversation.agent_unread}</span>}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <ListeConversations lignes={lignes} monCote="lady" />
         )}
       </div>
     </div>

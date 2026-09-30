@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { reduirePourStockage } from "@/lib/image-navigateur";
 import { createClient } from "@/lib/supabase/client";
 
 const TAILLE_MAX = 10 * 1024 * 1024;
@@ -48,14 +49,20 @@ export default function TeleverserPhotos({
         continue;
       }
 
+      // Réduite avant de partir : le site n'affiche jamais plus de 1280 px,
+      // et on stockait des originaux de plusieurs mégaoctets. Si le navigateur
+      // ne sait pas décoder le format — un HEIC sous Chrome, par exemple — on
+      // garde l'original plutôt que de refuser la photo.
+      const aEnvoyer = (await reduirePourStockage(fichier)) ?? fichier;
+
       // Le premier segment du chemin est l'identifiant de la femme : c'est lui
       // que la politique de stockage compare au mandat de l'agent.
-      const extension = fichier.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const extension = aEnvoyer.name.split(".").pop()?.toLowerCase() ?? "jpg";
       const chemin = `${ladyId}/${Date.now()}-${position}.${extension}`;
 
       const { error: erreurEnvoi } = await supabase.storage
         .from("lady-photos")
-        .upload(chemin, fichier, { upsert: false });
+        .upload(chemin, aEnvoyer, { upsert: false });
 
       if (erreurEnvoi) {
         refuses.push(`${fichier.name} : ${erreurEnvoi.message}`);

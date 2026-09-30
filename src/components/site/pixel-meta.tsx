@@ -5,7 +5,12 @@ import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
-import { PIXEL, enregistrerConsentement, evenementMeta } from "@/lib/pixel";
+import {
+  PIXEL,
+  type Consentement,
+  enregistrerConsentement,
+  evenementMeta,
+} from "@/lib/pixel";
 
 import { useConsentement } from "./consentement";
 
@@ -59,7 +64,7 @@ fbq('init', '${PIXEL}');`}
           toutes les pages seraient rendues à la demande à chaque visite, et la
           page d'accueil cesserait d'être servie depuis le cache. */}
       <Suspense fallback={null}>
-        <Parcours actif={actif} />
+        <Parcours choix={choix} />
       </Suspense>
 
       {choix === null && <Bandeau />}
@@ -68,9 +73,10 @@ fbq('init', '${PIXEL}');`}
 }
 
 /** Ce que l'adresse suffit à raconter : vues, fiches, recherches, inscription. */
-function Parcours({ actif }: { actif: boolean }) {
+function Parcours({ choix }: { choix: Consentement | null | undefined }) {
   const chemin = usePathname();
   const parametres = useSearchParams();
+  const actif = choix === "oui";
 
   // `useSearchParams` rend un nouvel objet à chaque rendu : la dépendance
   // porte sur le texte de la requête, sinon l'effet se rejouerait sans cesse.
@@ -105,17 +111,22 @@ function Parcours({ actif }: { actif: boolean }) {
   // ne tourne dans le navigateur à ce moment-là. Elle laisse donc une marque
   // dans l'adresse, lue ici puis effacée — sans quoi un rechargement, ou le
   // lien copié à quelqu'un, recompterait l'inscription.
+  //
+  // La marque attend qu'une réponse ait été donnée au bandeau. C'est le cas
+  // qui compte le plus : quelqu'un qui arrive d'une publicité, s'inscrit sans
+  // avoir répondu, puis accepte. Effacer la marque avant sa réponse perdrait
+  // précisément la conversion qu'on cherche à mesurer.
   useEffect(() => {
-    if (!inscrit) return;
+    if (!inscrit || choix === undefined || choix === null) return;
 
-    if (actif) {
+    if (choix === "oui") {
       evenementMeta("CompleteRegistration", { content_name: "compte membre", status: true });
     }
 
     const url = new URL(window.location.href);
     url.searchParams.delete("inscrit");
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-  }, [actif, inscrit]);
+  }, [choix, inscrit]);
 
   return null;
 }

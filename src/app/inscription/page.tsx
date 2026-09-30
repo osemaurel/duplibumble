@@ -75,6 +75,19 @@ export default async function Inscription({
       );
     }
 
+    // Quand la confirmation par e-mail est active, Supabase ne dit pas qu'une
+    // adresse est déjà prise — il renvoie un utilisateur factice, sans aucune
+    // identité rattachée. C'est délibéré de sa part : répondre « cette adresse
+    // existe » à qui la saisit, c'est répondre à n'importe qui. Mais pour
+    // nous, cela ressemble trait pour trait à une inscription — de quoi
+    // compter une conversion qui n'a pas eu lieu, et tenter d'offrir des
+    // crédits de bienvenue à un compte qui n'existe pas.
+    const dejaPris = Boolean(data.user) && (data.user?.identities?.length ?? 0) === 0;
+
+    if (dejaPris) {
+      echec("Un compte existe déjà avec cette adresse. Connectez-vous.");
+    }
+
     if (data.user) {
       // Les crédits de bienvenue passent par la clé de service : le journal
       // n'est ouvert en écriture à personne, sinon un membre pourrait s'en

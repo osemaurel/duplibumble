@@ -74,20 +74,53 @@ export function oublierCookiesMeta() {
   }
 }
 
+/** Combien de temps un événement patiente si le script n'est pas encore là. */
+const PATIENCE_MS = 150;
+const TENTATIVES = 20;
+
 /**
- * Signale un événement standard (`PageView`, `Purchase`, `Contact`…).
+ * Remet un événement à `fbq`, en patientant si le script n'est pas encore là.
  *
- * Sans pixel chargé — refus, choix pas encore fait, bloqueur de publicité —
- * l'appel ne fait rien. Les appelants n'ont donc aucune condition à écrire :
- * ils décrivent ce qui vient de se produire, et c'est tout.
+ * L'extrait de Meta installe une file d'attente dès qu'il s'exécute : à partir
+ * de cet instant, plus rien ne se perd. Mais il s'exécute après l'hydratation
+ * de la page, et une conversion peut survenir avant — une inscription signalée
+ * à l'arrivée, justement. Sans cette patience, l'événement tomberait dans le
+ * vide sur un téléphone lent, en silence, et rien ne le dirait.
+ *
+ * On ne patiente que si l'accord est donné : sans lui, aucun script ne viendra,
+ * et attendre serait une fuite en avant. C'est aussi ce qui garantit qu'un
+ * événement né avant le consentement n'est pas rattrapé après coup.
+ */
+function remettre(
+  methode: "track" | "trackCustom",
+  nom: string,
+  parametres?: Record<string, unknown>,
+  restant = TENTATIVES,
+) {
+  if (typeof window === "undefined") return;
+
+  if (window.fbq) {
+    window.fbq(methode, nom, parametres);
+    return;
+  }
+
+  if (restant <= 0 || lireConsentement() !== "oui") return;
+
+  window.setTimeout(() => remettre(methode, nom, parametres, restant - 1), PATIENCE_MS);
+}
+
+/**
+ * Signale un événement standard (`PageView`, `CompleteRegistration`…).
+ *
+ * Refus, choix pas encore fait, bloqueur de publicité : l'appel ne fait rien.
+ * Les appelants n'ont donc aucune condition à écrire — ils décrivent ce qui
+ * vient de se produire, et c'est tout.
  */
 export function evenementMeta(nom: string, parametres?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("track", nom, parametres);
+  remettre("track", nom, parametres);
 }
 
 /** Même chose pour un événement propre à Palab, hors de la liste de Meta. */
 export function evenementPerso(nom: string, parametres?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !window.fbq) return;
-  window.fbq("trackCustom", nom, parametres);
+  remettre("trackCustom", nom, parametres);
 }

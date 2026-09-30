@@ -2,8 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 
 import { requireMember } from "@/lib/auth";
+import { repondreMaintenant } from "@/lib/ia";
 import { createClient } from "@/lib/supabase/server";
 
 type Resultat = { ok: true; message: string } | { ok: false; message: string };
@@ -98,6 +100,13 @@ export async function envoyerMessage(
   revalidatePath("/membre");
   revalidatePath("/membre/compte");
 
+  // L'assistant enchaîne, une fois la réponse rendue au navigateur. Attendre
+  // ici retiendrait le message du membre le temps qu'OpenAI rédige — il
+  // verrait sa propre phrase mettre cinq secondes à s'afficher. Attendre
+  // ailleurs, comme avant, c'était laisser la base s'en apercevoir au réveil
+  // suivant, et parfois bien plus tard.
+  after(() => repondreMaintenant(conversationId));
+
   return { ok: true, message: "Message envoyé." };
 }
 
@@ -181,6 +190,10 @@ export async function envoyerCadeau(
 
   revalidatePath(`/membre/conversations/${conversationId}`);
   revalidatePath("/membre");
+
+  // Un cadeau appelle une réaction plus qu'un message ordinaire : le laisser
+  // sans réponse est le pire moment pour un silence.
+  after(() => repondreMaintenant(conversationId));
 
   return { ok: true, message: "Cadeau envoyé." };
 }

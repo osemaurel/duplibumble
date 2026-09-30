@@ -12,6 +12,14 @@ import { createClient } from "@/lib/supabase/server";
 
 import FormulaireMessage from "./formulaire-message";
 
+/**
+ * L'envoi d'un message est posté sur cette adresse, et l'assistant enchaîne
+ * derrière la réponse : la fonction doit rester en vie le temps qu'il rédige.
+ * À la durée par défaut de l'hébergement, elle serait coupée en plein vol et
+ * la réponse ne partirait jamais — sans que rien ne le signale.
+ */
+export const maxDuration = 30;
+
 export default async function Conversation({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requireMember();

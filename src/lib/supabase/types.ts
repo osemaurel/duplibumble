@@ -335,7 +335,21 @@ export type Database = {
         Args: { p_limite?: number };
         Returns: { conversation_id: string; agent_id: string }[];
       };
+      /** Remplacée par `reclamer_conversation_ia` ; conservée le temps d'un déploiement. */
       marquer_tentative_ia: { Args: { p_conversation_id: string }; Returns: undefined };
+      reclamer_conversation_ia: {
+        Args: { p_conversation_id: string; p_verrou_secondes?: number };
+        Returns: boolean;
+      };
+      liberer_conversation_ia: { Args: { p_conversation_id: string }; Returns: undefined };
+      agent_ia_de_la_conversation: {
+        Args: { p_conversation_id: string };
+        Returns: string | null;
+      };
+      diffuser_saisie: {
+        Args: { p_conversation_id: string; p_cote?: string };
+        Returns: undefined;
+      };
       debloquer_photo: { Args: { p_photo_id: string }; Returns: string };
       envoyer_cadeau_membre: {
         Args: { p_conversation_id: string; p_gift_code: string };

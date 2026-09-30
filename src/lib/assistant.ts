@@ -104,8 +104,15 @@ export async function proposerReponse(options: {
   femme: Lady;
   fil: MessageFil[];
   prenomMembre: string;
+  /**
+   * Patience accordée à OpenAI. Le brouillon demandé par un agent peut
+   * attendre — il regarde son écran. Une réponse automatique, non : personne
+   * ne la guette, et le membre, lui, guette la sienne.
+   */
+  delaiMs?: number;
 }): Promise<ResultatAssistant> {
   const { cle, modele, consignes, consignesFil, femme, fil, prenomMembre } = options;
+  const delaiMs = options.delaiMs ?? DELAI_MS;
 
   const contexte = [
     REGLES,
@@ -145,7 +152,7 @@ export async function proposerReponse(options: {
         temperature: 0.8,
         max_tokens: 300,
       }),
-      signal: AbortSignal.timeout(DELAI_MS),
+      signal: AbortSignal.timeout(delaiMs),
       cache: "no-store",
     });
 

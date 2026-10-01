@@ -11,13 +11,11 @@ import Photo from "./photo";
 /** Grille : deux colonnes sur mobile, jusqu'à six sur grand écran. */
 const TAILLES = "(max-width:640px) 47vw, (max-width:1100px) 30vw, 300px";
 
+// Le pays a été retiré des filtres : choisir « Ukraine » dans une liste et
+// voir qui s'affiche revient à publier où chacune habite. C'est précisément ce
+// que la fiche ne dit plus.
 const FILTRES = [
   { id: "age", label: "Âge", options: ["18-25", "26-35", "36-45", "46+"] },
-  {
-    id: "pays",
-    label: "Pays",
-    options: [] as string[],
-  },
 ];
 
 /**
@@ -44,7 +42,7 @@ async function fichesPubliees() {
     const { data: publiees } = await parNouveaute(
       supabase
         .from("ladies")
-        .select("id, display_name, age, display_country, headline"),
+        .select("id, display_name, age, headline"),
     ).limit(12);
 
     const reelles = publiees ?? [];
@@ -61,10 +59,6 @@ async function fichesPubliees() {
 
 export default async function Gallery() {
   const { reelles, photos } = await fichesPubliees();
-
-  const paysDisponibles = [
-    ...new Set(reelles.map((f) => f.display_country).filter(Boolean)),
-  ].sort() as string[];
 
   const cartes = reelles.length
     ? reelles.map((f) => ({
@@ -104,7 +98,7 @@ export default async function Gallery() {
             {FILTRES.map((filtre) => (
               <select key={filtre.id} name={filtre.id} defaultValue="" aria-label={filtre.label}>
                 <option value="">{filtre.label}</option>
-                {(filtre.id === "pays" ? paysDisponibles : filtre.options).map((option) => (
+                {filtre.options.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>

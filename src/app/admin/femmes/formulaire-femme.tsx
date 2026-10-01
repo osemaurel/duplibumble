@@ -84,12 +84,12 @@ export default function FormulaireFemme({ agents }: { agents: Option[] }) {
 
         <div className="bo-grille bo-grille-2">
           <div className="bo-champ">
-            <label htmlFor="display_city">Ville affichée</label>
-            <input id="display_city" name="display_city" placeholder="Abidjan" />
+            <label htmlFor="residence_city">Ville de résidence</label>
+            <input id="residence_city" name="residence_city" placeholder="Abidjan" />
           </div>
           <div className="bo-champ">
-            <label htmlFor="display_country">Pays affiché</label>
-            <input id="display_country" name="display_country" placeholder="Côte d'Ivoire" />
+            <label htmlFor="residence_country">Pays de résidence</label>
+            <input id="residence_country" name="residence_country" placeholder="Côte d'Ivoire" />
           </div>
         </div>
 

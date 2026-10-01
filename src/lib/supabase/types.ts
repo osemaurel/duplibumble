@@ -89,8 +89,6 @@ export type Lady = {
   status: LadyStatus;
   display_name: string;
   age: number | null;
-  display_city: string | null;
-  display_country: string | null;
   languages: Json;
   marital_status: MaritalStatus | null;
   children: string | null;

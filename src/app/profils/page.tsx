@@ -22,21 +22,19 @@ const LIMITE_SANS_COMPTE = 20;
 export default async function Profils({
   searchParams,
 }: {
-  searchParams: Promise<{ pays?: string; age?: string }>;
+  searchParams: Promise<{ age?: string }>;
 }) {
-  const { pays = "", age = "" } = await searchParams;
+  const { age = "" } = await searchParams;
   const supabase = await createClient();
   const session = await getSessionProfile();
 
   // Le RLS ne laisse sortir que les fiches publiées : le filtre de statut est
   // dans la base, pas dans cette requête.
-  let requete = parNouveaute(
+  const requete = parNouveaute(
     supabase
       .from("ladies")
-      .select("id, code, display_name, age, display_country, headline, seeking"),
+      .select("id, code, display_name, age, headline, seeking"),
   );
-
-  if (pays) requete = requete.eq("display_country", pays);
 
   const { data: toutes } = await requete;
 
@@ -66,10 +64,6 @@ export default async function Profils({
     affichees.map((f) => f.id),
   );
 
-  const paysDisponibles = [
-    ...new Set((toutes ?? []).map((f) => f.display_country).filter(Boolean)),
-  ].sort() as string[];
-
   return (
     <>
       <main className="bo-main" style={{ maxWidth: 1400, marginInline: "auto" }}>
@@ -84,18 +78,6 @@ export default async function Profils({
         </div>
 
         <form className="mb-filtres" method="get">
-          <div className="bo-champ">
-            <label htmlFor="pays">Pays</label>
-            <select id="pays" name="pays" defaultValue={pays}>
-              <option value="">Tous les pays</option>
-              {paysDisponibles.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="bo-champ">
             <label htmlFor="age">Âge</label>
             <select id="age" name="age" defaultValue={age}>

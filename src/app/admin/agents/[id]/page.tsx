@@ -16,7 +16,7 @@ export default async function FicheAgent({ params }: { params: Promise<{ id: str
 
   const { data: femmes } = await supabase
     .from("ladies")
-    .select("id, code, display_name, age, display_country, status")
+    .select("id, code, display_name, age, status")
     .eq("agent_id", id)
     .order("code");
 
@@ -108,7 +108,6 @@ export default async function FicheAgent({ params }: { params: Promise<{ id: str
                 <tr>
                   <th>Femme</th>
                   <th>Âge</th>
-                  <th>Pays</th>
                   <th>Statut</th>
                 </tr>
               </thead>
@@ -127,7 +126,6 @@ export default async function FicheAgent({ params }: { params: Promise<{ id: str
                       </div>
                     </td>
                     <td>{femme.age ?? "—"}</td>
-                    <td>{femme.display_country ?? "—"}</td>
                     <td>
                       <PastilleStatut statut={femme.status} />
                     </td>

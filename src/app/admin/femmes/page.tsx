@@ -30,7 +30,7 @@ export default async function Femmes({
 
   let requete = supabase
     .from("ladies")
-    .select("id, code, display_name, age, display_city, display_country, status, agent_id")
+    .select("id, code, display_name, age, status, agent_id")
     .order("created_at", { ascending: false });
 
   if (statut !== "tous") requete = requete.eq("status", statut);
@@ -54,6 +54,16 @@ export default async function Femmes({
       return compte;
     },
     { brouillon: 0, aValider: 0, refusees: 0, suspendues: 0 },
+  );
+
+  // La résidence ne vit plus sur la fiche publique : on la lit dans le dossier
+  // privé, dont le RLS n'ouvre que ce que l'on a le droit de voir.
+  const { data: dossiers } = await supabase
+    .from("lady_private")
+    .select("lady_id, residence_city, residence_country");
+
+  const residence = new Map(
+    (dossiers ?? []).map((d) => [d.lady_id, { ville: d.residence_city, pays: d.residence_country }]),
   );
 
   const agentParId = new Map((agents ?? []).map((a) => [a.id, a]));
@@ -140,8 +150,9 @@ export default async function Femmes({
                       </td>
                       <td>{femme.age ?? "—"}</td>
                       <td>
-                        {[femme.display_city, femme.display_country].filter(Boolean).join(", ") ||
-                          "—"}
+                        {[residence.get(femme.id)?.ville, residence.get(femme.id)?.pays]
+                          .filter(Boolean)
+                          .join(", ") || "—"}
                       </td>
                       <td>
                         {agent ? (

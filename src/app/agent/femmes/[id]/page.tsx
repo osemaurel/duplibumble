@@ -64,7 +64,6 @@ export default async function FicheFemmeAgent({
     !femme.headline && "l'accroche",
     !femme.bio && "la présentation",
     !femme.looking_for && "le texte « ce qu'elle recherche »",
-    !femme.display_country && "le pays",
     (photos ?? []).length < 4 && "au moins quatre photos",
     !prive?.mandate_signed && "le mandat signé (à faire remonter à l'administration)",
   ].filter(Boolean) as string[];

@@ -129,8 +129,9 @@ export async function creerFemme(_prev: Resultat | null, formData: FormData): Pr
   const legalName = String(formData.get("legal_name") ?? "").trim();
   const birthDate = String(formData.get("birth_date") ?? "").trim();
   const agentId = String(formData.get("agent_id") ?? "").trim() || null;
-  const displayCity = String(formData.get("display_city") ?? "").trim() || null;
-  const displayCountry = String(formData.get("display_country") ?? "").trim() || null;
+  // La résidence va au dossier privé, jamais à la fiche publique.
+  const residenceCity = String(formData.get("residence_city") ?? "").trim() || null;
+  const residenceCountry = String(formData.get("residence_country") ?? "").trim() || null;
 
   if (!code || !displayName || !legalName || !birthDate) {
     return {
@@ -147,8 +148,6 @@ export async function creerFemme(_prev: Resultat | null, formData: FormData): Pr
       code,
       display_name: displayName,
       agent_id: agentId,
-      display_city: displayCity,
-      display_country: displayCountry,
       status: "draft",
     })
     .select("id")
@@ -160,7 +159,13 @@ export async function creerFemme(_prev: Resultat | null, formData: FormData): Pr
 
   const { error: erreurPrive } = await supabase
     .from("lady_private")
-    .insert({ lady_id: femme.id, legal_name: legalName, birth_date: birthDate });
+    .insert({
+      lady_id: femme.id,
+      legal_name: legalName,
+      birth_date: birthDate,
+      residence_city: residenceCity,
+      residence_country: residenceCountry,
+    });
 
   if (erreurPrive) {
     await supabase.from("ladies").delete().eq("id", femme.id);
@@ -250,11 +255,14 @@ export async function seDeconnecter() {
   revalidatePath("/", "layout");
 }
 
-/** Champs publics d'une fiche, modifiables par l'administration. */
+/**
+ * Champs publics d'une fiche, modifiables par l'administration.
+ *
+ * Ni ville ni pays : la fiche publique ne dit plus où elle vit. La résidence
+ * réelle vit dans le dossier privé, où elle est à sa place.
+ */
 const CHAMPS_FICHE = [
   "display_name",
-  "display_city",
-  "display_country",
   "profession",
   "education",
   "children",

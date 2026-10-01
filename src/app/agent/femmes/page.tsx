@@ -10,10 +10,21 @@ export default async function MesFiches() {
 
   const { data: femmes } = await supabase
     .from("ladies")
-    .select("id, code, display_name, age, display_city, display_country, status, headline")
+    .select("id, code, display_name, age, status, headline")
     .order("code");
 
   const { data: photos } = await supabase.from("lady_photos").select("lady_id, status");
+
+  // La résidence ne vit plus sur la fiche publique : on la lit dans le dossier
+  // privé, dont le RLS n'ouvre que ce que l'on a le droit de voir.
+  const { data: dossiers } = await supabase
+    .from("lady_private")
+    .select("lady_id, residence_city, residence_country");
+
+  const residence = new Map(
+    (dossiers ?? []).map((d) => [d.lady_id, { ville: d.residence_city, pays: d.residence_country }]),
+  );
+
 
   const photosParFemme = new Map<string, { total: number; validees: number }>();
   for (const photo of photos ?? []) {
@@ -71,7 +82,9 @@ export default async function MesFiches() {
                 </div>
 
                 <p className="lieu">
-                  {[femme.display_city, femme.display_country].filter(Boolean).join(", ") ||
+                  {[residence.get(femme.id)?.ville, residence.get(femme.id)?.pays]
+                    .filter(Boolean)
+                    .join(", ") ||
                     "Localisation à renseigner"}
                 </p>
 

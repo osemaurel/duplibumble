@@ -40,8 +40,6 @@ const COLONNES: Record<string, string> = {
   "date de signature": "mandate_date",
   "consentement publication photos": "photo_consent",
   "prenom affiche": "display_name",
-  "ville affichee": "display_city",
-  "pays affiche": "display_country",
   langues: "languages",
   situation: "marital_status",
   enfants: "children",
@@ -232,8 +230,6 @@ export async function lireDossier(donnees: ArrayBuffer): Promise<LectureDossier>
       publique: {
         code,
         display_name: prenom ?? code,
-        display_city: texte(brut.display_city),
-        display_country: texte(brut.display_country),
         languages: langues,
         marital_status: situation,
         children: texte(brut.children),

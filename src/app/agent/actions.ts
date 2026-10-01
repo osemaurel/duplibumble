@@ -76,11 +76,12 @@ export async function marquerLu(formData: FormData) {
   revalidatePath(`/agent/conversations/${conversationId}`);
 }
 
-/** Champs publics de la fiche. Le reste appartient au dossier interne. */
+/**
+ * Champs publics de la fiche. Le reste appartient au dossier interne — dont
+ * la ville et le pays, qu'une fiche publique ne porte plus.
+ */
 const CHAMPS_PUBLICS = [
   "display_name",
-  "display_city",
-  "display_country",
   "profession",
   "education",
   "children",

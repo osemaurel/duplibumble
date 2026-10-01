@@ -106,8 +106,6 @@ export default function FormulaireFiche({ femme }: { femme: Lady }) {
           obligatoire
         />
         <div className="bo-grille bo-grille-2">
-          <Champ nom="display_city" libelle="Ville" valeur={femme.display_city} />
-          <Champ nom="display_country" libelle="Pays" valeur={femme.display_country} />
         </div>
 
         <div className="bo-champ">

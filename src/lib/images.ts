@@ -80,3 +80,31 @@ export async function flouter(original: ArrayBuffer, largeur: number): Promise<B
     .webp({ quality: 72 })
     .toBuffer();
 }
+
+/**
+ * Réduit un original conservé en stockage.
+ *
+ * Distinct de `redimensionner`, qui prépare un affichage précis et peut être
+ * rejoué à volonté depuis l'original. Ici on remplace l'original lui-même :
+ * ce qui est jeté l'est pour de bon. D'où une taille plus généreuse que la
+ * plus grande qu'on serve, et une qualité plus haute — c'est la source de
+ * toutes les autres.
+ *
+ * `fit: "inside"` borne le plus grand côté, en portrait comme en paysage.
+ * `rotate()` applique l'orientation EXIF avant de réencoder, sans quoi une
+ * photo prise à la verticale ressortirait couchée, définitivement.
+ */
+const COTE_CONSERVE = 1600;
+
+export async function comprimerOriginal(original: ArrayBuffer): Promise<Buffer> {
+  return sharp(Buffer.from(original))
+    .rotate()
+    .resize({
+      width: COTE_CONSERVE,
+      height: COTE_CONSERVE,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({ quality: 82 })
+    .toBuffer();
+}

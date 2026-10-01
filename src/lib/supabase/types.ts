@@ -152,6 +152,8 @@ export type LadyPhoto = {
   is_private: boolean;
   /** Coût du déblocage en crédits. Non nul dès lors que `is_private` l'est. */
   unlock_cost: number | null;
+  /** Passage par la recompression. Nul tant que la photo n'a pas été traitée. */
+  compresse_le: string | null;
   created_at: string;
   updated_at: string;
 };

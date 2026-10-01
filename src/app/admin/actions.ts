@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/auth";
 import { lireDossier } from "@/lib/import-dossier";
+import { comprimerOriginal } from "@/lib/images";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { LadyStatus, PhotoStatus } from "@/lib/supabase/types";
@@ -16,6 +17,13 @@ import type { LadyStatus, PhotoStatus } from "@/lib/supabase/types";
  */
 
 type Resultat = { ok: true; message: string } | { ok: false; message: string };
+
+/**
+ * Photos traitées par appel. Chacune se télécharge, se réencode et repart :
+ * au-delà, la fonction dépasse la durée que l'hébergement lui accorde, et
+ * tout le lot est perdu au lieu d'une partie.
+ */
+const PAR_LOT = 12;
 
 /** Mot de passe provisoire, montré une seule fois à l'administrateur. */
 function motDePasseProvisoire() {
@@ -724,4 +732,106 @@ export async function enregistrerPrixPaddle(
       `${rattaches.length} palier${rattaches.length > 1 ? "s" : ""} en vente.` +
       (vides.length ? ` Non rattaché${vides.length > 1 ? "s" : ""} : ${vides.join(", ")}.` : ""),
   };
+}
+
+/**
+ * Recompresse un lot de photos déjà déposées.
+ *
+ * Les fiches ont été remplies avant que la réduction à l'envoi n'existe :
+ * 538 photos, trois mégaoctets en moyenne, pour un site qui n'en affiche
+ * jamais plus de 1280 pixels de large. Le quota de stockage a cédé, et le
+ * projet a été restreint — connexion impossible pour tout le monde.
+ *
+ * Par lots, et jamais en une fois : six cents téléchargements suivis d'autant
+ * d'envois ne tiennent dans la durée d'aucune fonction. Ce qui est traité est
+ * marqué, si bien qu'un onglet fermé au milieu ne fait rien perdre et qu'un
+ * second passage ne refait rien.
+ */
+export async function compresserPhotos(): Promise<{
+  traitees: number;
+  restantes: number;
+  octetsAvant: number;
+  octetsApres: number;
+  echecs: string[];
+}> {
+  await requireAdmin();
+
+  const admin = createAdminClient();
+
+  const { data: photos } = await admin
+    .from("lady_photos")
+    .select("id, storage_path")
+    .is("compresse_le", null)
+    .order("created_at", { ascending: true })
+    .limit(PAR_LOT);
+
+  let octetsAvant = 0;
+  let octetsApres = 0;
+  let traitees = 0;
+  const echecs: string[] = [];
+
+  for (const photo of photos ?? []) {
+    try {
+      const { data: fichier, error } = await admin.storage
+        .from("lady-photos")
+        .download(photo.storage_path);
+
+      if (error || !fichier) throw new Error(error?.message ?? "téléchargement impossible");
+
+      const avant = await fichier.arrayBuffer();
+      const apres = await comprimerOriginal(avant);
+
+      // Plus lourd qu'avant : l'image était déjà sobre. On la laisse, et on
+      // la marque pour ne pas la reprendre à chaque passage.
+      if (apres.byteLength < avant.byteLength) {
+        const destination = photo.storage_path.replace(/\.[^./]+$/, "") + ".webp";
+
+        const { error: erreurEnvoi } = await admin.storage
+          .from("lady-photos")
+          .upload(destination, apres, {
+            upsert: true,
+            contentType: "image/webp",
+          });
+
+        if (erreurEnvoi) throw new Error(erreurEnvoi.message);
+
+        // La ligne pointe sur le nouveau fichier avant que l'ancien ne parte :
+        // interrompu entre les deux, on garde un orphelin plutôt qu'une fiche
+        // qui désigne un fichier disparu.
+        const { error: erreurLigne } = await admin
+          .from("lady_photos")
+          .update({ storage_path: destination, compresse_le: new Date().toISOString() })
+          .eq("id", photo.id);
+
+        if (erreurLigne) throw new Error(erreurLigne.message);
+
+        if (destination !== photo.storage_path) {
+          await admin.storage.from("lady-photos").remove([photo.storage_path]);
+        }
+
+        octetsApres += apres.byteLength;
+      } else {
+        await admin
+          .from("lady_photos")
+          .update({ compresse_le: new Date().toISOString() })
+          .eq("id", photo.id);
+
+        octetsApres += avant.byteLength;
+      }
+
+      octetsAvant += avant.byteLength;
+      traitees += 1;
+    } catch (erreur) {
+      echecs.push(`${photo.storage_path} : ${(erreur as Error).message}`);
+    }
+  }
+
+  const { count } = await admin
+    .from("lady_photos")
+    .select("*", { count: "exact", head: true })
+    .is("compresse_le", null);
+
+  if (traitees > 0) revalidatePath("/admin/stockage");
+
+  return { traitees, restantes: count ?? 0, octetsAvant, octetsApres, echecs };
 }

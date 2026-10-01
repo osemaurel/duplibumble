@@ -194,7 +194,18 @@ export async function repondreA(
 /** Points de saisie, jusqu'à ce qu'on les arrête. */
 function ouvrirSaisie(admin: Admin, conversationId: string) {
   const battre = () => {
-    void admin.rpc("diffuser_saisie", { p_conversation_id: conversationId, p_cote: "lady" });
+    // `.then()` n'est pas décoratif : le constructeur de requête de Supabase
+    // est paresseux, il n'envoie rien tant que personne ne l'attend. Écrit
+    // `void admin.rpc(...)`, l'appel ne partait pas — mesuré, aucun signal de
+    // saisie n'arrivait jamais, et rien ne le disait puisqu'il n'y avait pas
+    // d'erreur à voir. Les deux branches sont vides à dessein : un signal de
+    // saisie perdu ne doit pas faire échouer la réponse.
+    admin
+      .rpc("diffuser_saisie", { p_conversation_id: conversationId, p_cote: "lady" })
+      .then(
+        () => {},
+        () => {},
+      );
   };
 
   battre();
